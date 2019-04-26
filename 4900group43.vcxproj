@@ -72,7 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Brett\source\repos\4900group43\glew-2.1.0\include;C:\Users\Brett\source\repos\4900group43\freeglut\include;$(IncludePath)</IncludePath>
+    <IncludePath>glew-2.1.0\include;freeglut\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\Bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -80,6 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\Brett\source\repos\4900group43\glew-2.1.0\include;C:\Users\Brett\source\repos\4900group43\freeglut\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)\Bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -97,7 +99,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Users\Brett\source\repos\4900group43\glew-2.1.0\lib\Release\Win32\glew32.lib;C:\Users\Brett\source\repos\4900group43\freeglut\lib\freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew-2.1.0\lib\Release\Win32\glew32.lib;freeglut\lib\freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
