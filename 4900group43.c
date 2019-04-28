@@ -8,9 +8,13 @@
 #define M_PI 3.14159265358979323846
 #define M_COS60 0.5
 #define M_SIN60 0.86602540378443860
+int windowWidth = 800;
+int windowHeight = 600;
 
 void myInit();
 void myDraw();
+void drawTestPiece(double cX, double cY, double cZ, int div, int c);
+void drawStrip(double cX, double* cY, double cZ, double* prevR, double r2, double h, int div, int c);
 
 main(int argc, char *argv[])
 {
@@ -18,7 +22,7 @@ main(int argc, char *argv[])
 	/* Initialize window system */
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize(800, 600);
+	glutInitWindowSize(windowWidth, windowHeight);
 	glutCreateWindow("Hello World");
 
 	/* Initialize graphics */
@@ -39,8 +43,8 @@ void myInit()
 	glLoadIdentity();
     //glOrtho(-15.0, 15.0, -2.0, 10.0, -15.0, 15.0);
     //glFrustum(-15.0, 15.0, -2.0, 10.0, -15.0, 15.0);
-    gluPerspective(90, 0.8 / 0.6, 1, 30);
-    gluLookAt(0.0, 15.0, -7.5, 0.0, 0.0, -2.0, 0.0, 1.0, 0.0);
+    gluPerspective(60, windowWidth / windowHeight, 1, 50);
+    gluLookAt(1.0, 15.0, -15, 0.0, 0.0, -2.0, 0.0, 1.0, 0.0);
 }
 
 void myDraw()
@@ -57,14 +61,23 @@ void myDraw()
     //glVertex3f(0.25, 0.25, 0.0);
     //glVertex3f(0.75, 0.25, 0.0);
     //glEnd();
-    glBegin(GL_POLYGON);
+    int curPieceIndex = 0;
+    double xs[6];
+    double ys[6];
+    double zs[6];
+    int cs[6];
+    cs[0] = 2;
+    cs[1] = 3;
+    cs[2] = 5;
+    cs[3] = 6;
+    cs[4] = 10;
+    cs[5] = 15;
 
-    glEnd();
     int count = 0;
-    int boardRadius = 2;
+    int boardRadius = 5;
     double boardX = 0;
     double boardY = 0;
-    double tileRadius = 0.75;
+    double tileRadius = 1;
     double tileRadMod = 0.95;
     double vX = tileRadius * M_COS60;
     double vY = tileRadius * M_SIN60;
@@ -93,6 +106,12 @@ void myDraw()
                     if (j == 0 && ir2 == 0) {
                         break;
                     }
+                    if (j == hTiles && (i == 0 || i == boardRadius)) {
+                        xs[curPieceIndex] = boardX + modX * tileX;
+                        ys[curPieceIndex] = 0;
+                        zs[curPieceIndex] = boardY + modY * tileY;
+                        curPieceIndex++;
+                    }
                 }
                 if (i == 0) {
                     break;
@@ -101,8 +120,47 @@ void myDraw()
         }
     }
 
+    for (int i = 0; i < 6; i++) {
+        drawTestPiece(xs[i], ys[i], zs[i], 12, cs[i]);
+    }
 	/* Execute draw commands */
 	glFlush();
+}
+
+void drawTestPiece(double cX, double cY, double cZ, int div, int c) {
+    double prevR = 0.75;
+    drawStrip(cX, &cY, cZ, &prevR, 0.50, 0.25, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.25, 0.15, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.25, 0.25, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.40, 0.0, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.40, 0.05, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.30, 0.0, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.20, 0.05, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.25, 0.05, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.30, 0.075, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.35, 0.1, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.40, 0.15, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.45, 0.2, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.50, 0.25, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.30, 0.0, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.30, 0.10, div, c);
+    drawStrip(cX, &cY, cZ, &prevR, 0.00, 0.0, div, c);
+}
+
+void drawStrip(double cX, double* cY, double cZ, double* prevR, double r2, double h, int div, int c) {
+
+    double r1 = *prevR;
+    double i = 0.25 + (1 + (r1-r2)/sqrt((r2-r1)*(r2-r1) + h*h))/3;
+    glColor3f(c%2==0?i:0, c%3==0?i:0, c%5==0?i:0);
+    glBegin(GL_TRIANGLE_STRIP);
+    for (int d = 0; d <= div; d++) {
+        glVertex3f(cX + r1 * cos(2 * M_PI * d / div), *cY, cZ + r1 * sin(2 * M_PI * d / div));
+        glVertex3f(cX + r2 * cos(2 * M_PI * d / div), *cY + h, cZ + r2 * sin(2 * M_PI * d / div));
+    }
+    //glVertex3f();
+    glEnd();
+    *cY += h;
+    *prevR = r2;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
