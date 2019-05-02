@@ -18,7 +18,7 @@
 //#include <arpa/inet.h>
 
 boolean initWinsockLibrary(WSADATA *wsa);
-boolean createSocket(SOCKET *s);
+boolean createSocket(SOCKET *s, int protocol);
 boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port);
 boolean connectToServer(SOCKET *s, struct sockaddr_in *server);
 boolean sendData(SOCKET *s, char* message);
@@ -30,3 +30,7 @@ boolean listenforConnections(SOCKET *s, int maxConQueue);
 boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client);
 boolean cleanupWSA();
 boolean closeAndCleanup(SOCKET *s);
+void getIPfromSocket(int *family, struct sockaddr_in *sockAddr, char *ip);
+void getPortFromSocket(int *port, struct sockaddr_in *sockAddr);
+boolean getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int family);
+boolean reply(SOCKET *newSocket, char* message);

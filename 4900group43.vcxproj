@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Util.hpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Network.cpp" />
   </ItemGroup>

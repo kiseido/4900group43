@@ -1,14 +1,13 @@
 // main.c : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <Ws2tcpip.h>
+
+
 #include "Network.hpp"
+#include "Util.hpp"
+
 
 //#include <GL/glew.h>
-
-
 
 int main()
 {
@@ -21,7 +20,7 @@ int main()
 	//const char* message = "GET / HTTP/1.1\r\n\r\n";
 
 	initWinsockLibrary(&wsa);
-	createSocket(&s);
+	createSocket(&s, AUTO);
 
 	//Test for getIPFromDomain
 	//char hostName[] = "www.google.ca";
@@ -50,10 +49,10 @@ int main()
 	//const char* addr = "192.168.1.64";
 	SOCKET newSocket;
 	struct sockaddr_in client;
-	const char* addr = "127.0.0.1";
+	const char* addr = LOCAL_HOST;
 
-	int family = AF_INET;
-	int port = htons(8888);
+	int family = IPv4;
+	int port = 8888;
 
 	setupServer(&server, addr, family, port);
 
@@ -63,6 +62,14 @@ int main()
 
 	acceptConnection(&s, &newSocket, &client);
 
+	char message[50] = "Hello Client! I have received your connection";
+	reply(&newSocket, message);
+
+	char ip[INET_ADDRSTRLEN];
+	int resPort;
+
+	//getSockAddrInfo(ip, &resPort, &client, family);
+	
 	closeAndCleanup(&s);
 
 	//Prevents console from closing

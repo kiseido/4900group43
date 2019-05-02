@@ -21,10 +21,13 @@
     <ClCompile Include="Network.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Util.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,8 +3,10 @@
 */
 
 #include "Network.hpp"
-
+#include "Util.hpp"
 #pragma comment(lib, "ws2_32.lib")//Winsock library
+
+
 
 
 //Initialize Winsock
@@ -32,8 +34,6 @@ boolean bindSocket(struct sockaddr_in *server, SOCKET *s) {
 
 	puts("\nBind done!");
 
-	listen(*s, 3);
-
 	return 0;
 
 }
@@ -52,7 +52,7 @@ boolean listenforConnections(SOCKET *s, int maxConQueue)
 boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client) 
 {
 	int c = sizeof(struct sockaddr_in);
-	puts("\nWaiting for incoming connections...");
+	puts("Waiting for incoming connections...");
 	*newSocket = accept(*s, (struct sockaddr *)client, &c);
 	if (*newSocket == INVALID_SOCKET)
 	{
@@ -89,12 +89,12 @@ boolean setupServer(struct sockaddr_in *server, const char* addr, int family, in
 }
 
 //Create a socket
-boolean createSocket(SOCKET *s) 
+boolean createSocket(SOCKET *s, int protocol) 
 {
 	//Address Family : AF_INET(this is IP version 4)
 	//Type : SOCK_STREAM(this means connection oriented TCP protocol)
 	//Protocol : 0[or IPPROTO_TCP, IPPROTO_UDP]
-	if ((*s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+	if ((*s = socket(IPv4, SOCK_STREAM, AUTO)) == INVALID_SOCKET) {
 		printf("Could not create socket : %d", WSAGetLastError());
 		return 1;
 	}
@@ -229,5 +229,33 @@ boolean getIPFromDomain(char* hostName, PWSTR ip)
 		result = result->ai_next;
 	}
 
+	return 0;
+}
+
+void getIPfromSocket(int *family,struct sockaddr_in *sockAddr, char *ip)
+{
+	inet_ntop(*family, &(sockAddr->sin_addr), ip, INET_ADDRSTRLEN);
+	printf("\nIP: %s", ip);
+}
+
+void getPortFromSocket(int *port, struct sockaddr_in *sockAddr)
+{
+	*port = ntohs(sockAddr->sin_port);
+	printf("\nPort: %d", *port);
+}
+
+boolean getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int family)
+{
+	puts("\nInfo:");
+	getIPfromSocket(&family, sockAddr, ip);
+	getPortFromSocket(port, sockAddr);
+	return 0;
+}
+
+boolean reply(SOCKET *newSocket, char* message) {
+
+	send(*newSocket, message, strlen(message), 0);
+
+	getchar();
 	return 0;
 }
