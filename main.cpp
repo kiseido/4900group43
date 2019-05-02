@@ -8,7 +8,7 @@
 
 //#include <GL/glew.h>
 
-boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port);
+
 
 int main()
 {
@@ -16,20 +16,19 @@ int main()
 	WSADATA wsa;
 	SOCKET s;
 	struct sockaddr_in server;
-	char server_reply[2000];
 
 	//Message to send, this requests the HTML page
-	const char* message = "GET / HTTP/1.1\r\n\r\n";
+	//const char* message = "GET / HTTP/1.1\r\n\r\n";
 
 	initWinsockLibrary(&wsa);
 	createSocket(&s);
 
 	//Test for getIPFromDomain
 	//char hostName[] = "www.google.ca";
-	char hostName[] = "www.digitalprojects.info";
-	WCHAR ip[100];
+	//char hostName[] = "www.digitalprojects.info";
+	//WCHAR ip[100];
 
-	getIPFromDomain(hostName, ip);
+	//getIPFromDomain(hostName, ip);
 
 	//Google address
 	//const char* addr = "172.217.14.195";
@@ -39,26 +38,38 @@ int main()
 	//setupServer(&server, addr, family, port);
 	//connectToServer(&s, &server);
 	//sendData(&s, message);
+	
+	//char server_reply[2000];
 	//receiveReply(&s, server_reply);
 
 	////Display the reply
 	//puts(server_reply);
 
-	closeSocket(&s);
+	//Test BindSocket
+	//Server Info
+	//const char* addr = "192.168.1.64";
+	SOCKET newSocket;
+	struct sockaddr_in client;
+	const char* addr = "127.0.0.1";
+
+	int family = AF_INET;
+	int port = htons(8888);
+
+	setupServer(&server, addr, family, port);
+
+	bindSocket(&server, &s);
+
+	listenforConnections(&s, 3);
+
+	acceptConnection(&s, &newSocket, &client);
+
+	closeAndCleanup(&s);
 
 	//Prevents console from closing
 	getchar();
 }
 
-boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port)
-{
-	//server->sin_addr.s_addr = inet_addr(addr);
-	inet_pton(family, addr, &server->sin_addr.s_addr);
-	server->sin_family = AF_INET;
-	server->sin_port = htons(port);
 
-	return 0;
-}
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu

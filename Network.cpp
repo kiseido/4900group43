@@ -8,7 +8,7 @@
 
 
 //Initialize Winsock
-boolean initWinsockLibrary(WSADATA *wsa) 
+boolean initWinsockLibrary(WSADATA *wsa)
 {
 	printf("\nInitializing Winsock...");
 	if (WSAStartup(MAKEWORD(2, 2), wsa))
@@ -18,6 +18,72 @@ boolean initWinsockLibrary(WSADATA *wsa)
 	}
 
 	printf("\nInitialized.");
+
+	return 0;
+}
+
+boolean bindSocket(struct sockaddr_in *server, SOCKET *s) {
+	//Bind
+	if (bind(*s, (struct sockaddr *)server, sizeof(*server)) == SOCKET_ERROR)
+	{
+		printf("\nBind failed with error code : %d", WSAGetLastError());
+		return 1;
+	}
+
+	puts("\nBind done!");
+
+	listen(*s, 3);
+
+	return 0;
+
+}
+
+boolean listenforConnections(SOCKET *s, int maxConQueue)
+{
+	if (listen(*s, maxConQueue) == SOCKET_ERROR)
+	{
+		printf("\nListen failed with error code: %d", WSAGetLastError());
+		return 1;
+	}
+	return 0;
+
+}
+
+boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client) 
+{
+	int c = sizeof(struct sockaddr_in);
+	puts("\nWaiting for incoming connections...");
+	*newSocket = accept(*s, (struct sockaddr *)client, &c);
+	if (*newSocket == INVALID_SOCKET)
+	{
+		printf("\nAccept failed with error code: %d", WSAGetLastError());
+		return 1;
+	}
+
+	puts("\nConnection accepted");
+
+	return 0;
+}
+
+boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port)
+{
+	//server->sin_addr.s_addr = inet_addr(addr);
+	
+	int result = inet_pton(family, addr, &server->sin_addr.s_addr);
+	if (result == 0)
+	{
+		printf("\nSetup Server Failed. Invalid IPv4 or IPv6 string.");
+		return 1;
+	}
+	else if (result == -1)
+	{
+		printf("\nSetup Server Failed. Error code: %d", WSAGetLastError());
+		return 1;
+	}
+	server->sin_family = family;
+	
+	
+	server->sin_port = htons(port);
 
 	return 0;
 }
@@ -80,9 +146,29 @@ boolean receiveReply(SOCKET *s, char* server_reply)
 }
 
 boolean closeSocket(SOCKET *s) {
-	closesocket(*s);
-	WSACleanup();
+	if (closesocket(*s) == SOCKET_ERROR)
+	{
+		printf("Close Socket Failed. Error code: %d", WSAGetLastError());
+		return 1;
+	}
+}
 
+boolean cleanupWSA()
+{
+	if (WSACleanup() == SOCKET_ERROR)
+	{
+		printf("WSACleanup Failed. Error code: %d", WSAGetLastError());
+		return 1;
+	}
+
+	return 0;
+}
+
+boolean closeAndCleanup(SOCKET *s)
+{
+	if (closeSocket(s) == 1 || cleanupWSA() == 1) {
+		return 1;
+	}
 	return 0;
 }
 
@@ -133,6 +219,9 @@ boolean getIPFromDomain(char* hostName, PWSTR ip)
 			case AF_INET6:
 				ptr = &((struct sockaddr_in6 *) result->ai_addr)->sin6_addr;
 				break;
+			default:
+				printf("Invalid ai_family.");
+				return 1;
 		}
 		InetNtopW(result->ai_family, ptr, ip, 100);
 		printf("\nIPv%d address: %ls (%s)\n", result->ai_family == PF_INET6 ? 6 : 4,
@@ -141,18 +230,4 @@ boolean getIPFromDomain(char* hostName, PWSTR ip)
 	}
 
 	return 0;
-
-	////Cast the h_addr_list to in_addr, since h_addr_list also 
-	////has the ip address in long format only
-	//addr_list = (struct in_addr **) he->h_addr_list;
-
-	//for (int i = 0; addr_list[i] != NULL; i++) 
-	//{
-	//	//Return the first one;
-	//	strcpy_s(ip, sizeof(char) * 100, inet_ntoa(*addr_list[i]));
-	//}
-
-	//printf("%s resolved to : %s\n", hostName, ip);
-	//return 0;
-
 }

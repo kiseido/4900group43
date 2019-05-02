@@ -19,8 +19,14 @@
 
 boolean initWinsockLibrary(WSADATA *wsa);
 boolean createSocket(SOCKET *s);
+boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port);
 boolean connectToServer(SOCKET *s, struct sockaddr_in *server);
 boolean sendData(SOCKET *s, char* message);
 boolean receiveReply(SOCKET *s, char* server_reply);
 boolean closeSocket(SOCKET *s);
 boolean getIPFromDomain(char* hostName, PWSTR ip);
+boolean bindSocket(struct sockaddr_in *server, SOCKET *s);
+boolean listenforConnections(SOCKET *s, int maxConQueue);
+boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client);
+boolean cleanupWSA();
+boolean closeAndCleanup(SOCKET *s);
