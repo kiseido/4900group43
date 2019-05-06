@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Ws2tcpip.h>
+#include <vector>
+#include <thread>
+#include <mutex>
 
 #define IPv4 AF_INET
 #define IPv6 AF_INET6
@@ -8,3 +11,4 @@
 #define TCP IPPROTO_TCP
 #define UDP IPPROTO_UDP
 #define AUTO 0
+#define MAX_BACKLOG SOMAXCONN

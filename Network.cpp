@@ -7,7 +7,7 @@
 #pragma comment(lib, "ws2_32.lib")//Winsock library
 
 
-
+std::mutex recMutex;
 
 //Initialize Winsock
 boolean initWinsockLibrary(WSADATA *wsa)
@@ -51,9 +51,42 @@ boolean listenforConnections(SOCKET *s, int maxConQueue)
 
 boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client) 
 {
-	int c = sizeof(struct sockaddr_in);
 	puts("Waiting for incoming connections...");
-	*newSocket = accept(*s, (struct sockaddr *)client, &c);
+	if (accept(s, newSocket, client) == 1) {
+		return 1;
+	}
+	return 0;
+}
+
+boolean liveServer(SOCKET *s, std::vector<Connection> *connections, std::thread &tServerLoop)
+{
+	puts("Waiting for incoming connections...");
+	tServerLoop = std::thread(serverLoop, s, connections);
+	return 0;
+}
+
+void serverLoop(SOCKET *s, std::vector<Connection> *connections)
+{
+	SOCKET newSocket = NULL;
+	struct sockaddr_in client;
+	while (newSocket != INVALID_SOCKET) {
+		accept(s, &newSocket, &client);
+		char message[] = "Hello Client, I have received your connection.";
+		send(&newSocket, message);
+		Connection con = { &client, &newSocket };
+		connections->push_back(con);
+	}
+
+	if (newSocket == INVALID_SOCKET)
+	{
+		printf("Accept failed with error code: %d", WSAGetLastError());
+	}
+}
+
+boolean accept(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client)
+{
+	int size = sizeof(struct sockaddr_in);
+	*newSocket = accept(*s, (struct sockaddr *)client, &size);
 	if (*newSocket == INVALID_SOCKET)
 	{
 		printf("\nAccept failed with error code: %d", WSAGetLastError());
@@ -117,31 +150,55 @@ boolean connectToServer(SOCKET *s, struct sockaddr_in *server)
 	return 0;
 }
 
-boolean sendData(SOCKET *s, char* message)
+boolean send(SOCKET *s, char* message)
 {
 	if (send(*s, message, strlen(message), 0) < 0)
 	{
-		puts("\nSend Failed");
+		printf("\nSend Failed. Error code: %d", WSAGetLastError());
 		return 1;
 	}
 	puts("Data Sent");
 }
 
-boolean receiveReply(SOCKET *s, char* server_reply)
+boolean receiveMessages(SOCKET *s, std::vector<char*> &receivedMessages, std::thread &tReceiveLoop, int buffSize)
+{
+	tReceiveLoop = std::thread(receiveLoop, s, receivedMessages, buffSize);
+	return 0;
+}
+
+void receiveLoop(SOCKET *s, std::vector<char*> receivedMessages, int buffSize) 
+{
+	int ret = 0;
+	//std::vector<char> vecMessage(buffSize);
+
+	for(int i = 0; ret != 2; i++)
+	{
+		recMutex.lock();
+		receivedMessages.push_back(new char[buffSize]);	
+		recMutex.unlock();
+		ret = receive(s, receivedMessages[i], buffSize);
+	}
+
+}
+
+boolean receive(SOCKET *s, char* receivedMessage, int buffSize)
 {
 	int recv_size;
 
-	if ((recv_size = recv(*s, server_reply, 2000, 0)) == SOCKET_ERROR)
+	if ((recv_size = recv(*s, receivedMessage, buffSize - 1, 0)) == SOCKET_ERROR)
 	{
-		puts("Receive Failed");
+		printf("Receive Failed. Error code %d", WSAGetLastError());
 		return 1;
 	}
 
 	puts("Reply Received");
 	
 	//Add a NULL terminating character to make it a proper string before printing
-	server_reply[recv_size] = '\0';
-
+	receivedMessage[recv_size] = '\0';
+	if (recv_size == 0) 
+	{
+		return 2;
+	}
 	return 0;
 }
 
@@ -252,10 +309,6 @@ boolean getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int f
 	return 0;
 }
 
-boolean reply(SOCKET *newSocket, char* message) {
 
-	send(*newSocket, message, strlen(message), 0);
 
-	getchar();
-	return 0;
-}
+

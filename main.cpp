@@ -1,8 +1,6 @@
 // main.c : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-
-
 #include "Network.hpp"
 #include "Util.hpp"
 
@@ -53,27 +51,42 @@ int main()
 
 	int family = IPv4;
 	int port = 8888;
-
+	std::vector<Connection> connections;
+	std::vector<char*> messages;
 	setupServer(&server, addr, family, port);
-
 	bindSocket(&server, &s);
+	listenforConnections(&s, MAX_BACKLOG);
 
-	listenforConnections(&s, 3);
+	std::thread tServerLoop;
+	std::thread tMessageLoop;
 
-	acceptConnection(&s, &newSocket, &client);
+	liveServer(&s, &connections, tServerLoop);
+	
+	while(true)
+	{
+	if (connections.size() > 0)
+		{
+			receiveMessages(connections[0].socket, messages, tMessageLoop, 2000);
+			break;
+		}
+	}
 
-	char message[50] = "Hello Client! I have received your connection";
-	reply(&newSocket, message);
+	getchar();
+	
+	//acceptConnection(&s, &newSocket, &client);
 
-	char ip[INET_ADDRSTRLEN];
-	int resPort;
+	//char message[50] = "Hello Client! I have received your connection";
+	//reply(&newSocket, message);
+
+	//char ip[INET_ADDRSTRLEN];
+	//int resPort;
 
 	//getSockAddrInfo(ip, &resPort, &client, family);
 	
 	closeAndCleanup(&s);
 
 	//Prevents console from closing
-	getchar();
+	//getchar();
 }
 
 
