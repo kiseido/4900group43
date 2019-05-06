@@ -9,6 +9,29 @@ typedef int32_t EntityID;
 typedef uint8_t ComponentMask;
 
 typedef struct { int x; int y; int z; } Vec3i;
+
+Vec3i operator+(const Vec3i& left, const Vec3i& right) {
+	Vec3i out = { 0,0,0 };
+	out.x = left.x + right.x;
+	out.x = left.y + right.y;
+	out.x = left.z + right.z;
+	return out;
+}
+Vec3i operator*(const Vec3i& left, const Vec3i& right) {
+	Vec3i out = { 0,0,0 };
+	out.x = left.x * right.x;
+	out.x = left.y * right.y;
+	out.x = left.z * right.z;
+	return out;
+}
+Vec3i operator*(const Vec3i& left, const double right) {
+	Vec3i out = { 0,0,0 };
+	out.x = left.x * right;
+	out.x = left.y * right;
+	out.x = left.z * right;
+	return out;
+}
+
 typedef union {
 	int data[4 * 4];
 	struct {
@@ -38,6 +61,7 @@ typedef Vec3i Momentum;
 typedef Vec3i Mass;
 typedef char Visual;
 typedef long double TimeStamp;
+typedef Vec3i CollisionBody;
 
 template <typename ComponentT>
 class ComponentContainer {
@@ -45,17 +69,17 @@ private:
 public:
 	std::vector<ComponentT> Components;
 	std::unordered_map<EntityID,int> EntityMap;
-	ComponentT* getComponent(EntityID&);
-	void setComponent(EntityID&, ComponentT&);
+	ComponentT* getComponent(const EntityID&);
+	void setComponent(const EntityID&, const ComponentT&);
 };
 
 template <typename ComponentT> 
-ComponentT* ComponentContainer<ComponentT>::getComponent(EntityID& id) {
+ComponentT* ComponentContainer<ComponentT>::getComponent(const EntityID& id) {
 	return &(Container.at(id));
 }
 
 template <typename ComponentT>
-void ComponentContainer<ComponentT>::setComponent(EntityID& id, ComponentT& newElement) {
+void ComponentContainer<ComponentT>::setComponent(const EntityID& id, const ComponentT& newElement) {
 	Container.insert_or_assign(id, newElement);
 }
 
@@ -67,6 +91,7 @@ struct WorldState {
 	ComponentContainer<Mass> Masses;
 	ComponentContainer<Visual> Visuals;
 	ComponentContainer<ComponentMask> Entities;
+	ComponentContainer<CollisionBody> CollisionBodies;
 	TimeStamp WorldTime;
 };
 
@@ -77,6 +102,7 @@ class Entity {
 	Momentum* rotationalMomentum;
 	Mass* mass;
 	Visual* visual;
+	CollisionBody* collisionBody;
 	ComponentMask componentMask;
 	EntityID id;
 };
@@ -100,44 +126,63 @@ class System {
 };
 
 class Physics : System {
-	std::vector<Vec3i> temp;
-	void Run(const WorldState& lastState, WorldState& newState) {
+	static const int PerPass = 100;
+	void ProcessMomentums(const WorldState& lastState, WorldState& newState) {
 		newState.Momentums = lastState.Momentums;
+	}
+	void ProcessPositions(const WorldState& lastState, WorldState& newState) {
+		double delta = newState.WorldTime - lastState.WorldTime;
 
-		temp.resize(newState.Positions.Components.size());
-		for (int i = temp.size() - 1; i >= 0; ++i) {
-			Momentum* p = newState.Momentums.getComponent(i);
-			if (p == nullptr) {
-				temp[i] = {0,0,0};
-			}
-			else {
-				temp[i] = *p;
-			}
-		}
+		Momentum temp[PerPass];
 
-		const Position* lastPos = &lastState.Positions.Components[0];
+		int length = newState.Positions.Components.size();
+
+		auto posMapIter = newState.Positions.EntityMap.begin();
+
+		Momentum* pTemp;
+
 		Position* newPos = &newState.Positions.Components[0];
+		const Position* oldPos = &lastState.Positions.Components[0];
 
-		for (int count = lastState.Positions.Components.size() - 1; count >= 0; --count) {
+		for (int start = 0; start < length; start += PerPass) {
+			int end = start + PerPass;
+			if (end > length)
+				end = length;
 
+			pTemp = temp;
+
+			for (int i = start; i < end; ++i) {
+				Momentum* p = newState.Momentums.getComponent(posMapIter->first);
+
+				if (p == nullptr) {
+					*pTemp = { 0,0,0 };
+				}
+				else {
+					*pTemp = *p * delta;
+				}
+				++posMapIter;
+				++pTemp;
+			}
+
+			pTemp = temp;
+
+			for (int i = start; i < end; ++i) {
+				*newPos = *pTemp + *oldPos;
+				++newPos;
+				++pTemp;
+				++oldPos;
+			}
 		}
+	}
+	void ProcessRotations(const WorldState& lastState, WorldState& newState) {
 
-		//auto LastMomentumIter = lastState.Momentums.Container.begin();
-		//auto NewMomentumIter = lastState.Momentums.Container.begin();
-		//while (LastMomentumIter != lastState.Momentums.Container.end()) {
-
-		//	_asm {
-
-		//	}
-		//	++LastMomentumIter;
-		//	++NewMomentumIter;
-		//}
-
-		//for (auto MomentumIter = lastState.Momentums.Container.begin(); MomentumIter != lastState.Momentums.Container.end(); ++MomentumIter) {
-		//	auto& momentumPair = *MomentumIter;
-		//	const EntityID& id = momentumPair.first;
-		//	const Momentum& momentum = momentumPair.second;
-		//}
+	}
+public:
+	void Run(const WorldState& lastState, WorldState& newState) {
+		
+		ProcessMomentums(lastState, newState);
+		ProcessPositions(lastState, newState);
+		ProcessRotations(lastState, newState);
 	}
 };
 
