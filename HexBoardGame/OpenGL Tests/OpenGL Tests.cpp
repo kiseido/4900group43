@@ -8,7 +8,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp> // glm::value_ptr
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include "ImportedModel.h"
+#include "Model.h"
 #include "Utils.h"
 using namespace std;
 
@@ -29,34 +29,11 @@ float aspect;
 float test = 0;
 glm::mat4 projMat, camMat, tnetMat;
 
-ImportedModel myModel("hexagon.obj");
+Mesh myModel("hexagon.obj");
 
 float toRadians(float degrees) { return (degrees * 2.0f * 3.14159f) / 360.0f; }
 
 void setupVertices(void) {
-    double sin60 = sin(3.14159265358979323846 / 3);
-    double cos60 = cos(3.14159265358979323846 / 3);
-    double vxh = 0.5;
-    double vx = sin60 / 2;
-    double vy = cos60 / 2;
-    double txr = 0.5 + vx;
-    double txl = 0.5 - vx;
-    double tyu = 0.5 - vy;
-    double tyd = 0.5 + vy;
-    double txinnerhr = 0.5 + vxh * 0.6;
-    double txinnerhl = 0.5 - vxh * 0.6;
-    double txinnerxr = 0.5 + vx * 0.6;
-    double txinnerxl = 0.5 - vx * 0.6;
-    double tyinneru = 0.5 - vy * 0.6;
-    double tyinnerd = 0.5 + vy * 0.6;
-    double txouterhr = 0.5 + vxh * 0.8;
-    double txouterhl = 0.5 - vxh * 0.8;
-    double txouterxr = 0.5 + vx * 0.8;
-    double txouterxl = 0.5 - vx * 0.8;
-    double tyouteru = 0.5 - vy * 0.8;
-    double tyouterd = 0.5 + vy * 0.8;
-    
-
     std::vector<glm::vec3> vert = myModel.getVertices();
     std::vector<glm::vec2> tex = myModel.getTextureCoords();
     std::vector<glm::vec3> norm = myModel.getNormals();
@@ -91,9 +68,11 @@ void setupVertices(void) {
 }
 
 void init(GLFWwindow* window) {
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
     renderingProgram = Utils::createShaderProgram("vertShader.glsl", "fragShader.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.5f;
-    objLocX = 0.0f; objLocY = 0.0f; objLocZ = 0.0f;
+    objLocX = 1.0f; objLocY = 0.0f; objLocZ = 0.0f;
 
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
@@ -109,6 +88,7 @@ void display(GLFWwindow* window, double currentTime) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(renderingProgram);
+    
 
     camLoc = glGetUniformLocation(renderingProgram, "camera_matrix");
     tnetLoc = glGetUniformLocation(renderingProgram, "transform_matrix");
@@ -119,8 +99,8 @@ void display(GLFWwindow* window, double currentTime) {
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
     glUniformMatrix4fv(camLoc, 1, GL_FALSE, glm::value_ptr(camMat));
 
-
-    tnetMat = glm::translate(glm::mat4(1.0f), glm::vec3(objLocX, objLocY - 0.25, objLocZ));
+    tnetMat = glm::mat4(1.0f);
+    tnetMat = glm::translate(tnetMat, glm::vec3(objLocX, objLocY - 0.25, objLocZ));
     tnetMat = glm::rotate(tnetMat, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     tnetMat = glm::rotate(tnetMat, toRadians(135.0f + test), glm::vec3(0.0f, 1.0f, 0.0f));
     tnetMat = glm::rotate(tnetMat, toRadians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));

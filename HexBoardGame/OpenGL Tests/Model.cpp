@@ -1,18 +1,20 @@
 #include <fstream>
 #include <sstream>
 #include <glm\glm.hpp>
-#include "ImportedModel.h"
+#include "Model.h"
 using namespace std;
 
-ImportedModel::ImportedModel() {}
+Model ImportedMeshes::**Models[Meshes::MESH_LIST_SIZE];
 
-ImportedModel::ImportedModel(const char *filePath) {
-    ModelImporter modelImporter = ModelImporter();
-    modelImporter.parseOBJ(filePath);
-    numVertices = modelImporter.getNumVertices();
-    std::vector<float> verts = modelImporter.getVertices();
-    std::vector<float> tcs = modelImporter.getTextureCoordinates();
-    std::vector<float> normals = modelImporter.getNormals();
+Mesh::Mesh() {}
+
+Mesh::Mesh(const char *filePath) {
+    MeshImporter meshImporter = MeshImporter();
+    meshImporter.parseOBJ(filePath);
+    numVertices = meshImporter.getNumVertices();
+    std::vector<float> verts = meshImporter.getVertices();
+    std::vector<float> tcs = meshImporter.getTextureCoordinates();
+    std::vector<float> normals = meshImporter.getNormals();
 
     for (int i = 0; i < numVertices; i++) {
         vertices.push_back(glm::vec3(verts[i * 3], verts[i * 3 + 1], verts[i * 3 + 2]));
@@ -21,16 +23,17 @@ ImportedModel::ImportedModel(const char *filePath) {
     }
 }
 
-int ImportedModel::getNumVertices() { return numVertices; }
-std::vector<glm::vec3> ImportedModel::getVertices() { return vertices; }
-std::vector<glm::vec2> ImportedModel::getTextureCoords() { return texCoords; }
-std::vector<glm::vec3> ImportedModel::getNormals() { return normalVecs; }
+int Mesh::getNumVertices() { return numVertices; }
+std::vector<glm::vec3> Mesh::getVertices() { return vertices; }
+std::vector<glm::vec2> Mesh::getTextureCoords() { return texCoords; }
+std::vector<glm::vec3> Mesh::getNormals() { return normalVecs; }
 
 // ---------------------------------------------------------------
 
-ModelImporter::ModelImporter() {}
+MeshImporter::MeshImporter() {}
 
-void ModelImporter::parseOBJ(const char *filePath) {
+
+void MeshImporter::parseOBJ(const char *filePath) {
     float x, y, z;
     string content;
     ifstream fileStream(filePath, ios::in);
@@ -85,7 +88,7 @@ void ModelImporter::parseOBJ(const char *filePath) {
         }
     }
 }
-int ModelImporter::getNumVertices() { return (triangleVerts.size() / 3); }
-std::vector<float> ModelImporter::getVertices() { return triangleVerts; }
-std::vector<float> ModelImporter::getTextureCoordinates() { return textureCoords; }
-std::vector<float> ModelImporter::getNormals() { return normals; }
+int MeshImporter::getNumVertices() { return (triangleVerts.size() / 3); }
+std::vector<float> MeshImporter::getVertices() { return triangleVerts; }
+std::vector<float> MeshImporter::getTextureCoordinates() { return textureCoords; }
+std::vector<float> MeshImporter::getNormals() { return normals; }
