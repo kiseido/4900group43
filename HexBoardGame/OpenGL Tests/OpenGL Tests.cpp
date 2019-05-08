@@ -8,16 +8,16 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp> // glm::value_ptr
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include "Model.h"
+#include "Graphics.h"
 #include "Utils.h"
 using namespace std;
 
-#define numVAOs 1
-#define numVBOs 3
 
 float cameraX, cameraY, cameraZ;
 float objLocX, objLocY, objLocZ;
 GLuint renderingProgram;
+#define numVAOs 1
+#define numVBOs 3
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
 GLuint shuttleTexture;
@@ -29,42 +29,40 @@ float aspect;
 float test = 0;
 glm::mat4 projMat, camMat, tnetMat;
 
-Mesh myModel("hexagon.obj");
+Mesh* myModel = 0;
 
 float toRadians(float degrees) { return (degrees * 2.0f * 3.14159f) / 360.0f; }
 
 void setupVertices(void) {
-    std::vector<glm::vec3> vert = myModel.getVertices();
-    std::vector<glm::vec2> tex = myModel.getTextureCoords();
-    std::vector<glm::vec3> norm = myModel.getNormals();
-
-    std::vector<float> pvalues;
-    std::vector<float> tvalues;
-    std::vector<float> nvalues;
-
-    for (int i = 0; i < myModel.getNumVertices(); i++) {
-        pvalues.push_back((vert[i]).x);
-        pvalues.push_back((vert[i]).y);
-        pvalues.push_back((vert[i]).z);
-        tvalues.push_back((tex[i]).s);
-        tvalues.push_back((tex[i]).t);
-        nvalues.push_back((norm[i]).x);
-        nvalues.push_back((norm[i]).y);
-        nvalues.push_back((norm[i]).z);
-    }
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[0]);
     glGenBuffers(numVBOs, vbo);
 
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, pvalues.size() * 4, &pvalues[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glBufferData(GL_ARRAY_BUFFER, tvalues.size() * 4, &tvalues[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, shuttleTexture);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, myModel->pvalues.size() * 4, &myModel->pvalues[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, myModel->tvalues.size() * 4, &myModel->tvalues[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
-    glBufferData(GL_ARRAY_BUFFER, nvalues.size() * 4, &nvalues[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, myModel->nvalues.size() * 4, &myModel->nvalues[0], GL_STATIC_DRAW);
 }
 
 void init(GLFWwindow* window) {
@@ -72,12 +70,13 @@ void init(GLFWwindow* window) {
     //glCullFace(GL_BACK);
     renderingProgram = Utils::createShaderProgram("vertShader.glsl", "fragShader.glsl");
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.5f;
-    objLocX = 1.0f; objLocY = 0.0f; objLocZ = 0.0f;
+    objLocX = 0.0f; objLocY = 0.0f; objLocZ = 0.0f;
 
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
 
+    myModel = Resources::GetMesh(HexagonTileMesh);
     setupVertices();
     shuttleTexture = Utils::loadTexture("checker.jpg");
 }
@@ -108,20 +107,7 @@ void display(GLFWwindow* window, double currentTime) {
 
     glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnetMat));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(1);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, shuttleTexture);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDrawArrays(GL_TRIANGLES, 0, myModel.getNumVertices());
+    glDrawArrays(GL_TRIANGLES, 0, myModel->numVertices);
 
     //dafuq drawing a second one static
 
@@ -131,7 +117,7 @@ void display(GLFWwindow* window, double currentTime) {
     tnetMat = glm::rotate(tnetMat, toRadians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnetMat));
-    glDrawArrays(GL_TRIANGLES, 0, myModel.getNumVertices());
+    glDrawArrays(GL_TRIANGLES, 0, myModel->numVertices);
 }
 
 void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
