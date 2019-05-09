@@ -3,22 +3,34 @@
 
 #include "Network.hpp"
 #include "Util.hpp"
+#include "WSASession.hpp"
 
 
 //#include <GL/glew.h>
 
 int main()
 {
-	printf_s("Hello");
-	WSADATA wsa;
-	SOCKET s;
-	struct sockaddr_in server;
+	try {
+		WSASession();
+	} catch(WSAException e) { 
+		puts(e.what());
+	}
 
-	//Message to send, this requests the HTML page
-	//const char* message = "GET / HTTP/1.1\r\n\r\n";
 
-	initWinsockLibrary(&wsa);
-	createSocket(&s, AUTO);
+
+	//{
+		//printf_s("Hello");
+		//WSADATA wsa;
+		//SOCKET s;
+		//struct sockaddr_in server;
+		//int protocol = UDP;
+		////Message to send, this requests the HTML page
+		////const char* message = "GET / HTTP/1.1\r\n\r\n";
+
+		//initWinsockLibrary(&wsa);
+		//createSocket(&s, UDP);
+	//}
+
 
 	//Test for getIPFromDomain
 	//char hostName[] = "www.google.ca";
@@ -45,33 +57,37 @@ int main()
 	//Test BindSocket
 	//Server Info
 	//const char* addr = "192.168.1.64";
-	SOCKET newSocket;
-	struct sockaddr_in client;
-	const char* addr = LOCAL_HOST;
-
-	int family = IPv4;
-	int port = 8888;
-	std::vector<Connection> connections;
-	std::vector<char*> messages;
-	setupServer(&server, addr, family, port);
-	bindSocket(&server, &s);
-	listenforConnections(&s, MAX_BACKLOG);
-
-	std::thread tServerLoop;
-	std::thread tMessageLoop;
-
-	liveServer(&s, &connections, tServerLoop);
 	
-	while(true)
-	{
-	if (connections.size() > 0)
-		{
-			receiveMessages(connections[0].socket, messages, tMessageLoop, 2000);
-			break;
-		}
-	}
+	//{
+	//	SOCKET newSocket;
+	//	struct sockaddr_in client;
+	//	const char* addr = LOCAL_HOST;
 
-	getchar();
+	//	int family = IPv4;
+	//	int port = 8888;
+	//	std::vector<Connection> connections;
+	//	std::vector<char*> messages;
+	//	setupServer(&server, addr, family, port);
+	//	bindSocket(&server, &s);
+	//	listenforConnections(&s, MAX_BACKLOG);
+
+	//	std::thread tServerLoop;
+	//	std::thread tMessageLoop;
+
+	//	liveServer(&s, &connections, tServerLoop);
+
+	//	while (true)
+	//	{
+	//		if (connections.size() > 0)
+	//		{
+	//			receiveMessages(connections[0].socket, messages, tMessageLoop, 2000);
+	//			break;
+	//		}
+	//	}
+
+	//	getchar();
+	//}
+	
 	
 	//acceptConnection(&s, &newSocket, &client);
 
@@ -83,7 +99,7 @@ int main()
 
 	//getSockAddrInfo(ip, &resPort, &client, family);
 	
-	closeAndCleanup(&s);
+	//closeAndCleanup(&s);
 
 	//Prevents console from closing
 	//getchar();

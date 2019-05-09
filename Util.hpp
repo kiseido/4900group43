@@ -4,6 +4,8 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "Exceptions.hpp"
+#include <queue>
 
 #define IPv4 AF_INET
 #define IPv6 AF_INET6

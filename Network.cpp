@@ -6,23 +6,20 @@
 #include "Util.hpp"
 #pragma comment(lib, "ws2_32.lib")//Winsock library
 
-
 std::mutex recMutex;
 
 //Initialize Winsock
-boolean initWinsockLibrary(WSADATA *wsa)
-{
-	printf("\nInitializing Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), wsa))
-	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
-		return 1;
-	}
-
-	printf("\nInitialized.");
-
-	return 0;
-}
+//boolean initWinsockLibrary(WSADATA *wsa)
+//{
+//	printf("\nInitializing Winsock...");
+//	if (WSAStartup(MAKEWORD(2, 2), wsa))
+//	{
+//		printf("Failed. Error Code : %d", WSAGetLastError());
+//		return 1;
+//	}
+//	printf("\nInitialized.");
+//	return 0;
+//}
 
 boolean bindSocket(struct sockaddr_in *server, SOCKET *s) {
 	//Bind
@@ -51,7 +48,7 @@ boolean listenforConnections(SOCKET *s, int maxConQueue)
 
 boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client) 
 {
-	puts("Waiting for incoming connections...");
+	puts("\nWaiting for incoming connections...");
 	if (accept(s, newSocket, client) == 1) {
 		return 1;
 	}
@@ -122,19 +119,21 @@ boolean setupServer(struct sockaddr_in *server, const char* addr, int family, in
 }
 
 //Create a socket
-boolean createSocket(SOCKET *s, int protocol) 
-{
-	//Address Family : AF_INET(this is IP version 4)
-	//Type : SOCK_STREAM(this means connection oriented TCP protocol)
-	//Protocol : 0[or IPPROTO_TCP, IPPROTO_UDP]
-	if ((*s = socket(IPv4, SOCK_STREAM, AUTO)) == INVALID_SOCKET) {
-		printf("Could not create socket : %d", WSAGetLastError());
-		return 1;
-	}
-
-	printf("\nSocket created.");
-	return 0;
-}
+//boolean createSocket(SOCKET *s, int protocol) 
+//{
+//	//Address Family : AF_INET(this is IP version 4)
+//	//Type : SOCK_STREAM(this means connection oriented TCP protocol)
+//	//Protocol : AUTO(0)[or IPPROTO_TCP, IPPROTO_UDP]
+//	int type = protocol == TCP ? SOCK_STREAM : SOCK_DGRAM;
+//
+//	if ((*s = socket(IPv4, type, protocol)) == INVALID_SOCKET) {
+//		printf("Could not create socket : %d", WSAGetLastError());
+//		return 1;
+//	}
+//
+//	printf("\nSocket created.");
+//	return 0;
+//}
 
 //Connect to remote server
 boolean connectToServer(SOCKET *s, struct sockaddr_in *server)
@@ -150,15 +149,15 @@ boolean connectToServer(SOCKET *s, struct sockaddr_in *server)
 	return 0;
 }
 
-boolean send(SOCKET *s, char* message)
-{
-	if (send(*s, message, strlen(message), 0) < 0)
-	{
-		printf("\nSend Failed. Error code: %d", WSAGetLastError());
-		return 1;
-	}
-	puts("Data Sent");
-}
+//boolean send(SOCKET *s, char* message)
+//{
+//	if (send(*s, message, strlen(message), 0) < 0)
+//	{
+//		printf("\nSend Failed. Error code: %d", WSAGetLastError());
+//		return 1;
+//	}
+//	puts("Data Sent");
+//}
 
 boolean receiveMessages(SOCKET *s, std::vector<char*> &receivedMessages, std::thread &tReceiveLoop, int buffSize)
 {
@@ -210,24 +209,24 @@ boolean closeSocket(SOCKET *s) {
 	}
 }
 
-boolean cleanupWSA()
-{
-	if (WSACleanup() == SOCKET_ERROR)
-	{
-		printf("WSACleanup Failed. Error code: %d", WSAGetLastError());
-		return 1;
-	}
+//boolean cleanupWSA()
+//{
+//	if (WSACleanup() == SOCKET_ERROR)
+//	{
+//		printf("WSACleanup Failed. Error code: %d", WSAGetLastError());
+//		return 1;
+//	}
+//
+//	return 0;
+//}
 
-	return 0;
-}
-
-boolean closeAndCleanup(SOCKET *s)
-{
-	if (closeSocket(s) == 1 || cleanupWSA() == 1) {
-		return 1;
-	}
-	return 0;
-}
+//boolean closeAndCleanup(SOCKET *s)
+//{
+//	if (closeSocket(s) == 1 || cleanupWSA() == 1) {
+//		return 1;
+//	}
+//	return 0;
+//}
 
 boolean getIPFromDomain(char* hostName, PWSTR ip) 
 {

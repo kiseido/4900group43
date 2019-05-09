@@ -153,12 +153,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TCPSocket.cpp" />
+    <ClCompile Include="UDPSocket.cpp" />
     <ClCompile Include="Util.hpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="WSASession.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Exceptions.hpp" />
     <ClInclude Include="Network.hpp" />
+    <ClInclude Include="TCPSocket.hpp" />
+    <ClInclude Include="UDPSocket.hpp" />
+    <ClInclude Include="WSASession.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

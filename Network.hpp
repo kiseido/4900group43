@@ -24,22 +24,29 @@ struct Connection
 };
 
 
+//WSASession
+//boolean initWinsockLibrary(WSADATA *wsa);
+//boolean cleanupWSA();
 
-boolean initWinsockLibrary(WSADATA *wsa);
-boolean createSocket(SOCKET *s, int protocol);
+//TCP Socket
+//boolean createSocket(SOCKET *s, int protocol);
+
+//UDP Socket
+
+
 boolean setupServer(struct sockaddr_in *server, const char* addr, int family, int port);
 boolean connectToServer(SOCKET *s, struct sockaddr_in *server);
 boolean send(SOCKET *s, char* message);
 boolean receive(SOCKET *s, char* server_reply, int buffSize);
-boolean closeSocket(SOCKET *s);
 boolean getIPFromDomain(char* hostName, PWSTR ip);
 boolean bindSocket(struct sockaddr_in *server, SOCKET *s);
 boolean listenforConnections(SOCKET *s, int maxConQueue);
 boolean acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client);
 boolean accept(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client);
 boolean liveServer(SOCKET *s, std::vector<Connection> *connections, std::thread &tServerLoop);
-boolean cleanupWSA();
-boolean closeAndCleanup(SOCKET *s);
+
+boolean closeSocket(SOCKET *s);
+//boolean closeAndCleanup(SOCKET *s);
 void getIPfromSocket(int *family, struct sockaddr_in *sockAddr, char *ip);
 void getPortFromSocket(int *port, struct sockaddr_in *sockAddr);
 boolean getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int family);
