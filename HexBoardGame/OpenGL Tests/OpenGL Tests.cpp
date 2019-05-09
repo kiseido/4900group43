@@ -10,120 +10,88 @@
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include "Graphics.h"
 #include "Utils.h"
+#include "CompletelyFakeECS.h"
+#include "Renderer.h"
+#include "Transformer.h"
+
 using namespace std;
 
 
-float cameraX, cameraY, cameraZ;
+//float cameraX, cameraY, cameraZ;
 float objLocX, objLocY, objLocZ;
-GLuint renderingProgram;
-#define numVAOs 1
-#define numVBOs 3
-GLuint vao[numVAOs];
-GLuint vbo[numVBOs];
-GLuint shuttleTexture;
+//GLuint renderingProgram;
+//#define oldnumVAOs 1
+//#define oldnumVBOs 3
+//GLuint oldvao[oldnumVAOs];
+//GLuint oldvbo[oldnumVBOs];
+//GLuint shuttleTexture;
 
 // variable allocation for display
-GLuint projLoc, camLoc, tnetLoc;
+//GLuint projLoc, camLoc, tnetLoc;
 int width, height;
 float aspect;
-float test = 0;
-glm::mat4 projMat, camMat, tnetMat;
+float cos60 = glm::cos(Utils::toRadians(60));
+float sin60 = glm::sin(Utils::toRadians(60));
+EntityID lastEntity = 0;
+EntityID player;
 
-Mesh* myModel = 0;
-
-float toRadians(float degrees) { return (degrees * 2.0f * 3.14159f) / 360.0f; }
-
-void setupVertices(void) {
-
-    glGenVertexArrays(1, vao);
-    glBindVertexArray(vao[0]);
-    glGenBuffers(numVBOs, vbo);
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(1);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, shuttleTexture);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glBufferData(GL_ARRAY_BUFFER, myModel->pvalues.size() * 4, &myModel->pvalues[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-    glBufferData(GL_ARRAY_BUFFER, myModel->tvalues.size() * 4, &myModel->tvalues[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
-    glBufferData(GL_ARRAY_BUFFER, myModel->nvalues.size() * 4, &myModel->nvalues[0], GL_STATIC_DRAW);
-}
 
 void init(GLFWwindow* window) {
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    renderingProgram = Utils::createShaderProgram("vertShader.glsl", "fragShader.glsl");
-    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.5f;
     objLocX = 0.0f; objLocY = 0.0f; objLocZ = 0.0f;
 
     glfwGetFramebufferSize(window, &width, &height);
+    Renderer::SetAspectRatio(width, height);
     aspect = (float)width / (float)height;
-    projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+    
+    double testScale = 0.95;
 
-    myModel = Resources::GetMesh(HexagonTileMesh);
-    setupVertices();
-    shuttleTexture = Utils::loadTexture("checker.jpg");
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (((i == 5 || i == 6) && j < 5) || ((i == 4 || i == 5) && (j >= 5 && j < 10)) || ((i == 5 || i == 6) && (j >= 10 && j < 12)) || ((i == 6 || i == 7) && (j >= 12 && j < 15))) {
+                lastEntity = CompletelyFakeECS::CreateEntity(WaterTileModel);
+            }
+            else if (i < 9 || (i < 10 && (j < 5 || j >= 10))) {
+                lastEntity = CompletelyFakeECS::CreateEntity(GrassTileModel);
+            }
+            else if (((i == 15 || i == 17) && (j > 10 && j < 13)) || (i == 16 && (j > 10 && j < 14))){
+                lastEntity = CompletelyFakeECS::CreateEntity(RockTileModel);
+            }
+            else {
+                lastEntity = CompletelyFakeECS::CreateEntity(DesertTileModel);
+            }
+            //Transformer::SetPosition(lastEntity, glm::vec3(-5 * (1+cos60) + i * (1 + cos60) + 1.5 * (j % 2) * cos60, 0, -5 * 0.5 * sin60 + j * 0.5 * sin60));
+            Transformer::SetPosition(lastEntity, glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
+            Transformer::SetScale(lastEntity, glm::vec3(testScale, testScale, testScale));
+        }
+    }
+    player = CompletelyFakeECS::CreateEntity(RockTileModel);
+    Transformer::SetPosition(player, glm::vec3(CompletelyFakeECS::GetTransform(0)->position));
+    Transformer::Translate(player, glm::vec3(0,0.25,0));
+
+
+    Renderer::Setup();
 }
 
 void display(GLFWwindow* window, double currentTime) {
     glClear(GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+    Renderer::UpdateCamera();
 
-    glUseProgram(renderingProgram);
-    
-
-    camLoc = glGetUniformLocation(renderingProgram, "camera_matrix");
-    tnetLoc = glGetUniformLocation(renderingProgram, "transform_matrix");
-    projLoc = glGetUniformLocation(renderingProgram, "projection_matrix");
-
-    camMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
-    glUniformMatrix4fv(camLoc, 1, GL_FALSE, glm::value_ptr(camMat));
-
-    tnetMat = glm::mat4(1.0f);
-    tnetMat = glm::translate(tnetMat, glm::vec3(objLocX, objLocY - 0.25, objLocZ));
-    tnetMat = glm::rotate(tnetMat, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    tnetMat = glm::rotate(tnetMat, toRadians(135.0f + test), glm::vec3(0.0f, 1.0f, 0.0f));
-    tnetMat = glm::rotate(tnetMat, toRadians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    test += 0.25f;
-
-    glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnetMat));
-
-    glDrawArrays(GL_TRIANGLES, 0, myModel->numVertices);
-
-    //dafuq drawing a second one static
-
-    tnetMat = glm::translate(glm::mat4(1.0f), glm::vec3(objLocX, objLocY + 0.25, objLocZ));
-    tnetMat = glm::rotate(tnetMat, 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    tnetMat = glm::rotate(tnetMat, toRadians(135.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    tnetMat = glm::rotate(tnetMat, toRadians(35.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-    glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnetMat));
-    glDrawArrays(GL_TRIANGLES, 0, myModel->numVertices);
+    for (int eid = 0; eid <= lastEntity; eid++) {
+        //Transformer::SetRotation(eid, glm::vec3(Utils::toRadians(10 * (currentTime < 10 ? 0 : (currentTime - 10))), 0, 0));
+        Renderer::RenderEntity(eid);
+    }
+    int curPos = glm::floor(currentTime);
+    Transformer::SetPosition(player, glm::vec3(CompletelyFakeECS::GetTransform(10+curPos*15)->position));
+    Transformer::Translate(player, glm::vec3(0, 0.15, 0));
+    Renderer::RenderEntity(player);
 }
 
 void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
     aspect = (float)newWidth / (float)newHeight;
     glViewport(0, 0, newWidth, newHeight);
-    projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+    Renderer::SetAspectRatio(newWidth, newHeight);
 }
 
 int main(void) {

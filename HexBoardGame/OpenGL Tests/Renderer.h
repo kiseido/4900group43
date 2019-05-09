@@ -4,10 +4,14 @@
 
 namespace Renderer
 {
+    void JustRenderThisForMePlease(Model* model);
     namespace {
-        GLuint curTexture = 0;
-        Mesh* curMesh = nullptr;
-
+        constexpr int numVAOs = 1;
+        constexpr int numVBOs = 3;
+        GLuint vao[numVAOs];
+        GLuint vbo[numVBOs];
+        GLuint curTexture;
+        Mesh* curMesh;
         GLuint renderingProgram;
         float cameraX, cameraY, cameraZ;
         GLuint projLoc, camLoc, tnetLoc;
@@ -16,15 +20,16 @@ namespace Renderer
         glm::mat4 projMat, camMat, tnetMat;
     }
 
-    #define numVAOs 1
-    #define numVBOs 3
-    GLuint vao[numVAOs];
-    GLuint vbo[numVBOs];
+    GLuint wtf();
+    GLuint camLocF();
+    GLuint projLocF();
+    GLuint tnetLocF();
 
-    void SetWindow(GLFWwindow* window);
 
-    void setup();
+    void Setup();
 
+    void SetAspectRatio(int width, int height);
+    void UpdateCamera();
     void RenderEntity(EntityID eid);
 };
 

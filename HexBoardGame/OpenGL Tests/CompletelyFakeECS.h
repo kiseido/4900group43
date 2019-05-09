@@ -18,6 +18,7 @@ namespace CompletelyFakeECS
     EntityID CreateEntity(ModelID m);
 
     Model* GetModel(EntityID eid);
+    Transform* GetTransform(EntityID eid);
 
 };
 

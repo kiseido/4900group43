@@ -13,10 +13,13 @@ EntityID CompletelyFakeECS::CreateEntity(ModelID m) {
 EntityID CompletelyFakeECS::CreateEntity(Transform* t, Model* m) {
     ECS_Transform[nextEntity] = t;
     ECS_Model[nextEntity] = m;
-
     return nextEntity++;
 }
 
 Model* CompletelyFakeECS::GetModel(EntityID eid) {
     return ECS_Model[eid];
+}
+
+Transform* CompletelyFakeECS::GetTransform(EntityID eid) {
+    return ECS_Transform[eid];
 }

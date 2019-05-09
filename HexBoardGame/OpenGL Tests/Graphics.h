@@ -59,6 +59,7 @@ namespace Resources {
     Mesh* GetMesh(MeshID meshId);
     Mesh* LoadMesh(const char* filePath);
     Texture GetTexture(TextureID textureId);
+    Texture LoadTexture(const char* filePath);
     Mesh* MeshList[];
     Texture TextureList[];
     Model* ModelList[];

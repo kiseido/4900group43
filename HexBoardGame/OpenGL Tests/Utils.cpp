@@ -13,6 +13,8 @@ using namespace std;
 
 Utils::Utils() {}
 
+float Utils::toRadians(float degrees) { return (degrees * 2.0f * 3.14159f) / 360.0f; }
+
 string Utils::readShaderFile(const char *filePath) {
     string content;
     ifstream fileStream(filePath, ios::in);

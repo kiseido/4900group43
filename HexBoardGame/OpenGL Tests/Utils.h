@@ -21,6 +21,7 @@ private:
 
 public:
     Utils();
+    static float toRadians(float degrees);
     static bool checkOpenGLError();
     static GLuint createShaderProgram(const char *vp, const char *fp);
     static GLuint createShaderProgram(const char *vp, const char *gp, const char *fp);

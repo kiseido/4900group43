@@ -43,12 +43,28 @@ Texture Resources::GetTexture(TextureID textureId) {
     if (Resources::TextureList[textureId] == 0) {
         switch (textureId) {
         case GrassTexture:
+            Resources::TextureList[textureId] = LoadTexture("grass.jpg");
+            break;
+        case WaterTexture:
+            Resources::TextureList[textureId] = LoadTexture("water.jpg");
+            break;
+        case DesertTexture:
+            Resources::TextureList[textureId] = LoadTexture("desert.jpg");
+            break;
+        case RockTexture:
+            Resources::TextureList[textureId] = LoadTexture("rock.jpg");
             break;
         default:
-            Resources::MeshList[textureId] = 0;
+            Resources::TextureList[textureId] = 0;
         }
     }
     return Resources::TextureList[textureId];
+}
+
+Texture Resources::LoadTexture(const char* filePath) {
+    Texture t;
+    ResourceImporter::TextureImporter::ImportTexture(filePath, t);
+    return t;
 }
 
 Model* Resources::GetModel(ModelID modelId) {
@@ -56,6 +72,15 @@ Model* Resources::GetModel(ModelID modelId) {
         switch (modelId) {
         case GrassTileModel:
             Resources::ModelList[modelId] = new Model(HexagonTileMesh, GrassTexture);
+            break;
+        case WaterTileModel:
+            Resources::ModelList[modelId] = new Model(HexagonTileMesh, WaterTexture);
+            break;
+        case DesertTileModel:
+            Resources::ModelList[modelId] = new Model(HexagonTileMesh, DesertTexture);
+            break;
+        case RockTileModel:
+            Resources::ModelList[modelId] = new Model(HexagonTileMesh, RockTexture);
             break;
         default:
             Resources::ModelList[modelId] = nullptr;
