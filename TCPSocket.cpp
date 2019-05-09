@@ -1,58 +1,50 @@
 #include "TCPSocket.hpp"
 
-/*
-Creates a TCP Socket that defaults to IPv4 address type.
-*/
+
 TCPSocket::TCPSocket() 
 {
 	addrType = IPv4;
+	protocol = TCP;
 	create();
 }
+
 
 TCPSocket::TCPSocket(int addrType) 
 {
-	addrType = addrType;
+	this->addrType = addrType;
+	protocol = TCP;
 	create();
 }
 
+
 TCPSocket::~TCPSocket() {
-	closesocket(*sock);
+	closesocket(sock);
 }
 
-void TCPSocket::create()
-{
-	if ((*sock = socket(addrType, SOCK_STREAM, TCP)) == INVALID_SOCKET) 
-	{
-		const char * error = "Could not create socket : " + 
-			WSAGetLastError();
-		throw TCPException(error);
-		puts(error);
-	}
-	printf("\nSocket created.");
-}
 
-void TCPSocket::sendTo(const char * message) 
+void TCPSocket::sendTo(const char * message, SOCKET *clientSock)
 {
-	if (send(*sock, message, strlen(message), 0) < 0)
+	if (send(*clientSock, message, strlen(message), 0) < 0)
 	{
-		const char * error = "\nSend Failed. Error code : " + 
-			WSAGetLastError();
+		std::string error = "\nSend Failed. Error code : " + 
+			std::to_string(WSAGetLastError());
 		throw TCPException(error);
-		puts(error);
 	}
 	puts("Data Sent");
 }
 
-int TCPSocket::receiveFrom(std::queue<char*> &receivedMessages, const int &buffSize)
+
+int TCPSocket::receiveFrom(SOCKET *otherSocket, const int &buffSize)
 {
 	int recvSize;
 	char * message = new char[buffSize];
-	if ((recvSize = recv(*sock, message, buffSize - 1, 0)) == SOCKET_ERROR)
+	if ((recvSize = recv(*otherSocket, message, buffSize - 1, 0)) == SOCKET_ERROR)
 	{
 		const char * error = "\nReceive Failed. Error code : " + 
 			WSAGetLastError();
-		throw TCPException(error);
 		puts(error);
+		throw TCPException(error);
+
 	}
 	puts("Reply Received");
 
@@ -60,10 +52,6 @@ int TCPSocket::receiveFrom(std::queue<char*> &receivedMessages, const int &buffS
 	message[recvSize] = '\0';
 	
 	receivedMessages.push(message);
-	//if (recvSize == 0)
-	//{
-	//	msgRcvd = false;
-	//	return;
-	//}
-	//msgRcvd = true;
+	
+	return recvSize;
 }

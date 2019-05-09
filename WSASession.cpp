@@ -5,7 +5,7 @@
 WSASession::WSASession()
 {
 	printf("\nInitializing Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), wsaData))
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData))
 	{
 		const char * message = 
 			"\nInitializing winsock failed. Error code: " +

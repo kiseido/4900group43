@@ -5,34 +5,49 @@
 class WSAException : public std::exception
 {
 private:
-	const char * message;
+	std::string message;
 public:
-	WSAException(const char * message):message(message) {}
+	WSAException(std::string message):message(message) {}
 	const char * what() const throw() {
-		return message;
+		const char * error = message.c_str();
+		return error;
+	}
+};
+
+class SocketException : public std::exception 
+{
+private:
+	std::string message;
+public:
+	SocketException(std::string message) :message(message) {}
+	const char * what() const throw() {
+		const char * error = message.c_str();
+		return error;
 	}
 };
 
 class TCPException : public std::exception
 {
 private:
-	const char * message;
+	std::string message;
 public:
-	TCPException(const char * message):message(message){}
+	TCPException(std::string message) :message(message) {}
 	const char * what() const throw()
 	{
-		return message;
+		const char * error = message.c_str();
+		return error;
 	}
 };
 
 class UDPException : public std::exception 
 {
 private:
-	const char * message;
+	std::string message;
 public:
-	UDPException(const char * message): message(message){}
+	UDPException(std::string message): message(message){}
 	const char * what() const throw()
 	{
-		return message;
+		const char * error = message.c_str();
+		return error;
 	}
 };

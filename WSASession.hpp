@@ -7,6 +7,7 @@ class WSASession
 public:
 	WSASession();
 	~WSASession();
+	WSADATA wsaData;
 private:
-	WSADATA *wsaData;
+
 };

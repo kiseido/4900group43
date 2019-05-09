@@ -6,6 +6,8 @@
 #include <mutex>
 #include "Exceptions.hpp"
 #include <queue>
+#include <iostream>
+#include <string>
 
 #define IPv4 AF_INET
 #define IPv6 AF_INET6
