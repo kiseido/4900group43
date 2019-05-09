@@ -6,39 +6,60 @@ class Socket
 private:
 
 protected:
-	void create();
-
 	int addrType, sockType, protocol;
-	
+	sockaddr_in sockAddr;
+	char ip[40];
+	int port;
 	SOCKET sock;
 	std::queue<char*> receivedMessages;
 	std::string error = "";
-public:
 
+	/* Creates a socket using members addrType, sockType & protocol and
+	saves socket descriptor in member sock
+	@throws TCPException or UDPException if fails*/
+	void create();
+
+public:
 	/* Initializes sockaddr_in structure sockAddr using 
 	the ip address & port number 
 	@param sockAddr the structure you want to fill
 	@param addr the ip address
-	@param port the port number*/
+	@param port the port number
+	@throws SocketException if fails*/
 	void setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int port);
 	
 	/* Listens for incoming connections on current bound
 	ip address & port
-	@param maxConQueue specifies the maximum connections*/
+	@param maxConQueue specifies the maximum connections
+	@throws TCPException or UDPException if fails*/
 	void listenforConnections(int maxConQueue);
 	
 	/* Binds socket to port and address associated with 
 	the sockaddr_in structure
 	@param sockAddr the structure containing ip address &
-	port information*/
+	port information
+	@throws TCPException or UDPException if fails*/
 	void bindSock(struct sockaddr_in *sockAddr);
 
-	//virtual void sendTo(SOCKET clientSock, const char * message) = 0;
+	/* Extracts the IP address as a char * from sockAddr & stores it in ip
+	@param sockAddr structure containing socket information
+	@param ip char * that is meant to contain the extracted IP*/
+	void getIPfromSockAddr(struct sockaddr_in *sockAddr, char *ip);
 
-	void getIPfromSocket(struct sockaddr_in *sockAddr, char *ip);
-	void getPortFromSocket(struct sockaddr_in *sockAddr, int *port);
-	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int family);
+	/* Extracts the Port number as an int from sockAddr & stores it in port
+	@param sockAddr structure containing socket information
+	@param port int that is meant to contain the extracted port number*/
+	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
+	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
 	
-	SOCKET acceptConnection(struct sockaddr_in *sockAddr);
+	/* Accepts an incoming connection from a client & saves the socket information
+	in client
+	@param client sockaddr_in structure to contain client info like port & ip address
+	@return new Socket object pointer representing the client socket.
+	@throws TCPException or UDPException if fails*/
+	SOCKET acceptConnection(struct sockaddr_in *client);
+
+
+	//virtual void sendTo(SOCKET clientSock, const char * message) = 0;
 
 };

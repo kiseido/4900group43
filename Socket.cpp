@@ -72,22 +72,22 @@ void Socket::listenforConnections(int maxConQueue)
 	}
 }
 
-void Socket::getIPfromSocket(struct sockaddr_in *sockAddr, char *ip)
+void Socket::getIPfromSockAddr(struct sockaddr_in *sockAddr, char *ip)
 {
 	inet_ntop(addrType, &(sockAddr->sin_addr), ip, INET_ADDRSTRLEN);
 	printf("\nIP: %s", ip);
 }
-void Socket::getPortFromSocket(struct sockaddr_in *sockAddr, int *port)
+void Socket::getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port)
 {
 	*port = ntohs(sockAddr->sin_port);
 	printf("\nPort: %d", *port);
 }
 
-void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr, int family)
+void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)
 {
 	puts("\nInfo:");
-	getIPfromSocket(sockAddr, ip);
-	getPortFromSocket(sockAddr, port);
+	getIPfromSockAddr(sockAddr, ip);
+	getPortFromSockAddr(sockAddr, port);
 }
 
 SOCKET Socket::acceptConnection(struct sockaddr_in *client)
@@ -108,7 +108,9 @@ SOCKET Socket::acceptConnection(struct sockaddr_in *client)
 			throw UDPException(error);
 		}
 	}
-
 	puts("\nConnection accepted");
+	
+
+	
 	return newSocket;
 }

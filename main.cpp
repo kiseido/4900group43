@@ -17,18 +17,24 @@ int main()
 		wsa = new WSASession();
 	} catch(WSAException e) { puts(e.what()); }
 
+	//TCP Test
+	//try {
+	//	TCPSocket tSock(IPv4);
+	//	tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
+	//	tSock.bindSock(&sockAddr);
+	//	tSock.listenforConnections(2);
+	//	SOCKET clientSock = tSock.acceptConnection(&sockAddr);
+	//	Connection clientCon = { &sockAddr, &clientSock };
+	//	tSock.sendTo("Hello new connection", clientCon.sock);
+	//	tSock.receiveFrom(&clientSock, 100);
+	//}
+	//catch (TCPException e) { puts(e.what()); }
+	
+	//UDP Test
 	try {
-		TCPSocket tSock(IPv4);
-		tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
-		tSock.bindSock(&sockAddr);
-		tSock.listenforConnections(2);
-		SOCKET clientSock = tSock.acceptConnection(&sockAddr);
-		tSock.sendTo("Hello new connection", &clientSock);
-		tSock.receiveFrom(&clientSock, 100);
+
 	}
-	catch (TCPException e) { puts(e.what()); }
-	
-	
+	catch (UDPException e) { puts(e.what()); }
 
 	//{
 		//printf_s("Hello");

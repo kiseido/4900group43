@@ -16,8 +16,8 @@ public:
 	the address type.
 	@param addrType the addressType you desire(IPv4 or IPv6);*/
 	TCPSocket(int addrType);
-
-	/*Destructor closes the socket. */
+	
+		/*Destructor closes the socket. */
 	~TCPSocket();
 
 	/*	Sends message to bound address & port.

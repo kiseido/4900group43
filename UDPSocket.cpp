@@ -24,3 +24,13 @@ void UDPSocket::create()
 	}
 	printf("\nSocket created.");
 }
+//void sendTo(SOCKET *clientSock, const char* sendBuff)
+//{
+//	if(sendto(*clientSock, sendBuff, BufLen, 0, (SOCKADDR *)& RecvAddr, sizeof(RecvAddr)) == SOCKET_ERROR);
+//	if (iResult == SOCKET_ERROR) {
+//		wprintf(L"sendto failed with error: %d\n", WSAGetLastError());
+//		closesocket(SendSocket);
+//		WSACleanup();
+//		return 1;
+//}
+

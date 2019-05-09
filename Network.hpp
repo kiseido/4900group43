@@ -19,8 +19,8 @@
 
 struct Connection
 {
-	struct sockaddr_in *client;
-	SOCKET *socket;
+	struct sockaddr_in * addr_in;
+	SOCKET * sock;
 };
 
 

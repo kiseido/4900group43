@@ -5,7 +5,8 @@ TCPSocket::TCPSocket()
 {
 	addrType = IPv4;
 	protocol = TCP;
-	create();
+	sockType = SOCK_STREAM;
+	this->create();
 }
 
 
@@ -13,6 +14,7 @@ TCPSocket::TCPSocket(int addrType)
 {
 	this->addrType = addrType;
 	protocol = TCP;
+	sockType = SOCK_STREAM;
 	create();
 }
 
