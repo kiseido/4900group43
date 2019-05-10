@@ -14,8 +14,8 @@ protected:
 	std::queue<char*> receivedMessages;
 	std::string error = "";
 
-	/* Creates a socket using members addrType, sockType & protocol and
-	saves socket descriptor in member sock
+	/* Creates a socket using class members addrType, sockType
+	& protocol and saves socket descriptor in class member sock
 	@throws TCPException or UDPException if fails*/
 	void create();
 
