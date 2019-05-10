@@ -10,12 +10,13 @@ void Socket::setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int p
 	}
 	else if (result == -1)
 	{
-		error = "\nSetup Server Failed. Error code: " + 
+		error = "\nSetup SockAddr Failed. Error code: " + 
 			std::to_string(WSAGetLastError());
 		throw(SocketException(error));
 	}
 	sockAddr->sin_family = addrType;
 	sockAddr->sin_port = htons(port);
+
 }
 
 void Socket::bindSock(struct sockaddr_in *sockAddr) 
@@ -54,24 +55,6 @@ void Socket::create()
 	printf("\nSocket created.");
 }
 
-void Socket::listenforConnections(int maxConQueue)
-{
-	puts("\nListening...");
-	if (listen(sock, maxConQueue) == SOCKET_ERROR)
-	{
-		error = "\nListen failed with error code : " +
-			std::to_string(WSAGetLastError());
-		if (protocol == TCP)
-		{
-			throw TCPException(error);
-		}
-		else if (protocol == UDP)
-		{
-			throw UDPException(error);
-		}
-	}
-}
-
 void Socket::getIPfromSockAddr(struct sockaddr_in *sockAddr, char *ip)
 {
 	inet_ntop(addrType, &(sockAddr->sin_addr), ip, INET_ADDRSTRLEN);
@@ -90,14 +73,10 @@ void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)
 	getPortFromSockAddr(sockAddr, port);
 }
 
-SOCKET Socket::acceptConnection(struct sockaddr_in *client)
-{
-	puts("\nAccepting incoming connections...");
-	int size = sizeof(struct sockaddr_in);
-	SOCKET newSocket = accept(sock, (struct sockaddr *)client, &size);
-	if (newSocket == INVALID_SOCKET)
+void Socket::closeSocket(SOCKET *s) {
+	if (closesocket(*s) == SOCKET_ERROR)
 	{
-		std::string error = "\nAccept failed with error code: " +
+		error = "Close Socket Failed. Error code : " +
 			std::to_string(WSAGetLastError());
 		if (protocol == TCP)
 		{
@@ -108,9 +87,4 @@ SOCKET Socket::acceptConnection(struct sockaddr_in *client)
 			throw UDPException(error);
 		}
 	}
-	puts("\nConnection accepted");
-	
-
-	
-	return newSocket;
 }

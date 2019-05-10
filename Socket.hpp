@@ -28,12 +28,6 @@ public:
 	@throws SocketException if fails*/
 	void setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int port);
 	
-	/* Listens for incoming connections on current bound
-	ip address & port
-	@param maxConQueue specifies the maximum connections
-	@throws TCPException or UDPException if fails*/
-	void listenforConnections(int maxConQueue);
-	
 	/* Binds socket to port and address associated with 
 	the sockaddr_in structure
 	@param sockAddr the structure containing ip address &
@@ -52,12 +46,9 @@ public:
 	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
 	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
 	
-	/* Accepts an incoming connection from a client & saves the socket information
-	in client
-	@param client sockaddr_in structure to contain client info like port & ip address
-	@return new Socket object pointer representing the client socket.
-	@throws TCPException or UDPException if fails*/
-	SOCKET acceptConnection(struct sockaddr_in *client);
+	/*Closes the socket specified
+	@param s socket descriptor*/
+	void closeSocket(SOCKET *s);
 
 
 	//virtual void sendTo(SOCKET clientSock, const char * message) = 0;

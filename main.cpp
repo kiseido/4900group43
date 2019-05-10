@@ -5,24 +5,27 @@
 #include "Util.hpp"
 #include "WSASession.hpp"
 #include "TCPSocket.hpp"
+#include "UDPSocket.hpp"
 
 //#include <GL/glew.h>
 
 int main()
 {
-	WSASession *wsa;
-	struct sockaddr_in sockAddr;
 	
-	try {
-		wsa = new WSASession();
-	} catch(WSAException e) { puts(e.what()); }
 
-	//TCP Test
+	////TCP Test
+	//WSASession *wsa;
+	//struct sockaddr_in sockAddr;
+
+	//try {
+	//	wsa = new WSASession();
+	//}
+	//catch (WSAException e) { puts(e.what()); }
 	//try {
 	//	TCPSocket tSock(IPv4);
 	//	tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
 	//	tSock.bindSock(&sockAddr);
-	//	tSock.listenforConnections(2);
+	//	tSock.listenForConnections(2);
 	//	SOCKET clientSock = tSock.acceptConnection(&sockAddr);
 	//	Connection clientCon = { &sockAddr, &clientSock };
 	//	tSock.sendTo("Hello new connection", clientCon.sock);
@@ -30,31 +33,50 @@ int main()
 	//}
 	//catch (TCPException e) { puts(e.what()); }
 	
-	//UDP Test
-	try {
 
-	}
-	catch (UDPException e) { puts(e.what()); }
 
-	//{
-		//printf_s("Hello");
-		//WSADATA wsa;
-		//SOCKET s;
-		//struct sockaddr_in server;
-		//int protocol = UDP;
-		////Message to send, this requests the HTML page
-		////const char* message = "GET / HTTP/1.1\r\n\r\n";
+	////UDP Test
+	//WSASession *wsa;
+	//struct sockaddr_in server, sockAddr;
 
-		//initWinsockLibrary(&wsa);
-		//createSocket(&s, UDP);
+	//try {
+	//	wsa = new WSASession();
 	//}
+	//catch (WSAException e) { puts(e.what()); }
+	//try {
+	//	UDPSocket uSock(IPv4);
+	//	uSock.setupSockAddr(&server, LOCAL_HOST, 8888);
+	//	uSock.bindSock(&server);
+	//	
+	//	SOCKET s = uSock.getSocket();
+
+	//	puts("\nWaiting for data");
+	//	while (true)
+	//	{
+	//		char buff[100];
+	//		int buffLen = sizeof(buff);
+	//		
+	//		uSock.receiveFrom(&s, buff, buffLen, &sockAddr);
+
+	//		printf("Received packet from %d\n",
+	//			ntohs(sockAddr.sin_port));
+	//		printf("Data: %s", buff);
+
+	//		puts("Sending Reply");
+
+	//		buffLen = sizeof(buff);
+	//		uSock.sendTo(&s, buff, buffLen, &sockAddr);
+	//	}
+	//	uSock.~UDPSocket();
+	//}
+	//catch (UDPException e) { puts(e.what()); }
+
 
 
 	//Test for getIPFromDomain
 	//char hostName[] = "www.google.ca";
 	//char hostName[] = "www.digitalprojects.info";
 	//WCHAR ip[100];
-
 	//getIPFromDomain(hostName, ip);
 
 	//Google address

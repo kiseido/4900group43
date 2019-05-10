@@ -23,10 +23,43 @@ TCPSocket::~TCPSocket() {
 	closesocket(sock);
 }
 
-
-void TCPSocket::sendTo(const char * message, SOCKET *clientSock)
+void TCPSocket::listenForConnections(int maxConQueue)
 {
-	if (send(*clientSock, message, strlen(message), 0) < 0)
+	puts("\nListening...");
+	if (listen(sock, maxConQueue) == SOCKET_ERROR)
+	{
+		error = "\nListen failed with error code : " +
+			std::to_string(WSAGetLastError());
+		throw TCPException(error);
+	}
+}
+
+SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
+{
+	puts("\nAccepting incoming connections...");
+	int size = sizeof(struct sockaddr_in);
+	SOCKET newSocket = accept(sock, (struct sockaddr *)client, &size);
+	if (newSocket == INVALID_SOCKET)
+	{
+		std::string error = "\nAccept failed with error code: " +
+			std::to_string(WSAGetLastError());
+		if (protocol == TCP)
+		{
+			throw TCPException(error);
+		}
+		else if (protocol == UDP)
+		{
+			throw UDPException(error);
+		}
+	}
+	puts("\nConnection accepted");
+
+	return newSocket;
+}
+
+void TCPSocket::sendTo(const char * message, SOCKET *s)
+{
+	if (send(*s, message, strlen(message), 0) < 0)
 	{
 		std::string error = "\nSend Failed. Error code : " + 
 			std::to_string(WSAGetLastError());
@@ -36,11 +69,11 @@ void TCPSocket::sendTo(const char * message, SOCKET *clientSock)
 }
 
 
-int TCPSocket::receiveFrom(SOCKET *otherSocket, const int &buffSize)
+int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize)
 {
 	int recvSize;
 	char * message = new char[buffSize];
-	if ((recvSize = recv(*otherSocket, message, buffSize - 1, 0)) == SOCKET_ERROR)
+	if ((recvSize = recv(*s, message, buffSize - 1, 0)) == SOCKET_ERROR)
 	{
 		const char * error = "\nReceive Failed. Error code : " + 
 			WSAGetLastError();

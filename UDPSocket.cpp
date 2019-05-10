@@ -3,34 +3,49 @@
 UDPSocket::UDPSocket() 
 {
 	addrType = IPv4;
+	protocol = UDP;
+	sockType = SOCK_DGRAM;
+	create();
 }
 
 UDPSocket::UDPSocket(int addrType) {
 	this->addrType = addrType;
+	protocol = UDP;
+	sockType = SOCK_DGRAM;
+	create();
 }
 
 UDPSocket::~UDPSocket() {
-	closesocket(*sock);
+	closesocket(sock);
 }
 
-void UDPSocket::create()
+void UDPSocket::sendTo(SOCKET *s, const char* sendBuff, int buffLen, 
+	struct sockaddr_in *recvAddr)
 {
-	if ((*sock = socket(addrType, SOCK_DGRAM, UDP)) == INVALID_SOCKET)
+	if (sendto(*s, sendBuff, buffLen, 0,
+		(struct sockaddr *)recvAddr, sizeof(*recvAddr)) == SOCKET_ERROR)
 	{
-		const char * message = "Could not create socket : " +
-			WSAGetLastError();
-		throw TCPException(message);
-		puts(message);
+		std::string error = "\nSend Failed. Error code : " +
+			std::to_string(WSAGetLastError());
+		throw UDPException(error);
 	}
-	printf("\nSocket created.");
 }
-//void sendTo(SOCKET *clientSock, const char* sendBuff)
-//{
-//	if(sendto(*clientSock, sendBuff, BufLen, 0, (SOCKADDR *)& RecvAddr, sizeof(RecvAddr)) == SOCKET_ERROR);
-//	if (iResult == SOCKET_ERROR) {
-//		wprintf(L"sendto failed with error: %d\n", WSAGetLastError());
-//		closesocket(SendSocket);
-//		WSACleanup();
-//		return 1;
-//}
+
+int UDPSocket::receiveFrom(SOCKET *s, char * recvBuff, int buffLen,
+	struct sockaddr_in *srcAddr)
+{
+	memset(recvBuff, '\0', buffLen);
+	int addrLen = sizeof(*srcAddr);
+	int recvLen;
+	if ((recvLen = recvfrom(*s, recvBuff, buffLen, 0, (struct sockaddr *)srcAddr, &addrLen)) == SOCKET_ERROR)
+	{
+		std::string error = "\nReceive Failed. Error code : " +
+			std::to_string(WSAGetLastError());
+		throw UDPException(error);
+	}
+	return recvLen;
+}
+
+
+
 

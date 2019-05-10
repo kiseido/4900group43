@@ -78,20 +78,20 @@ std::mutex recMutex;
 //	}
 //}
 
-boolean Network::acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client)
-{
-	int size = sizeof(struct sockaddr_in);
-	*newSocket = accept(*s, (struct sockaddr *)client, &size);
-	if (*newSocket == INVALID_SOCKET)
-	{
-		printf("\nAccept failed with error code: %d", WSAGetLastError());
-		return 1;
-	}
-
-	puts("\nConnection accepted");
-
-	return 0;
-}
+//boolean Network::acceptConnection(SOCKET *s, SOCKET *newSocket, struct sockaddr_in *client)
+//{
+//	int size = sizeof(struct sockaddr_in);
+//	*newSocket = accept(*s, (struct sockaddr *)client, &size);
+//	if (*newSocket == INVALID_SOCKET)
+//	{
+//		printf("\nAccept failed with error code: %d", WSAGetLastError());
+//		return 1;
+//	}
+//
+//	puts("\nConnection accepted");
+//
+//	return 0;
+//}
 
 //boolean Network::setupSockAddr(struct sockaddr_in *server, const char* addr, int family, int port)
 //{
@@ -199,13 +199,7 @@ boolean Network::connectToServer(SOCKET *s, struct sockaddr_in *server)
 //	return 0;
 //}
 
-boolean Network::closeSocket(SOCKET *s) {
-	if (closesocket(*s) == SOCKET_ERROR)
-	{
-		printf("Close Socket Failed. Error code: %d", WSAGetLastError());
-		return 1;
-	}
-}
+
 
 //boolean cleanupWSA()
 //{
