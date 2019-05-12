@@ -140,7 +140,19 @@ void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
 }
 
+#include "ECS.h"
+
 int main(void) {
+
+	if (true) {
+
+		ECS::World ecsWorld;
+
+		
+
+		return 0;
+	}
+
     if (!glfwInit()) { exit(EXIT_FAILURE); }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);

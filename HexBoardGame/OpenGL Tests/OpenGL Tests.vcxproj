@@ -159,11 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Common.hpp" />
+    <ClInclude Include="ECS.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ECS.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="OpenGL Tests.cpp" />
     <ClCompile Include="Transform.cpp" />
