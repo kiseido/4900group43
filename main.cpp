@@ -1,37 +1,39 @@
 // main.c : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
 #include "Network.hpp"
 #include "Util.hpp"
 #include "WSASession.hpp"
 #include "TCPSocket.hpp"
 #include "UDPSocket.hpp"
-
 //#include <GL/glew.h>
 
 int main()
 {
 	
 
-	////TCP Test
-	//WSASession *wsa;
-	//struct sockaddr_in sockAddr;
+	//TCP Test
+	WSASession *wsa;
+	struct sockaddr_in sockAddr;
 
-	//try {
-	//	wsa = new WSASession();
-	//}
-	//catch (WSAException e) { puts(e.what()); }
-	//try {
-	//	TCPSocket tSock(IPv4);
-	//	tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
-	//	tSock.bindSock(&sockAddr);
-	//	tSock.listenForConnections(2);
-	//	SOCKET clientSock = tSock.acceptConnection(&sockAddr);
-	//	Connection clientCon = { &sockAddr, &clientSock };
-	//	tSock.sendTo("Hello new connection", clientCon.sock);
-	//	tSock.receiveFrom(&clientSock, 100);
-	//}
-	//catch (TCPException e) { puts(e.what()); }
+	try {
+		wsa = new WSASession();
+	}
+	catch (WSAException e) { puts(e.what()); }
+	try {
+		TCPSocket tSock(IPv4);
+		tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
+		tSock.bindSock(&sockAddr);
+		tSock.listenForConnections(2);
+		SOCKET clientSock = tSock.acceptConnection(&sockAddr);
+		Connection clientCon = { &sockAddr, &clientSock };
+		tSock.sendTo("Hello new connection", clientCon.sock);
+		tSock.receiveFrom(&clientSock, 100);
+	}
+	catch (TCPException e) { puts(e.what()); }
 	
 
 
@@ -70,14 +72,17 @@ int main()
 	//	uSock.~UDPSocket();
 	//}
 	//catch (UDPException e) { puts(e.what()); }
+	//WSASession wsa;
+	//TCPSocket tSock;
 
-
-
-	//Test for getIPFromDomain
-	//char hostName[] = "www.google.ca";
+	////Test for getIPFromDomain
+	////char hostName[] = "www.google.ca";
 	//char hostName[] = "www.digitalprojects.info";
-	//WCHAR ip[100];
-	//getIPFromDomain(hostName, ip);
+	//char ip[100];
+	//
+	//tSock.getIPFromDomain(hostName, ip);
+
+	//tSock.getIPFromDomain(hostName, ip);
 
 	//Google address
 	//const char* addr = "172.217.14.195";
@@ -87,7 +92,7 @@ int main()
 	//setupServer(&server, addr, family, port);
 	//connectToServer(&s, &server);
 	//sendData(&s, message);
-	
+	//
 	//char server_reply[2000];
 	//receiveReply(&s, server_reply);
 
@@ -147,13 +152,5 @@ int main()
 
 
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+

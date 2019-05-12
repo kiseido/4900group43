@@ -36,10 +36,10 @@ void TCPSocket::listenForConnections(int maxConQueue)
 
 SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
 {
-	puts("\nAccepting incoming connections...");
+	//puts("\nAccepting incoming connections...");
 	int size = sizeof(struct sockaddr_in);
-	SOCKET newSocket = accept(sock, (struct sockaddr *)client, &size);
-	if (newSocket == INVALID_SOCKET)
+	SOCKET newSocket;
+	if ((newSocket = accept(sock, (struct sockaddr *)client, &size)) == INVALID_SOCKET)
 	{
 		std::string error = "\nAccept failed with error code: " +
 			std::to_string(WSAGetLastError());
@@ -52,8 +52,8 @@ SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
 			throw UDPException(error);
 		}
 	}
-	puts("\nConnection accepted");
-
+	//puts("\nConnection accepted");
+	std::cout << "User " << newSocket << " has joined the chat!\n";
 	return newSocket;
 }
 
@@ -65,26 +65,25 @@ void TCPSocket::sendTo(const char * message, SOCKET *s)
 			std::to_string(WSAGetLastError());
 		throw TCPException(error);
 	}
-	puts("Data Sent");
+	//puts("Data Sent");
 }
 
 
-int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize)
+int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize, char* message)
 {
 	int recvSize;
-	char * message = new char[buffSize];
+
+	//char * message = new char[buffSize];
 	if ((recvSize = recv(*s, message, buffSize - 1, 0)) == SOCKET_ERROR)
 	{
 		std::string error = "\nReceive Failed. Error code : " + 
 			std::to_string(WSAGetLastError());
 		throw TCPException(error);
 	}
-	puts("Reply Received");
+	//puts("Reply Received");
 
 	//Add a NULL terminating character to make it a proper string before printing
 	message[recvSize] = '\0';
-	
-	receivedMessages.push(message);
 	
 	return recvSize;
 }

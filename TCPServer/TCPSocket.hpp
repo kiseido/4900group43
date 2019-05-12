@@ -48,7 +48,7 @@ public:
 	received message
 	@return 0 if connection closed, SOCKET_ERROR if error, 
 	or number of bytes received.*/
-	int receiveFrom(SOCKET *otherSocket, const int &buffSize);
+	int receiveFrom(SOCKET *s, const int &buffSize, char* message);
 
 
 	void connectToServer(struct sockaddr_in *server);
