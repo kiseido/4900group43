@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{F049B08A-6F15-499C-B0DA-492D6542B4A3}</ProjectGuid>
-    <RootNamespace>TCPClient</RootNamespace>
+    <ProjectGuid>{15047839-FF30-4420-A8A4-498B2D72E908}</ProjectGuid>
+    <RootNamespace>UDPClient</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -118,17 +118,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Exceptions.hpp" />
-    <ClInclude Include="Socket.hpp" />
-    <ClInclude Include="TCPSocket.hpp" />
-    <ClInclude Include="Util.hpp" />
-    <ClInclude Include="WSASession.hpp" />
+    <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="UDPClientMain.cpp" />
+    <ClCompile Include="UDPSocket.cpp" />
+    <ClCompile Include="WSASession.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TCPClientMain.cpp" />
-    <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="TCPSocket.cpp" />
-    <ClCompile Include="WSASession.cpp" />
+    <ClInclude Include="Exceptions.hpp" />
+    <ClInclude Include="Socket.hpp" />
+    <ClInclude Include="UDPSocket.hpp" />
+    <ClInclude Include="Util.hpp" />
+    <ClInclude Include="WSASession.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
