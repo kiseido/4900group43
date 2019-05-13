@@ -12,12 +12,17 @@ Texture Resources::TextureList[TEXTURE_LIST_SIZE];
 Model* Resources::ModelList[MODEL_LIST_SIZE];
 
 
-Mesh::Mesh() {}
 
-
-Model::Model(MeshID m, TextureID t) {
+Model::Model(MeshID m, TextureID t) : Component(ComponentModel) {
     mesh = Resources::GetMesh(m);
     texture = Resources::GetTexture(t);
+}
+
+Material::Material() {
+    ambient = glm::vec4(0.7);
+    diffuse = glm::vec4(0.5);
+    specular = glm::vec4(0.25);
+    shininess = 0.5;
 }
 
 Mesh* Resources::GetMesh(MeshID meshId) {
@@ -25,6 +30,9 @@ Mesh* Resources::GetMesh(MeshID meshId) {
         switch (meshId) {
         case HexagonTileMesh:
             Resources::MeshList[meshId] = LoadMesh("hexagon.obj");
+            break;
+        case Piece1Mesh:
+            Resources::MeshList[meshId] = LoadMesh("piece1.obj");
             break;
         default:
             Resources::MeshList[meshId] = nullptr;
@@ -54,6 +62,9 @@ Texture Resources::GetTexture(TextureID textureId) {
         case RockTexture:
             Resources::TextureList[textureId] = LoadTexture("rock.jpg");
             break;
+        case Piece1Texture:
+            Resources::TextureList[textureId] = LoadTexture("wood.jpg");
+            break;
         default:
             Resources::TextureList[textureId] = 0;
         }
@@ -81,6 +92,9 @@ Model* Resources::GetModel(ModelID modelId) {
             break;
         case RockTileModel:
             Resources::ModelList[modelId] = new Model(HexagonTileMesh, RockTexture);
+            break;
+        case Piece1Model:
+            Resources::ModelList[modelId] = new Model(Piece1Mesh, Piece1Texture);
             break;
         default:
             Resources::ModelList[modelId] = nullptr;

@@ -1,5 +1,5 @@
 #pragma once
-#include "CompletelyFakeECS.h"
+#include "ECS.h"
 
 namespace Transformer {
     void CalcTNet(EntityID eid);

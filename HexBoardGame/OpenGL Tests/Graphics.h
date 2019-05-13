@@ -3,6 +3,7 @@
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 #include "Transform.h"
+#include "Component.h"
 
 typedef GLuint Texture;
 
@@ -25,10 +26,9 @@ enum MeshID {
     MESH_LIST_SIZE
 };
 
-class Mesh
-{
+class Mesh {
 public:
-    Mesh();
+    Mesh() = default;
     int numVertices;
     std::vector<float> pvalues;
     std::vector<float> tvalues;
@@ -40,15 +40,22 @@ public:
 };
 
 
+class Material {
+public:
+    Material();
+    glm::vec4 ambient;
+    glm::vec4 diffuse;
+    glm::vec4 specular;
+    float shininess;
+};
 
 
 
-class Model {
-private: 
-    Model();
+class Model : public Component {
 public:
     Model(MeshID m, TextureID t);
     Mesh* mesh;
+    Material material;
     Texture texture;
     ~Model() = default;
 };

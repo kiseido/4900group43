@@ -1,13 +1,13 @@
 #pragma once
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include "Component.h"
 
-
-class Transform
+class Transform : public Component
 {
 public:
     Transform();
-    ~Transform();
+    ~Transform() = default;
 
     bool change = true;
 

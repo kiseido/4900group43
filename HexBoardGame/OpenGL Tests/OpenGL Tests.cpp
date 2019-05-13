@@ -10,24 +10,12 @@
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include "Graphics.h"
 #include "Utils.h"
-#include "CompletelyFakeECS.h"
+#include "ECS.h"
 #include "Renderer.h"
 #include "Transformer.h"
 
 using namespace std;
 
-
-//float cameraX, cameraY, cameraZ;
-float objLocX, objLocY, objLocZ;
-//GLuint renderingProgram;
-//#define oldnumVAOs 1
-//#define oldnumVBOs 3
-//GLuint oldvao[oldnumVAOs];
-//GLuint oldvbo[oldnumVBOs];
-//GLuint shuttleTexture;
-
-// variable allocation for display
-//GLuint projLoc, camLoc, tnetLoc;
 int width, height;
 float aspect;
 float cos60 = glm::cos(Utils::toRadians(60));
@@ -37,8 +25,6 @@ EntityID player;
 
 
 void init(GLFWwindow* window) {
-    objLocX = 0.0f; objLocY = 0.0f; objLocZ = 0.0f;
-
     glfwGetFramebufferSize(window, &width, &height);
     Renderer::SetAspectRatio(width, height);
     aspect = (float)width / (float)height;
@@ -48,28 +34,29 @@ void init(GLFWwindow* window) {
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 15; j++) {
             if (((i == 5 || i == 6) && j < 5) || ((i == 4 || i == 5) && (j >= 5 && j < 10)) || ((i == 5 || i == 6) && (j >= 10 && j < 12)) || ((i == 6 || i == 7) && (j >= 12 && j < 15))) {
-                lastEntity = CompletelyFakeECS::CreateEntity(WaterTileModel);
+                lastEntity = ECS::CreateEntity(WaterTileModel);
             }
             else if (i < 9 || (i < 10 && (j < 5 || j >= 10))) {
-                lastEntity = CompletelyFakeECS::CreateEntity(GrassTileModel);
+                lastEntity = ECS::CreateEntity(GrassTileModel);
             }
             else if (((i == 15 || i == 17) && (j > 10 && j < 13)) || (i == 16 && (j > 10 && j < 14))){
-                lastEntity = CompletelyFakeECS::CreateEntity(RockTileModel);
+                lastEntity = ECS::CreateEntity(RockTileModel);
             }
             else {
-                lastEntity = CompletelyFakeECS::CreateEntity(DesertTileModel);
+                lastEntity = ECS::CreateEntity(DesertTileModel);
             }
             //Transformer::SetPosition(lastEntity, glm::vec3(-5 * (1+cos60) + i * (1 + cos60) + 1.5 * (j % 2) * cos60, 0, -5 * 0.5 * sin60 + j * 0.5 * sin60));
             Transformer::SetPosition(lastEntity, glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
             Transformer::SetScale(lastEntity, glm::vec3(testScale, testScale, testScale));
         }
     }
-    player = CompletelyFakeECS::CreateEntity(RockTileModel);
-    Transformer::SetPosition(player, glm::vec3(CompletelyFakeECS::GetTransform(0)->position));
+    player = ECS::CreateEntity(Piece1Model);
+    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(0)->position));
     Transformer::Translate(player, glm::vec3(0,0.25,0));
 
 
     Renderer::Setup();
+    Renderer::SetLight(glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f }, glm::vec3{ 0, 1, 1 }, glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 }
 
 void display(GLFWwindow* window, double currentTime) {
@@ -83,8 +70,7 @@ void display(GLFWwindow* window, double currentTime) {
         Renderer::RenderEntity(eid);
     }
     int curPos = glm::floor(currentTime);
-    Transformer::SetPosition(player, glm::vec3(CompletelyFakeECS::GetTransform(10+curPos*15)->position));
-    Transformer::Translate(player, glm::vec3(0, 0.15, 0));
+    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(10+curPos*15)->position));
     Renderer::RenderEntity(player);
 }
 
@@ -98,7 +84,7 @@ int main(void) {
     if (!glfwInit()) { exit(EXIT_FAILURE); }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter6 - program1", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(600, 600, "H.E.X.", NULL, NULL);
     glfwMakeContextCurrent(window);
     if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
     glfwSwapInterval(1);
