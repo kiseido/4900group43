@@ -13,8 +13,6 @@
 
 int main()
 {
-	
-
 	//TCP Test
 	WSASession *wsa;
 	struct sockaddr_in sockAddr;

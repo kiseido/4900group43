@@ -6,11 +6,11 @@
 #include "Util.hpp"
 
 
-void processClient(SOCKET, TCPSocket *);
+void processClient(SOCKET, TCPSocket *, int index);
 
 int main()
 {
-	puts("TCPServerTest! XD");
+	puts("TCP Server Test! XD");
 	WSASession wsa;
 	TCPSocket tSock;
 	sockaddr_in sockAddr;
@@ -24,21 +24,22 @@ int main()
 
 	tSock.bindSock(&sockAddr);
 
-	//MODIFY THIS
+	//MODIFY THIS TOO
 	int maxConnectionQueue = 3;
 
 	tSock.listenForConnections(maxConnectionQueue);
 
 	sockaddr_in clientAddr;
 	SOCKET newClient;
-	while ((newClient = tSock.acceptConnection(&clientAddr)) != INVALID_SOCKET)
+	for (int index = 0; (newClient = tSock.acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
 	{
-		std::thread conThread(*processClient, newClient, &tSock);
+		tSock.clients.push_back(newClient);
+		std::thread conThread(*processClient, newClient, &tSock, index);
 		conThread.detach();
 	}
 }
 
-void processClient(SOCKET s, TCPSocket *tSock)
+void processClient(SOCKET s, TCPSocket *tSock, int index)
 {
 	const char * sendMessage = "Connection successful!";
 	char receiveMessage[100];
@@ -48,11 +49,20 @@ void processClient(SOCKET s, TCPSocket *tSock)
 	{
 		if (tSock->receiveFrom(&s, 100, receiveMessage) == 0)
 		{
+			tSock->clients.erase(tSock->clients.begin() + index);
 			std::cout << "User " << s << " has left the chat.";
 			tSock->closeSocket(&s);
 			break;
 		}
-		std::cout << "User " << s << ':' << receiveMessage << '\n';
-		//tSock->sendTo(receiveMessage, &s);
+		std::string strRecv(receiveMessage);
+		std::string s(std::to_string(s));
+		std::string strBuff = "\tUser " + s + ": ";
+		strBuff += strRecv;
+
+		const char * endMsg = strBuff.c_str();
+		for (int i = 0; i < tSock->clients.size(); i++) {
+			tSock->sendTo(endMsg, &tSock->clients[i]);
+		}
+		std::cout << "User " << s << ": " << receiveMessage << '\n';
 	}
 }
