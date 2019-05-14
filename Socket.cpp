@@ -160,11 +160,16 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 		}
 		InetNtopW(result->ai_family, ptr, ip, 100);		
 		_bstr_t b(ip);
-		fetchedIP = b;
+		char * temp = b;
+		for (int i = 0; i < 100; i++)
+		{
+			fetchedIP[i] = temp[i];
+		}
 		printf("\nIPv%d address: %s (%s)\n", result->ai_family == PF_INET6 ? 6 : 4,
 			fetchedIP, result->ai_canonname);
 		result = result->ai_next;
 	}
+	int i = 0;
 
 
 }

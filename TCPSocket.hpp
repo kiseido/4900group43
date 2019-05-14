@@ -52,5 +52,10 @@ public:
 
 
 	void connectToServer(struct sockaddr_in *server);
+
+	SOCKET* getSock()
+	{
+		return &sock;
+	}
 };
 

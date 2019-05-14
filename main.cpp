@@ -23,13 +23,28 @@ int main()
 	catch (WSAException e) { puts(e.what()); }
 	try {
 		TCPSocket tSock(IPv4);
-		tSock.setupSockAddr(&sockAddr, LOCAL_HOST, 8888);
-		tSock.bindSock(&sockAddr);
-		tSock.listenForConnections(2);
-		SOCKET clientSock = tSock.acceptConnection(&sockAddr);
-		Connection clientCon = { &sockAddr, &clientSock };
-		tSock.sendTo("Hello new connection", clientCon.sock);
-		tSock.receiveFrom(&clientSock, 100);
+		char fetchedIP[100];
+		char google[] = "www.google.ca";
+				
+		tSock.getIPFromDomain(google, fetchedIP);
+		tSock.setupSockAddr(&sockAddr, fetchedIP, 80);
+		tSock.connectToServer(&sockAddr);
+		
+		const char * message = "A\n";
+		
+		tSock.sendTo(message, tSock.getSock());
+		tSock.receiveFrom(tSock.getSock(), 5000);
+
+		std::cout << tSock.receivedMessages.front();
+
+
+
+		//tSock.bindSock(&sockAddr);
+		//tSock.listenForConnections(2);
+		//SOCKET clientSock = tSock.acceptConnection(&sockAddr);
+		//Connection clientCon = { &sockAddr, &clientSock };
+		//tSock.sendTo("Hello new connection", clientCon.sock);
+		//tSock.receiveFrom(&clientSock, 100);
 	}
 	catch (TCPException e) { puts(e.what()); }
 	
