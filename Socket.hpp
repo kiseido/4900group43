@@ -11,7 +11,7 @@ protected:
 	char ip[40];
 	int port;
 	SOCKET sock;
-	std::queue<char*> receivedMessages;
+
 	std::string error = "";
 
 	/* Creates a socket using class members addrType, sockType
@@ -20,6 +20,7 @@ protected:
 	void create();
 
 public:
+	std::queue<char*> receivedMessages;
 	/* Initializes sockaddr_in structure sockAddr using 
 	the ip address & port number 
 	@param sockAddr the structure you want to fill
