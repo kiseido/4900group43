@@ -2,9 +2,9 @@
 #include "Transform.h"
 #include "Graphics.h"
 #include "Board.h"
-constexpr unsigned int FAKE_ENTITY_SIZE_STUFF = 1024;
+#include "Entity.h"
+constexpr unsigned int MAX_ENTITY_ARRAY_SIZE = 1024;
 
-typedef unsigned int EntityID;
 
 
 namespace ECS
@@ -20,6 +20,13 @@ namespace ECS
     EntityID CreateEntity(ModelID m);
     EntityID CreateEntity();
 
+
+    bool HasComponents(EntityID eid, ComponentID components);
+
+    Component* GetComponent(EntityID eid, ComponentID compID);
+    void SetComponent(EntityID eid, Component* component);
+
+
     Transform* GetTransform(EntityID eid);
     void SetTransform(EntityID eid, Transform* transform);
 
@@ -28,9 +35,6 @@ namespace ECS
 
     BoardPosition* GetBoardPosition(EntityID eid);
     void SetBoardPosition(EntityID eid, BoardPosition* boardposition);
-
-    Component* GetComponent(EntityID eid, ComponentID compID);
-    void SetComponent(EntityID eid, Component* component);
 
 };
 

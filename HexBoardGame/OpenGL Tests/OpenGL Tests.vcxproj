@@ -160,9 +160,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BoardManager.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceImporter.h" />
     <ClInclude Include="Transform.h" />
@@ -171,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="BoardManager.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Graphics.cpp" />

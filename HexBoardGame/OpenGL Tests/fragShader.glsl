@@ -23,7 +23,14 @@ struct Material
     vec4 specular;
     float shininess;
 };
+struct RenderOptions {
+    int pick;
+    vec3 color;
+    float normalMod;
+    float scaleMod;
+};
 
+uniform RenderOptions render_options;
 uniform vec4 globalAmbient;
 uniform PositionalLight light;
 uniform Material material;
@@ -59,6 +66,8 @@ void main(void)
     vec3 diffuse = light.diffuse.xyz * diffColor.xyz * max(cosTheta, 0.0);
     vec3 specular = light.specular.xyz * specColor.xyz * pow(max(cosPhi, 0.0), material.shininess*3.0);
     fragColor = vec4((ambient + diffuse + specular), 1.0);
+    if (render_options.pick != 0) {
+        fragColor = vec4(render_options.color,1);
+    }
     //fragColor = texColor;
-    //fragColor = vec4(vec3(material.ambient),1);
 }

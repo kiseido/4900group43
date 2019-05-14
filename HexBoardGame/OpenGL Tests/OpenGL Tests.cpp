@@ -45,36 +45,57 @@ void init(GLFWwindow* window) {
             else {
                 lastEntity = ECS::CreateEntity(DesertTileModel);
             }
-            //Transformer::SetPosition(lastEntity, glm::vec3(-5 * (1+cos60) + i * (1 + cos60) + 1.5 * (j % 2) * cos60, 0, -5 * 0.5 * sin60 + j * 0.5 * sin60));
-            Transformer::SetPosition(lastEntity, glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
+            Transformer::SetPosition(lastEntity, 
+                glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
             Transformer::SetScale(lastEntity, glm::vec3(testScale, testScale, testScale));
         }
     }
     player = ECS::CreateEntity(Piece1Model);
-    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(0)->position));
-    Transformer::Translate(player, glm::vec3(0,0.25,0));
 
 
     Renderer::Setup();
-    Renderer::SetLight(glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f }, glm::vec3{ 0, 1, 1 }, glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+    Renderer::SetLight(
+        glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f }, 
+        glm::vec3{ 0, 1, 1 }, 
+        glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }, 
+        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, 
+        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }
+    );
+}
+
+EntityID mouseEntityID;
+void checkMouseOver(GLFWwindow* window) {
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    mouseEntityID = Renderer::GetMouseEntity(mouseX, mouseY);
 }
 
 void display(GLFWwindow* window, double currentTime) {
     glClear(GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+    checkMouseOver(window);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
     Renderer::UpdateCamera();
-
-    for (int eid = 0; eid <= lastEntity; eid++) {
-        //Transformer::SetRotation(eid, glm::vec3(Utils::toRadians(10 * (currentTime < 10 ? 0 : (currentTime - 10))), 0, 0));
-        Renderer::RenderEntity(eid);
+    //Renderer::RenderEntity(mouseEntityID);
+    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(70)->position));
+    bool valid = ECS::HasComponents(mouseEntityID, ComponentTransform);
+    if (valid) {
+        Transformer::Translate(mouseEntityID, glm::vec3(0, 0.15, 0));
     }
-    int curPos = glm::floor(currentTime);
-    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(10+curPos*15)->position));
-    Renderer::RenderEntity(player);
+    std::cout << mouseEntityID << std::endl;
+    Renderer::RenderAll();
+    if (valid) {
+        Transformer::Translate(mouseEntityID, glm::vec3(0, -0.15, 0));
+    }
+    //Renderer::RenderEntity(player);
 }
 
 void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
+    width = newWidth;
+    height = newHeight;
     aspect = (float)newWidth / (float)newHeight;
     glViewport(0, 0, newWidth, newHeight);
     Renderer::SetAspectRatio(newWidth, newHeight);

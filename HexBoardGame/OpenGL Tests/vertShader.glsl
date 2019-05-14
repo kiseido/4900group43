@@ -24,7 +24,14 @@ struct Material
     vec4 specular;
     float shininess;
 };
+struct RenderOptions {
+    int pick;
+    vec3 color;
+    float normalMod;
+    float scaleMod;
+};
 
+uniform RenderOptions render_options;
 uniform vec4 globalAmbient;
 uniform PositionalLight light;
 uniform Material material;

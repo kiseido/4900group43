@@ -10,12 +10,14 @@ using namespace std;
 Mesh* Resources::MeshList[MESH_LIST_SIZE];
 Texture Resources::TextureList[TEXTURE_LIST_SIZE];
 Model* Resources::ModelList[MODEL_LIST_SIZE];
+Material* Resources::MaterialList[MATERIAL_LIST_SIZE];
 
 
 
-Model::Model(MeshID m, TextureID t) : Component(ComponentModel) {
+Model::Model(MeshID m, TextureID t, MaterialID mat) : Component(ComponentModel) {
     mesh = Resources::GetMesh(m);
     texture = Resources::GetTexture(t);
+    material = Resources::GetMaterial(mat);
 }
 
 Material::Material() {
@@ -23,6 +25,10 @@ Material::Material() {
     diffuse = glm::vec4(0.5);
     specular = glm::vec4(0.25);
     shininess = 0.5;
+}
+
+Material::Material(glm::vec4 amb, glm::vec4 diff, glm::vec4 spec, float shin) : ambient(amb), diffuse(diff), specular(spec), shininess(shin) {
+    
 }
 
 Mesh* Resources::GetMesh(MeshID meshId) {
@@ -101,4 +107,17 @@ Model* Resources::GetModel(ModelID modelId) {
         }
     }
     return Resources::ModelList[modelId];
+}
+
+Material* Resources::GetMaterial(MaterialID materialId) {
+    if (Resources::ModelList[materialId] == nullptr || Resources::ModelList[materialId] == 0) {
+        switch (materialId) {
+        case BasicMaterial:
+            Resources::MaterialList[materialId] = new Material(glm::vec4(0.7), glm::vec4(0.5), glm::vec4(0.25), 0.5);
+            break;
+        default:
+            Resources::MaterialList[materialId] = nullptr;
+        }
+    }
+    return Resources::MaterialList[materialId];
 }

@@ -2,7 +2,7 @@
 
 
 namespace {
-    EntityID nextEntity = 0;
+    EntityID nextEntity = 1;
     EntityID entityCount = 0;
     std::vector<EntityID> freedEntityIds;
     EntityID GetNextEntity() {
@@ -22,10 +22,10 @@ namespace {
 
 
 
-ComponentID ECS::ECS_EntityComponents[FAKE_ENTITY_SIZE_STUFF];
-BoardPosition* ECS::ECS_BoardPosition[FAKE_ENTITY_SIZE_STUFF];
-Transform* ECS::ECS_Transform[FAKE_ENTITY_SIZE_STUFF];
-Model* ECS::ECS_Model[FAKE_ENTITY_SIZE_STUFF];
+ComponentID ECS::ECS_EntityComponents[MAX_ENTITY_ARRAY_SIZE];
+BoardPosition* ECS::ECS_BoardPosition[MAX_ENTITY_ARRAY_SIZE];
+Transform* ECS::ECS_Transform[MAX_ENTITY_ARRAY_SIZE];
+Model* ECS::ECS_Model[MAX_ENTITY_ARRAY_SIZE];
 
 
 unsigned int ECS::GetEntityCount() { return nextEntity; }
@@ -39,9 +39,17 @@ EntityID ECS::CreateEntity(ModelID m) {
 }
 
 EntityID ECS::CreateEntity(Transform* t, Model* m) {
-    ECS_Transform[nextEntity] = t;
-    ECS_Model[nextEntity] = m;
+    //ECS_Transform[nextEntity] = t;
+    //ECS_Model[nextEntity] = m;
+    SetComponent(nextEntity, t);
+    SetComponent(nextEntity, m);
     return nextEntity++;
+}
+
+
+bool ECS::HasComponents(EntityID eid, ComponentID components) {
+    if (eid > MAX_ENTITY_ARRAY_SIZE) return false;
+    return (components & ECS_EntityComponents[eid]) == components;
 }
 
 Component* ECS::GetComponent(EntityID eid, ComponentID compid) {
@@ -59,20 +67,22 @@ Component* ECS::GetComponent(EntityID eid, ComponentID compid) {
 }
 
 void ECS::SetComponent(EntityID eid, Component* component) {
-    switch (component->compID) {
-    case ComponentBoardPosition:
-        ECS_BoardPosition[eid] = (BoardPosition*)component;
-        break;
-    case ComponentTransform:
-        ECS_Transform[eid] = (Transform*)component;
-        break;
-    case ComponentModel:
-        ECS_Model[eid] = (Model*)component;
-        break;  
-    default:
-        return;
+    if (component) {
+        switch (component->compID) {
+        case ComponentBoardPosition:
+            ECS_BoardPosition[eid] = (BoardPosition*)component;
+            break;
+        case ComponentTransform:
+            ECS_Transform[eid] = (Transform*)component;
+            break;
+        case ComponentModel:
+            ECS_Model[eid] = (Model*)component;
+            break;
+        default:
+            return;
+        }
+        ECS_EntityComponents[eid] |= component->compID;
     }
-    ECS_EntityComponents[eid] |= component->compID;
 }
 
 
@@ -85,7 +95,8 @@ void ECS::SetModel(EntityID eid, Model* model) {
 }
 
 Transform* ECS::GetTransform(EntityID eid) {
-    return ECS_Transform[eid];
+    //return ECS_Transform[eid];
+    return (Transform*)GetComponent(eid, ComponentTransform);
 }
 void ECS::SetTransform(EntityID eid, Transform* transform) {
     ECS_Transform[eid] = transform;

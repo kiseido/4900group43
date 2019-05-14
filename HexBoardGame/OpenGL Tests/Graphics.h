@@ -26,6 +26,11 @@ enum MeshID {
     MESH_LIST_SIZE
 };
 
+enum MaterialID {
+    BasicMaterial,
+    MATERIAL_LIST_SIZE
+};
+
 class Mesh {
 public:
     Mesh() = default;
@@ -43,6 +48,7 @@ public:
 class Material {
 public:
     Material();
+    Material(glm::vec4 amb, glm::vec4 diff, glm::vec4 spec, float shin);
     glm::vec4 ambient;
     glm::vec4 diffuse;
     glm::vec4 specular;
@@ -53,9 +59,9 @@ public:
 
 class Model : public Component {
 public:
-    Model(MeshID m, TextureID t);
+    Model(MeshID m, TextureID t, MaterialID mat = BasicMaterial);
     Mesh* mesh;
-    Material material;
+    Material* material;
     Texture texture;
     ~Model() = default;
 };
@@ -67,7 +73,9 @@ namespace Resources {
     Mesh* LoadMesh(const char* filePath);
     Texture GetTexture(TextureID textureId);
     Texture LoadTexture(const char* filePath);
+    Material* GetMaterial(MaterialID materialId);
     Mesh* MeshList[];
     Texture TextureList[];
     Model* ModelList[];
+    Material* MaterialList[];
 };
