@@ -17,7 +17,7 @@ int main()
 	
 
 	//CHANGE THESE TO WHAT YOU WANT
-	const char * addr = LOCAL_HOST;
+	const char * addr = "142.232.142.251";
 	int port = 8888;
 
 	tSock.setupSockAddr(&sockAddr, addr, port);
@@ -36,7 +36,11 @@ int main()
 		tSock.clients.push_back(newClient);
 		std::thread conThread(*processClient, newClient, &tSock, index);
 		conThread.detach();
+		int clientPort;
+		tSock.getPortFromSockAddr(&clientAddr, &clientPort);
+		std::cout << "Client Port: " << port;
 	}
+
 }
 
 void processClient(SOCKET s, TCPSocket *tSock, int index)

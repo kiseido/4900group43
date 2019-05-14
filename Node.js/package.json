@@ -1,0 +1,16 @@
+{
+  "name": "4900lobby",
+  "version": "0.0.1",
+  "description": "To be added",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Kemal Holubeshen",
+  "license": "ISC",
+  "dependencies": {
+    "externalip": "^1.0.2",
+    "net": "^1.0.2"
+  }
+}
