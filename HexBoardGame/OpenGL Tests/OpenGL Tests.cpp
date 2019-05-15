@@ -13,6 +13,7 @@
 #include "ECS.h"
 #include "Renderer.h"
 #include "Transformer.h"
+#include "Window.h"
 
 using namespace std;
 
@@ -24,11 +25,7 @@ EntityID lastEntity = 0;
 EntityID player;
 
 
-void init(GLFWwindow* window) {
-    glfwGetFramebufferSize(window, &width, &height);
-    Renderer::SetAspectRatio(width, height);
-    aspect = (float)width / (float)height;
-    
+void init() {
     double testScale = 0.95;
 
     for (int i = 0; i < 20; i++) {
@@ -48,64 +45,22 @@ void init(GLFWwindow* window) {
             Transformer::SetPosition(lastEntity, 
                 glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
             Transformer::SetScale(lastEntity, glm::vec3(testScale, testScale, testScale));
+            ECS::AddComponentMask(lastEntity, ComponentBoardPosition);
         }
     }
     player = ECS::CreateEntity(Piece1Model);
+    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(70)->position));
+    ECS::AddComponentMask(player, ComponentBoardPiece);
 
 
     Renderer::Setup();
 }
 
-EntityID mouseEntityID;
-void checkMouseOver(GLFWwindow* window) {
-    double mouseX, mouseY;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
-    mouseEntityID = Renderer::GetMouseEntity(mouseX, mouseY);
-}
-
-void display(GLFWwindow* window, double currentTime) {
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    checkMouseOver(window);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    Renderer::UpdateCamera();
-    Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(70)->position));
-    std::cout << mouseEntityID << std::endl;
-    Renderer::RenderAll();
-    Renderer::RenderOutline(mouseEntityID);
-}
-
-void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
-    width = newWidth;
-    height = newHeight;
-    aspect = (float)newWidth / (float)newHeight;
-    glViewport(0, 0, newWidth, newHeight);
-    Renderer::SetAspectRatio(newWidth, newHeight);
-}
 
 int main(void) {
-    if (!glfwInit()) { exit(EXIT_FAILURE); }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    GLFWwindow* window = glfwCreateWindow(600, 600, "H.E.X.", NULL, NULL);
-    glfwMakeContextCurrent(window);
-    if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
-    glfwSwapInterval(1);
+    Window::Init();
 
-    glfwSetWindowSizeCallback(window, window_size_callback);
+    init();
 
-    init(window);
-
-    while (!glfwWindowShouldClose(window)) {
-        display(window, glfwGetTime());
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    exit(EXIT_SUCCESS);
+    Window::Start();
 }

@@ -21,9 +21,9 @@ Model::Model(MeshID m, TextureID t, MaterialID mat) : Component(ComponentModel) 
 }
 
 Material::Material() {
-    ambient = glm::vec4(0.7);
-    diffuse = glm::vec4(0.5);
-    specular = glm::vec4(0.25);
+    ambient = glm::vec4(0.7f);
+    diffuse = glm::vec4(0.5f);
+    specular = glm::vec4(0.25f);
     shininess = 0.5;
 }
 
@@ -113,7 +113,7 @@ Material* Resources::GetMaterial(MaterialID materialId) {
     if (Resources::ModelList[materialId] == nullptr || Resources::ModelList[materialId] == 0) {
         switch (materialId) {
         case BasicMaterial:
-            Resources::MaterialList[materialId] = new Material(glm::vec4(0.7), glm::vec4(0.5), glm::vec4(0.25), 0.5);
+            Resources::MaterialList[materialId] = new Material(glm::vec4(0.7f), glm::vec4(0.5f), glm::vec4(0.25f), 0.5f);
             break;
         default:
             Resources::MaterialList[materialId] = nullptr;

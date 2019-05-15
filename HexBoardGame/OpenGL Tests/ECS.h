@@ -23,6 +23,9 @@ namespace ECS
 
     bool HasComponents(EntityID eid, ComponentID components);
 
+    void AddComponentMask(EntityID eid, ComponentID mask);
+    void RemoveComponentMask(EntityID eid, ComponentID mask);
+
     Component* GetComponent(EntityID eid, ComponentID compID);
     void SetComponent(EntityID eid, Component* component);
 

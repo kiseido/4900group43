@@ -3,9 +3,10 @@ typedef unsigned long ComponentID;
 
 
 //Component Masks
-constexpr ComponentID ComponentBoardPosition = 0b00000000000000000000000000000001;
-constexpr ComponentID ComponentTransform = 0b00000000000000000000000000000010;
-constexpr ComponentID ComponentModel = 0b00000000000000000000000000000100;
+constexpr ComponentID ComponentTransform =      0b00000000000000000000000000000001;
+constexpr ComponentID ComponentModel =          0b00000000000000000000000000000010;
+constexpr ComponentID ComponentBoardPosition =  0b00000000000000000000000000000100;
+constexpr ComponentID ComponentBoardPiece =     0b00000000000000000000000000001000;
 
 class Component
 {

@@ -21,7 +21,6 @@ namespace {
 }
 
 
-
 ComponentID ECS::ECS_EntityComponents[MAX_ENTITY_ARRAY_SIZE];
 BoardPosition* ECS::ECS_BoardPosition[MAX_ENTITY_ARRAY_SIZE];
 Transform* ECS::ECS_Transform[MAX_ENTITY_ARRAY_SIZE];
@@ -44,6 +43,11 @@ EntityID ECS::CreateEntity(Transform* t, Model* m) {
     SetComponent(nextEntity, t);
     SetComponent(nextEntity, m);
     return nextEntity++;
+}
+
+
+void ECS::AddComponentMask(EntityID eid, ComponentID mask) {
+    ECS_EntityComponents[eid] |= mask;
 }
 
 

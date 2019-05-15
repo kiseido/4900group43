@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Component.h"
 #include "Window.h"
+#include "Utils.h"
 
 
 namespace {
@@ -12,12 +13,12 @@ namespace {
     GLuint vbo[numVBOs];
     GLuint renderingProgram;
     float cameraX, cameraY, cameraZ;
+    float aspectRatio;
+    float cameraZoom = 1.05f;
     GLuint projLoc, camLoc, tnetLoc, normalLoc;
     GLuint globalAmbLoc, lightAmbLoc, lightDiffLoc, lightSpecLoc, lightPosLoc;
     GLuint matAmbLoc, matDiffLoc, matSpecLoc, matShinLoc;
     GLuint renderOptionsSpecialLoc, renderOptionsLightingLoc, renderOptionsColorLoc, renderOptionsNormModLoc, renderOptionsScaleModLoc;
-    int width, height;
-    float aspect;
     glm::mat4 projMat, camMat, tnetMat;
 
     float globalAmb[4] = { 0,0,0,0 };
@@ -147,19 +148,10 @@ namespace {
 
 
 void Renderer::RenderScene() {
-    glClear(GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    double mouseX, mouseY;
-    Window::checkMouseOver(mouseX, mouseY);
-    EntityID mouseEntityID = Renderer::GetMouseEntity(mouseX, mouseY);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    Renderer::UpdateCamera();
-    //std::cout << mouseEntityID << std::endl;
-    Renderer::RenderAll();
-    Renderer::RenderOutline(mouseEntityID);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    RenderEntity(301);
+    RenderAll();
 }
 
 
@@ -168,13 +160,14 @@ void Renderer::RenderScene() {
 //GLuint curTexture = 0;
 //Mesh* curMesh = nullptr;
 
-void Renderer::SetAspectRatio(int w, int h) {
-    width = w; height = h;
-    aspect = (float)width / (float)height;
-    projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+void Renderer::SetAspectRatio(float aspect) {
+    aspectRatio = aspect;
+    projMat = glm::perspective(cameraZoom, aspectRatio, 0.1f, 1000.0f);
 }
-void Renderer::SetAspectRatio(float a) {
-    projMat = glm::perspective(1.472f, aspect, 0.1f, 1000.0f);
+
+void Renderer::ChangeCameraZoom(float zoom) {
+    cameraZoom += zoom;
+    projMat = glm::perspective(cameraZoom, aspectRatio, 0.1f, 1000.0f);
 }
 
 void Renderer::SetLight(glm::vec4 global_amb, glm::vec3 pos, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec) {
@@ -226,6 +219,7 @@ void Renderer::Setup() {
 
 
     cameraX = 0.0f; cameraY = 10.0f; cameraZ = 10.0f;
+    cameraZoom = 1.05f;
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(vao[0]);
@@ -247,6 +241,8 @@ void Renderer::Setup() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     SetRenderOptions(RenderOptions{ 0, 1, glm::vec3{1,1,1}, 0, 0 }, true);
     SetLight(
@@ -284,9 +280,9 @@ glm::vec3 EntityToColor(EntityID entity) {
     return glm::vec3(r/255.0, g/255.0, b/255.0);
 }
 EntityID ColorToEntity(glm::vec3 color) {
-    uint8_t r = color.x * 255;
-    uint8_t g = color.y * 255;
-    uint8_t b = color.z * 255;
+    uint8_t r = uint8_t(color.x * 255);
+    uint8_t g = uint8_t(color.y * 255);
+    uint8_t b = uint8_t(color.z * 255);
     EntityID eid = b;
     eid = eid << 8;
     eid = eid | g;
@@ -296,8 +292,10 @@ EntityID ColorToEntity(glm::vec3 color) {
 }
 
 EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_SCISSOR_TEST);
-    glScissor(mouseX, height - mouseY, 1, 1);
+    glScissor(mouseX, mouseY, 1, 1);
     EntityID totalEntities = ECS::GetEntityCount();
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
@@ -308,7 +306,7 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
         }
     }
     unsigned char pixel[4];
-    glReadPixels (mouseX, height - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+    glReadPixels (mouseX, mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
     EntityID mouseEntityId = ColorToEntity(glm::vec3(pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0));
     glDisable(GL_SCISSOR_TEST);
     SetRenderOptionsSpecial(0);
@@ -326,25 +324,55 @@ void Renderer::RenderAll(ComponentID components, bool entitytocolor) {
     }
 }
 
-void Renderer::RenderOutline(EntityID eid) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //SetRenderOptionsSpecial(2);
+    //SetRenderOptionsLighting(0);
+    //SetRenderOptionsColor(glm::vec3(255, 0, 0));
+    //glLineWidth(5);
+    ////glEnable(GL_CULL_FACE);
+    ////glCullFace(GL_FRONT);
+    ////SetRenderOptionsNormalMod(-0.05);
+    ////glDepthRange(0.01, 0.02);
+    //RenderEntity(eid);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    //SetRenderOptionsSpecial(0);
+    //SetRenderOptionsLighting(1);
+    ////SetRenderOptionsNormalMod(0);
+    ////glDepthRange(0.00, 0.01);
+    //RenderEntity(eid);
+    ////glDepthRange(0.0, 1.0);
+    ////glCullFace(GL_BACK);
+
+
+    //glDisable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
+    RenderEntity(eid);
+
+
+    //glDisable(GL_DEPTH_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x01);
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
-    SetRenderOptionsColor(glm::vec3(255, 0, 0));
-    glLineWidth(5);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_FRONT);
-    //SetRenderOptionsNormalMod(-0.05);
-    glDepthRange(0.01, 0.02);
+    SetRenderOptionsColor(color);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLineWidth(width);
+    //Transformer::Scale(eid, glm::vec3(1.25));
     RenderEntity(eid);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    //Transformer::Scale(eid, glm::vec3(0.8));
+
+    
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
     SetRenderOptionsSpecial(0);
     SetRenderOptionsLighting(1);
-    //SetRenderOptionsNormalMod(0);
-    glDepthRange(0.00, 0.01);
-    RenderEntity(eid);
-    glDepthRange(0.0, 1.0);
-    //glCullFace(GL_BACK);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 
 
 
