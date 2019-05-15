@@ -13,14 +13,12 @@ void Game::GameLoop(double currentTime) {
     Window::GetMousePosition(mouseX, mouseY);
     mouseOverEntity = Renderer::GetMouseEntity(mouseX, mouseY);
 
-    std::cout << mouseX << "  <  " << mouseY << "  <  " << mouseOverEntity << std::endl;
-
     Renderer::RenderScene();
     Renderer::RenderOutline(mouseOverEntity, 4, Renderer::COLOR_RED);
     if (selectedPieceEntity) Renderer::RenderOutline(selectedPieceEntity, 10, Renderer::COLOR_BLUE);
 }
 
-void Game::MouseClick() {
+void Game::MouseLeftClick() {
     if (!selectedPieceEntity) {
         if (ECS::HasComponents(mouseOverEntity, ComponentBoardPiece)) {
             selectedPieceEntity = mouseOverEntity;
@@ -31,4 +29,9 @@ void Game::MouseClick() {
             Transformer::SetPosition(selectedPieceEntity, ECS::GetTransform(mouseOverEntity)->position);
         }
     }
+}
+
+
+void Game::MouseRightClick() {
+    selectedPieceEntity = 0;
 }

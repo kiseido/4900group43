@@ -3,6 +3,7 @@
 #include "Entity.h"
 
 namespace Game {
-    void MouseClick();
+    void MouseLeftClick();
+    void MouseRightClick();
     void GameLoop(double currentTime);
 }

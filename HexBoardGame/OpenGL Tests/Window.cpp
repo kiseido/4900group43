@@ -73,7 +73,9 @@ void Window::window_size_callback(GLFWwindow* win, int newWidth, int newHeight) 
 void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        Game::MouseClick();
+        Game::MouseLeftClick();
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        Game::MouseRightClick();
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
