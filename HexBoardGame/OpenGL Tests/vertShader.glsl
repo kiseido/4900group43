@@ -25,7 +25,8 @@ struct Material
     float shininess;
 };
 struct RenderOptions {
-    int pick;
+    int special;
+    int lighting;
     vec3 color;
     float normalMod;
     float scaleMod;
@@ -43,14 +44,16 @@ layout (binding=0) uniform sampler2D s;
 
 void main(void)
 {
-    varyingVertPos = (transform_matrix * vec4(position, 1.0)).xyz;
-    varyingLightDir = light.position - varyingVertPos;
-    varyingNormal = (normal_matrix * vec4(normal, 1.0)).xyz;
+    if (render_options.lighting != 0) {
+        varyingVertPos = (transform_matrix * vec4(position, 1.0)).xyz;
+        varyingLightDir = light.position - varyingVertPos;
+        varyingNormal = (normal_matrix * vec4(normal, 1.0)).xyz;
 
-    varyingHalfVector =
-        normalize(normalize(varyingLightDir)
-            + normalize(-varyingVertPos)).xyz;
-
-    gl_Position = projection_matrix * transform_matrix * vec4(position,1.0);
+        varyingHalfVector =
+            normalize(normalize(varyingLightDir)
+                + normalize(-varyingVertPos)).xyz;
+    }
+    gl_Position = projection_matrix * transform_matrix * vec4(position,1.0) + render_options.normalMod*vec4(normal, 0);
+    
     texcoord = tex_coord;
 }

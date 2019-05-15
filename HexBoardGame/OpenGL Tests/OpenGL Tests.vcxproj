@@ -163,6 +163,7 @@
     <ClInclude Include="BoardManager.h" />
     <ClInclude Include="ECS.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Renderer.h" />
@@ -170,12 +171,14 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Transformer.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="BoardManager.cpp" />
     <ClCompile Include="ECS.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="OpenGL Tests.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -183,6 +186,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Transformer.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragShader.glsl" />

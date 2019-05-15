@@ -2,7 +2,7 @@
 #include "Transformer.h"
 #include <iostream>
 #include "Component.h"
-#include "Utils.h"
+#include "Window.h"
 
 
 namespace {
@@ -15,7 +15,7 @@ namespace {
     GLuint projLoc, camLoc, tnetLoc, normalLoc;
     GLuint globalAmbLoc, lightAmbLoc, lightDiffLoc, lightSpecLoc, lightPosLoc;
     GLuint matAmbLoc, matDiffLoc, matSpecLoc, matShinLoc;
-    GLuint renderOptionsPickLoc, renderOptionsColorLoc, renderOptionsNormModLoc, renderOptionsScaleModLoc;
+    GLuint renderOptionsSpecialLoc, renderOptionsLightingLoc, renderOptionsColorLoc, renderOptionsNormModLoc, renderOptionsScaleModLoc;
     int width, height;
     float aspect;
     glm::mat4 projMat, camMat, tnetMat;
@@ -45,6 +45,12 @@ namespace {
         arr[0] = vec.x; arr[1] = vec.y; arr[2] = vec.z;
     }
 
+    glm::vec3 lightPositionVector;
+    void UpdateLightPosition() {
+        glm::vec3 pos = glm::vec3(camMat * glm::vec4(lightPositionVector, 1.0));
+        setArray(lightPos, pos);
+        glProgramUniform3fv(renderingProgram, lightPosLoc, 1, lightPos);
+    }
 
     void SetRenderingMesh(Mesh* mesh) {
         if (curMesh != mesh) {
@@ -97,39 +103,63 @@ namespace {
         }
     }
 
-    void SetRenderOptionsColor(glm::vec3 color) {
-        //if (curOptions.color != color) {
+    void SetRenderOptionsSpecial(int special, bool force = false) {
+        if (force || curOptions.special != special) {
+            glProgramUniform1i(renderingProgram, renderOptionsSpecialLoc, special);
+            curOptions.special = special;
+        }
+    }
+    void SetRenderOptionsLighting(int lighting, bool force = false) {
+        if (force || curOptions.lighting != lighting) {
+            glProgramUniform1i(renderingProgram, renderOptionsLightingLoc, lighting);
+            curOptions.lighting = lighting;
+        }
+    }
+    void SetRenderOptionsColor(glm::vec3 color, bool force = false) {
+        if (force || curOptions.color != color) {
             setArray(renderOptionsColor, color);
             float wut[4] = { renderOptionsColor[0], renderOptionsColor[1], renderOptionsColor[2], renderOptionsColor[3] };
             glProgramUniform3fv(renderingProgram, renderOptionsColorLoc, 1, renderOptionsColor);
             curOptions.color = color;
-        //}
+        }
     }
-    void SetRenderOptionsPick(int pick) {
-        //if (curOptions.pick != pick) {
-            glProgramUniform1i(renderingProgram, renderOptionsPickLoc, pick);
-            curOptions.pick = pick;
-        //}
-    }
-    void SetRenderOptionsNormalMod(float normalMod) {
-        //if (curOptions.normalMod != normalMod) {
+    void SetRenderOptionsNormalMod(float normalMod, bool force = false) {
+        if (force || curOptions.normalMod != normalMod) {
             glProgramUniform1f(renderingProgram, renderOptionsNormModLoc, normalMod);
             curOptions.normalMod = normalMod;
-        //}
+        }
     }
-    void SetRenderOptionsScaleMod(float scaleMod) {
-        //if (curOptions.scaleMod != scaleMod) {
+    void SetRenderOptionsScaleMod(float scaleMod, bool force = false) {
+        if (force || curOptions.scaleMod != scaleMod) {
             glProgramUniform1f(renderingProgram, renderOptionsScaleModLoc, scaleMod);
             curOptions.scaleMod = scaleMod;
-        //}
+        }
     }
-    void SetRenderOptions(RenderOptions options) {
-        SetRenderOptionsPick(options.pick);
-        SetRenderOptionsColor(options.color);
-        SetRenderOptionsNormalMod(options.normalMod);
-        SetRenderOptionsScaleMod(options.scaleMod);
+    void SetRenderOptions(RenderOptions options, bool force = false) {
+        SetRenderOptionsSpecial(options.special, force);
+        SetRenderOptionsLighting(options.lighting, force);
+        SetRenderOptionsColor(options.color, force);
+        SetRenderOptionsNormalMod(options.normalMod, force);
+        SetRenderOptionsScaleMod(options.scaleMod, force);
     }
     
+}
+
+
+void Renderer::RenderScene() {
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    double mouseX, mouseY;
+    Window::checkMouseOver(mouseX, mouseY);
+    EntityID mouseEntityID = Renderer::GetMouseEntity(mouseX, mouseY);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    Renderer::UpdateCamera();
+    //std::cout << mouseEntityID << std::endl;
+    Renderer::RenderAll();
+    Renderer::RenderOutline(mouseEntityID);
 }
 
 
@@ -143,23 +173,30 @@ void Renderer::SetAspectRatio(int w, int h) {
     aspect = (float)width / (float)height;
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
 }
+void Renderer::SetAspectRatio(float a) {
+    projMat = glm::perspective(1.472f, aspect, 0.1f, 1000.0f);
+}
 
 void Renderer::SetLight(glm::vec4 global_amb, glm::vec3 pos, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec) {
-    pos = glm::vec3(camMat * glm::vec4(pos, 1.0));
+    lightPositionVector = pos;
     setArray(globalAmb, global_amb);
-    setArray(lightPos, pos);
     setArray(lightAmb, amb);
     setArray(lightDiff, diff);
     setArray(lightSpec, spec);
     glProgramUniform4fv(renderingProgram, globalAmbLoc, 1, globalAmb);
-    glProgramUniform3fv(renderingProgram, lightPosLoc, 1, lightPos);
     glProgramUniform4fv(renderingProgram, lightAmbLoc, 1, lightAmb);
     glProgramUniform4fv(renderingProgram, lightDiffLoc, 1, lightDiff);
     glProgramUniform4fv(renderingProgram, lightSpecLoc, 1, lightSpec);
+    UpdateLightPosition();
 }
 
 
+
 void Renderer::Setup() {
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, dbuffer->texId, 0);
+
     renderingProgram = Utils::createShaderProgram("vertShader.glsl", "fragShader.glsl");
 
     glUseProgram(renderingProgram);
@@ -180,10 +217,11 @@ void Renderer::Setup() {
     matDiffLoc = glGetUniformLocation(renderingProgram, "material.diffuse");
     matSpecLoc = glGetUniformLocation(renderingProgram, "material.specular");
     matShinLoc = glGetUniformLocation(renderingProgram, "material.shininess");
-    renderOptionsPickLoc = glGetUniformLocation(renderingProgram, "render_options.pick");
+    renderOptionsSpecialLoc = glGetUniformLocation(renderingProgram, "render_options.special");
+    renderOptionsLightingLoc = glGetUniformLocation(renderingProgram, "render_options.lighting");
     renderOptionsColorLoc = glGetUniformLocation(renderingProgram, "render_options.color");
-    renderOptionsNormModLoc = glGetUniformLocation(renderingProgram, "render_options.normalmod");
-    renderOptionsScaleModLoc = glGetUniformLocation(renderingProgram, "render_options.scalemod");
+    renderOptionsNormModLoc = glGetUniformLocation(renderingProgram, "render_options.normalMod");
+    renderOptionsScaleModLoc = glGetUniformLocation(renderingProgram, "render_options.scaleMod");
 
 
 
@@ -210,7 +248,14 @@ void Renderer::Setup() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    SetRenderOptions(RenderOptions{ 0, glm::vec3{1,1,1}, 0, 0 });
+    SetRenderOptions(RenderOptions{ 0, 1, glm::vec3{1,1,1}, 0, 0 }, true);
+    SetLight(
+        glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f },
+        glm::vec3{ 0, 1, 1 },
+        glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
+        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
+        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }
+    );
     UpdateCamera();
 }
 
@@ -221,6 +266,7 @@ void Renderer::UpdateCamera() {
     //camMat = glm::rotate(camMat, Utils::toRadians(45.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
     glUniformMatrix4fv(camLoc, 1, GL_FALSE, glm::value_ptr(camMat));
+    UpdateLightPosition();
 }
 
 void Renderer::SetNormalRendering() {
@@ -253,7 +299,8 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
     glEnable(GL_SCISSOR_TEST);
     glScissor(mouseX, height - mouseY, 1, 1);
     EntityID totalEntities = ECS::GetEntityCount();
-    SetRenderOptionsPick(1);
+    SetRenderOptionsSpecial(2);
+    SetRenderOptionsLighting(0);
     for (EntityID eid = 0; eid < totalEntities; eid++) {
         if (ECS::HasComponents(eid, 0 | ComponentTransform | ComponentModel)) {
             SetRenderOptionsColor(EntityToColor(eid));
@@ -264,17 +311,64 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
     glReadPixels (mouseX, height - mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
     EntityID mouseEntityId = ColorToEntity(glm::vec3(pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0));
     glDisable(GL_SCISSOR_TEST);
-    SetRenderOptionsPick(0);
+    SetRenderOptionsSpecial(0);
+    SetRenderOptionsLighting(1);
     return mouseEntityId;
 }
-
-void Renderer::RenderAll(ComponentID components) {
+void Renderer::RenderAll(ComponentID components, bool entitytocolor) {
     EntityID totalEntities = ECS::GetEntityCount();
     for (EntityID eid = 0; eid < totalEntities; eid++) {
         if (ECS::HasComponents(eid, components | ComponentTransform | ComponentModel)) {
+            if(entitytocolor)
+                SetRenderOptionsColor(EntityToColor(eid));
             RenderEntity(eid);
         }
     }
+}
+
+void Renderer::RenderOutline(EntityID eid) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    SetRenderOptionsSpecial(2);
+    SetRenderOptionsLighting(0);
+    SetRenderOptionsColor(glm::vec3(255, 0, 0));
+    glLineWidth(5);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_FRONT);
+    //SetRenderOptionsNormalMod(-0.05);
+    glDepthRange(0.01, 0.02);
+    RenderEntity(eid);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    SetRenderOptionsSpecial(0);
+    SetRenderOptionsLighting(1);
+    //SetRenderOptionsNormalMod(0);
+    glDepthRange(0.00, 0.01);
+    RenderEntity(eid);
+    glDepthRange(0.0, 1.0);
+    //glCullFace(GL_BACK);
+
+
+
+     //glClearStencil(0);
+     //glClear(GL_STENCIL_BUFFER_BIT);
+
+     //// Render the mesh into the stencil buffer.
+	
+     //glEnable(GL_STENCIL_TEST);
+
+     //glStencilFunc(GL_ALWAYS, 1, -1);
+     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+     //RenderMesh();
+
+     //// Render the thick wireframe version.
+
+     //glStencilFunc(GL_NOTEQUAL, 1, -1);
+     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+     //glLineWidth(3);
+     //glPolygonMode(GL_FRONT, GL_LINE);
+	
+     //RenderMesh();
 }
 
 void Renderer::RenderEntity(EntityID eid) {

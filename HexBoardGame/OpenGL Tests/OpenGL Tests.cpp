@@ -54,13 +54,6 @@ void init(GLFWwindow* window) {
 
 
     Renderer::Setup();
-    Renderer::SetLight(
-        glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f }, 
-        glm::vec3{ 0, 1, 1 }, 
-        glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f }, 
-        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, 
-        glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }
-    );
 }
 
 EntityID mouseEntityID;
@@ -79,18 +72,10 @@ void display(GLFWwindow* window, double currentTime) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     Renderer::UpdateCamera();
-    //Renderer::RenderEntity(mouseEntityID);
     Transformer::SetPosition(player, glm::vec3(ECS::GetTransform(70)->position));
-    bool valid = ECS::HasComponents(mouseEntityID, ComponentTransform);
-    if (valid) {
-        Transformer::Translate(mouseEntityID, glm::vec3(0, 0.15, 0));
-    }
     std::cout << mouseEntityID << std::endl;
     Renderer::RenderAll();
-    if (valid) {
-        Transformer::Translate(mouseEntityID, glm::vec3(0, -0.15, 0));
-    }
-    //Renderer::RenderEntity(player);
+    Renderer::RenderOutline(mouseEntityID);
 }
 
 void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {

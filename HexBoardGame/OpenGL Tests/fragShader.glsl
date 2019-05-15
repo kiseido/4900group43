@@ -24,7 +24,8 @@ struct Material
     float shininess;
 };
 struct RenderOptions {
-    int pick;
+    int special;
+    int lighting;
     vec3 color;
     float normalMod;
     float scaleMod;
@@ -42,31 +43,34 @@ layout (binding=0) uniform sampler2D texturesample;
 void main(void)
 {
     vec4 texColor = texture(texturesample, texcoord);
-    vec4 ambColor = texColor * material.ambient;
-    vec4 diffColor = texColor * material.diffuse;
-    vec4 specColor = texColor * material.specular;
-    // normalize the light, normal, and view vectors:
-    vec3 L = normalize(varyingLightDir);
-    vec3 N = normalize(varyingNormal);
-    vec3 V = normalize(-varyingVertPos);
 
-    // get the angle between the light and surface normal:
-    float cosTheta = dot(L, N);
+    if (render_options.lighting != 0) {
+        vec4 ambColor = texColor * material.ambient;
+        vec4 diffColor = texColor * material.diffuse;
+        vec4 specColor = texColor * material.specular;
+        // normalize the light, normal, and view vectors:
+        vec3 L = normalize(varyingLightDir);
+        vec3 N = normalize(varyingNormal);
+        vec3 V = normalize(-varyingVertPos);
 
-    // halfway vector varyingHalfVector was computed in the vertex shader,
-    // and interpolated prior to reaching the fragment shader.
-    // It is copied into variable H here for convenience later.
-    vec3 H = normalize(varyingHalfVector);
+        // get the angle between the light and surface normal:
+        float cosTheta = dot(L, N);
 
-    // get angle between the normal and the halfway vector
-    float cosPhi = dot(H, N);
+        // halfway vector varyingHalfVector was computed in the vertex shader,
+        // and interpolated prior to reaching the fragment shader.
+        // It is copied into variable H here for convenience later.
+        vec3 H = normalize(varyingHalfVector);
 
-    // compute ADS contributions (per pixel):
-    vec3 ambient = ((globalAmbient * ambColor) + (light.ambient * ambColor)).xyz;
-    vec3 diffuse = light.diffuse.xyz * diffColor.xyz * max(cosTheta, 0.0);
-    vec3 specular = light.specular.xyz * specColor.xyz * pow(max(cosPhi, 0.0), material.shininess*3.0);
-    fragColor = vec4((ambient + diffuse + specular), 1.0);
-    if (render_options.pick != 0) {
+        // get angle between the normal and the halfway vector
+        float cosPhi = dot(H, N);
+
+        // compute ADS contributions (per pixel):
+        vec3 ambient = ((globalAmbient * ambColor) + (light.ambient * ambColor)).xyz;
+        vec3 diffuse = light.diffuse.xyz * diffColor.xyz * max(cosTheta, 0.0);
+        vec3 specular = light.specular.xyz * specColor.xyz * pow(max(cosPhi, 0.0), material.shininess*3.0);
+        fragColor = vec4((ambient + diffuse + specular), 1.0);
+    }
+    else if (render_options.special == 2) {
         fragColor = vec4(render_options.color,1);
     }
     //fragColor = texColor;
