@@ -41,6 +41,8 @@ public:
 	@throws TCPException or UDPException if fails*/
 	SOCKET acceptConnection(struct sockaddr_in *client);
 
+	SOCKET acceptConnection(SOCKET *sock, struct sockaddr_in *client);
+
 	/*  Receives a message from specified socket
 	stores it in the receivedMessages queue if there is 
 	a message.

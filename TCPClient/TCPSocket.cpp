@@ -57,6 +57,29 @@ SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
 	return newSocket;
 }
 
+SOCKET TCPSocket::acceptConnection(SOCKET *sock, struct sockaddr_in *client)
+{
+	//puts("\nAccepting incoming connections...");
+	int size = sizeof(struct sockaddr_in);
+	SOCKET newSocket;
+	if ((newSocket = accept(*sock, (struct sockaddr *)client, &size)) == INVALID_SOCKET)
+	{
+		std::string error = "\nAccept failed with error code: " +
+			std::to_string(WSAGetLastError());
+		if (protocol == TCP)
+		{
+			throw TCPException(error);
+		}
+		else if (protocol == UDP)
+		{
+			throw UDPException(error);
+		}
+	}
+	puts("\nConnection accepted");
+	std::cout << "User " << newSocket << " has joined the chat!\n";
+	return newSocket;
+}
+
 void TCPSocket::sendTo(const char * message)
 {
 	if (send(sock, message, strlen(message), 0) < 0)

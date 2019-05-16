@@ -7,7 +7,7 @@
 #include <sstream>
 
 void processSend(TCPSocket *tSock);
-void checkHeader(TCPSocket * tSock, std::string message);
+void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receiveThread);
 void holePunch(TCPSocket *tSock, const char * addr, int port);
 std::vector<std::string> parseString(std::string *message);
 void processReply(SOCKET s, TCPSocket *tSock);
@@ -68,33 +68,32 @@ void processReply(SOCKET s, TCPSocket *tSock)
 	{
 		if (tSock->receiveFrom(&s, 100, receiveMessage) == 0)
 		{
-			std::cout << "Server has disconnected.";
+			std::cout << "User " << s << " has Disconnected.";
 			tSock->closeSocket(&s);
 			break;
 		}
-		std::thread tReply(checkHeader, tSock, receiveMessage);
+		std::thread tReply(checkHeader, tSock, receiveMessage, std::this_thread::get_id());
 		tReply.detach();
 		std::cout << "Reply: " << receiveMessage << '\n';
 	}
 }
 
-void processAccept(TCPSocket *tSock)
+void processAccept(TCPSocket *sock)
 {
-	tSock->listenForConnections(1);
 	sockaddr_in clientAddr;
 	SOCKET newClient;
-	for (int index = 0; (newClient = tSock->acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
+	for (int index = 0; (newClient = sock->acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
 	{
-		tSock->clients.push_back(newClient);
+		sock->clients.push_back(newClient);
 		//std::thread conThread(*processClient, newClient, &tSock, index);
 		//conThread.detach();
 		int clientPort;
-		tSock->getPortFromSockAddr(&clientAddr, &clientPort);
+		sock->getPortFromSockAddr(&clientAddr, &clientPort);
 		std::cout << "Client Port: " << clientPort;
 	}
 }
 
-void checkHeader(TCPSocket * tSock, std::string message)
+void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receiveThread)
 {
 	std::vector<std::string> parStrings = parseString(&message);
 	std::string str = parStrings.at(0);
@@ -112,21 +111,37 @@ void checkHeader(TCPSocket * tSock, std::string message)
 
 void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
-	tSock->closeSocket(tSock->getSock());
 	try 
 	{
+		const char * internalAddr = "192.168.1.64";
 		TCPSocket cSock(IPv4);
+
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		sockaddr_in sockAddrBind;
-		cSock.setupSockAddr(&sockAddrBind, addr, 8080);
-		cSock.bindSock(&sockAddrBind);
-		std::thread tAccept(processAccept, &cSock);
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, 8080);
+		
+		//Test Stuff
+		char domain[] = "node.digitalprojects.info";
+		char fetchedIP[100];
+		sockaddr_in sockAddr;
+		cSock.getIPFromDomain(domain, fetchedIP);
+		cSock.setupSockAddr(&sockAddr, fetchedIP, 8080);
+		cSock.connectToServer(&sockAddr);
+		
+			
+		//cSock.bindSock(&sockAddrBind);
+		//cSock.listenForConnections(1);
 
-		cSock.connectToServer(&sockAddrConnect);
+		//std::thread tAccept(processAccept, &cSock);
+		//tAccept.detach();
+		//cSock.connectToServer(&sockAddrConnect);
+		getchar();
 	}
-	catch (TCPException e) { puts(e.what()); }
-
+	catch (TCPException e) { 
+		puts(e.what()); 
+		exit(1);
+	}
 }
 
 void hostServer(Socket *tSock)
