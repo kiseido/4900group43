@@ -22,7 +22,7 @@ int main()
 	//catch (WSAException e) { puts(e.what()); }
 
 	TCPSocket tSock;
-	sockaddr_in sockAddr;
+	sockaddr_in serverAddr;
 	
 	//CHANGE THESE TO WHAT YOU WANT
 	//const char * addr = "142.232.142.251";
@@ -35,9 +35,9 @@ int main()
 		char fetchedIP[100];
 		tSock.getIPFromDomain(domain, fetchedIP);
 		
-		tSock.setupSockAddr(&sockAddr, fetchedIP, port);
+		tSock.setupSockAddr(&serverAddr, fetchedIP, port);
 
-		tSock.connectToServer(&sockAddr);
+		tSock.connectToServer(&serverAddr);
 
 		std::thread thrSend(processSend, &tSock);
 		thrSend.detach();
@@ -78,18 +78,17 @@ void processReply(SOCKET s, TCPSocket *tSock)
 	}
 }
 
-void processAccept(TCPSocket *tSock)
+void processAccept(TCPSocket *sock)
 {
-	tSock->listenForConnections(1);
 	sockaddr_in clientAddr;
 	SOCKET newClient;
-	for (int index = 0; (newClient = tSock->acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
+	for (int index = 0; (newClient = sock->acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
 	{
-		tSock->clients.push_back(newClient);
+		sock->clients.push_back(newClient);
 		//std::thread conThread(*processClient, newClient, &tSock, index);
 		//conThread.detach();
 		int clientPort;
-		tSock->getPortFromSockAddr(&clientAddr, &clientPort);
+		sock->getPortFromSockAddr(&clientAddr, &clientPort);
 		std::cout << "Client Port: " << clientPort;
 	}
 }
@@ -112,20 +111,35 @@ void checkHeader(TCPSocket * tSock, std::string message)
 
 void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
-	tSock->closeSocket(tSock->getSock());
+	//Game Client Code
 	try 
 	{
+		const char * internalAddr = "192.168.43.103";
 		TCPSocket cSock(IPv4);
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		sockaddr_in sockAddrBind;
-		cSock.setupSockAddr(&sockAddrBind, addr, 8080);
-		cSock.bindSock(&sockAddrBind);
-		std::thread tAccept(processAccept, &cSock);
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, 8080);
+		while (true) {
+			try {
+				cSock.connectToServer(&sockAddrConnect);
+			}
+			catch (TCPException e) { puts(e.what()); };
+		}
 
-		cSock.connectToServer(&sockAddrConnect);
+
+
+
+
+
+;
+
+
 	}
-	catch (TCPException e) { puts(e.what()); }
+	catch (TCPException e) { 
+		puts(e.what());
+		exit(1);
+	}
 
 }
 
