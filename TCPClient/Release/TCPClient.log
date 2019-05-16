@@ -1,0 +1,26 @@
+﻿  TCPClientMain.cpp
+c:\users\kemal\desktop\4900group43\tcpclient\tcpclientmain.cpp(41): warning C4101: 'result': unreferenced local variable
+c:\users\kemal\desktop\4900group43\tcpclient\tcpclientmain.cpp(73): warning C4101: 'result': unreferenced local variable
+  Socket.cpp
+  TCPSocket.cpp
+  WSASession.cpp
+c:\users\kemal\desktop\4900group43\tcpclient\wsasession.cpp(25): warning C4297: 'WSASession::~WSASession': function assumed not to throw an exception but does
+  c:\users\kemal\desktop\4900group43\tcpclient\wsasession.cpp(25): note: destructor or deallocator has a (possibly implicit) non-throwing exception specification
+Socket.obj : error LNK2001: unresolved external symbol __imp__WSAGetLastError@0
+Socket.obj : error LNK2001: unresolved external symbol __imp__htons@4
+Socket.obj : error LNK2001: unresolved external symbol _inet_ntop@16
+Socket.obj : error LNK2001: unresolved external symbol __imp__ntohs@4
+Socket.obj : error LNK2001: unresolved external symbol __imp__socket@12
+Socket.obj : error LNK2001: unresolved external symbol _InetNtopW@16
+Socket.obj : error LNK2001: unresolved external symbol __imp__getaddrinfo@16
+Socket.obj : error LNK2001: unresolved external symbol __imp__inet_pton@12
+Socket.obj : error LNK2001: unresolved external symbol __imp__closesocket@4
+Socket.obj : error LNK2001: unresolved external symbol __imp__bind@12
+TCPSocket.obj : error LNK2001: unresolved external symbol __imp__recv@16
+TCPSocket.obj : error LNK2001: unresolved external symbol __imp__connect@12
+TCPSocket.obj : error LNK2001: unresolved external symbol __imp__send@16
+TCPSocket.obj : error LNK2001: unresolved external symbol __imp__listen@8
+TCPSocket.obj : error LNK2001: unresolved external symbol __imp__accept@12
+WSASession.obj : error LNK2001: unresolved external symbol __imp__WSAStartup@8
+WSASession.obj : error LNK2001: unresolved external symbol __imp__WSACleanup@0
+C:\Users\Kemal\Desktop\4900group43\Release\TCPClient.exe : fatal error LNK1120: 17 unresolved externals

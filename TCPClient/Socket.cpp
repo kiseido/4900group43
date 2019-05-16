@@ -74,9 +74,25 @@ void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)
 	getPortFromSockAddr(sockAddr, port);
 }
 
+void Socket::closeSocket()
+{
+	if (closesocket(sock) == SOCKET_ERROR)
+	{
+		error = "Close Socket Failed. Error code : " +
+			std::to_string(WSAGetLastError());
+		if (protocol == TCP)
+		{
+			throw TCPException(error);
+		}
+		else if (protocol == UDP)
+		{
+			throw UDPException(error);
+		}
+	}
+}
 
-
-void Socket::closeSocket(SOCKET *s) {
+void Socket::closeSocket(SOCKET *s) 
+{
 	if (closesocket(*s) == SOCKET_ERROR)
 	{
 		error = "Close Socket Failed. Error code : " +
@@ -158,13 +174,15 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 				throw UDPException(error);
 			}
 		}
-		InetNtopW(result->ai_family, ptr, ip, 100);		
+		InetNtopW(result->ai_family, ptr, ip, 100);
 		_bstr_t b(ip);
-		fetchedIP = b;
+		char * temp = b;
+		for (int i = 0; i < 100; i++)
+		{
+			fetchedIP[i] = temp[i];
+		}
 		printf("\nIPv%d address: %s (%s)\n", result->ai_family == PF_INET6 ? 6 : 4,
 			fetchedIP, result->ai_canonname);
 		result = result->ai_next;
 	}
-
-
 }

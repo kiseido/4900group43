@@ -90,6 +90,7 @@ int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize, char* message)
 
 void TCPSocket::connectToServer(struct sockaddr_in *server)
 {
+	puts("\nConnecting...");
 	if (connect(sock, (struct sockaddr *)server, sizeof(struct sockaddr_in)) < 0)
 	{
 		std::string error = "\nConnect Error. Error code : " +

@@ -51,6 +51,9 @@ public:
 	@param s socket descriptor*/
 	void closeSocket(SOCKET *s);
 
+	/*Closes socket associated with this object*/
+	void closeSocket();
+
 	void getIPFromDomain(char* hostName, char* fetchedIP);
 
 	//virtual void sendTo(SOCKET clientSock, const char * message) = 0;
