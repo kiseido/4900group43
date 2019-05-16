@@ -40,7 +40,6 @@ int main()
 		tSock.getPortFromSockAddr(&clientAddr, &clientPort);
 		std::cout << "Client Port: " << port;
 	}
-
 }
 
 void processClient(SOCKET s, TCPSocket *tSock, int index)
