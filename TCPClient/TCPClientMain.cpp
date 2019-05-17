@@ -11,10 +11,12 @@ void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receive
 void holePunch(TCPSocket *tSock, const char * addr, int port);
 std::vector<std::string> parseString(std::string *message);
 void processReply(SOCKET s, TCPSocket *tSock);
+void servePunch(TCPSocket *tSock, const char * addr);
+void conPunch(const char * addr, int port);
 
 int main()
 {
-	puts("TCP Client Test! XD");
+	puts("TCP Game Client Test! XD");
 
 	WSASession wsa;
 	TCPSocket tSock;
@@ -23,7 +25,7 @@ int main()
 	//CHANGE THESE TO WHAT YOU WANT
 	//const char * addr = "142.232.142.251";
 	//const char * addr = "198.105.215.35";
-	const char * addr = LOCAL_HOST;
+	//const char * addr = LOCAL_HOST;
 	int port = 8080;
 
 	try {
@@ -120,38 +122,65 @@ void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receive
 
 void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
-	try 
+	std::thread tServePunch(servePunch, tSock, addr);
+	tServePunch.detach();
+
+	conPunch(addr, port);
+}
+
+void conPunch(const char * addr, int port)
+{
+	try
 	{
-		//const char * internalAddr = INADDR_ANY;
 		TCPSocket cSock(IPv4);
-		port++;
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
-		//sockaddr_in sockAddrBind;
-		//cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
-		
-		//cSock.setupSockAddr(&sockAddrConnect, addr, port);
-		cSock.connectToServer(&sockAddrConnect);
-		
-			
-		//cSock.bindSock(&sockAddrBind);
-		//cSock.listenForConnections(1);
 
-		//std::thread tAccept(processAccept, &cSock);
-		//tAccept.detach();
-		//cSock.connectToServer(&sockAddrConnect);
+		while (true) 
+		{
+			cSock.connectToServer(&sockAddrConnect);
+		}
+
+
 		getchar();
 	}
-	catch (TCPException e) { 
-		puts(e.what()); 
+	catch (TCPException e) {
+		puts(e.what());
 		getchar();
-		//exit(1);
+		exit(1);
 	}
 }
 
-void hostServer(Socket *tSock)
+void servePunch(TCPSocket *tSock, const char * addr)
 {
+	try
+	{
+		sockaddr_in privateAddr;
+		tSock->getSockName(&privateAddr);
+		int port;
+		tSock->getPortFromSockAddr(&privateAddr, &port);
+		char internalAddr[100];
+		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
+		
+		TCPSocket cSock(IPv4);
+		sockaddr_in sockAddrConnect;
+		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		sockaddr_in sockAddrBind;
 
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
+		cSock.bindSock(&sockAddrBind);
+
+		cSock.listenForConnections(1);
+
+		std::thread tAccept(processAccept, &cSock);
+		tAccept.detach();
+		getchar();
+	}
+	catch (TCPException e) {
+		puts(e.what());
+		getchar();
+		exit(1);
+	}
 }
 
 std::vector<std::string> parseString(std::string *message)
