@@ -17,6 +17,25 @@ void Socket::setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int p
 	}
 	sockAddr->sin_family = addrType;
 	sockAddr->sin_port = htons(port);
+}
+
+void Socket::setupSockAddr(struct sockaddr_in *sockAddr, int port)
+{
+	//int result = inet_pton(addrType, addr, &sockAddr->sin_addr.s_addr);
+	//if (result == 0)
+	//{
+	//	error = "\nSetup SockAddr Failed. Invalid IPv4 or IPv6 string.";
+	//	throw(SocketException(error));
+	//}
+	//else if (result == -1)
+	//{
+	//	error = "\nSetup SockAddr Failed. Error code: " +
+	//		std::to_string(WSAGetLastError());
+	//	throw(SocketException(error));
+	//}
+	sockAddr->sin_family = addrType;
+	sockAddr->sin_port = htons(port);
+	sockAddr->sin_addr.s_addr = htonl(INADDR_ANY);
 
 }
 
@@ -64,7 +83,7 @@ void Socket::getIPfromSockAddr(struct sockaddr_in *sockAddr, char *ip)
 void Socket::getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port)
 {
 	*port = ntohs(sockAddr->sin_port);
-	printf("\nMy Local Port: %d", *port);
+	printf("\nPort: %d", *port);
 }
 
 void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)

@@ -29,6 +29,8 @@ public:
 	@param port the port number
 	@throws SocketException if fails*/
 	void setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int port);
+
+	void setupSockAddr(struct sockaddr_in *sockAddr, int port);
 	
 	/* Binds socket to port and address associated with 
 	the sockaddr_in structure

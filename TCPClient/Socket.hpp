@@ -22,15 +22,17 @@ protected:
 public:
 	int internalPort;
 	std::vector<SOCKET> clients;
-	/* Initializes sockaddr_in structure sockAddr using 
-	the ip address & port number 
+	/* Initializes sockaddr_in structure sockAddr using
+	the ip address & port number
 	@param sockAddr the structure you want to fill
 	@param addr the ip address
 	@param port the port number
 	@throws SocketException if fails*/
 	void setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int port);
-	
-	/* Binds socket to port and address associated with 
+
+	void setupSockAddr(struct sockaddr_in *sockAddr, int port);
+
+	/* Binds socket to port and address associated with
 	the sockaddr_in structure
 	@param sockAddr the structure containing ip address &
 	port information
@@ -47,7 +49,7 @@ public:
 	@param port int that is meant to contain the extracted port number*/
 	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
 	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
-	
+
 	void setSockOptions(int optName, const char * optVal, int optLen);
 
 	void getSockName(sockaddr_in *name);

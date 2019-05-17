@@ -11,16 +11,35 @@ void Socket::setupSockAddr(struct sockaddr_in *sockAddr, const char* addr, int p
 	}
 	else if (result == -1)
 	{
-		error = "\nSetup SockAddr Failed. Error code: " + 
+		error = "\nSetup SockAddr Failed. Error code: " +
 			std::to_string(WSAGetLastError());
 		throw(SocketException(error));
 	}
 	sockAddr->sin_family = addrType;
 	sockAddr->sin_port = htons(port);
+}
+
+void Socket::setupSockAddr(struct sockaddr_in *sockAddr, int port)
+{
+	//int result = inet_pton(addrType, addr, &sockAddr->sin_addr.s_addr);
+	//if (result == 0)
+	//{
+	//	error = "\nSetup SockAddr Failed. Invalid IPv4 or IPv6 string.";
+	//	throw(SocketException(error));
+	//}
+	//else if (result == -1)
+	//{
+	//	error = "\nSetup SockAddr Failed. Error code: " +
+	//		std::to_string(WSAGetLastError());
+	//	throw(SocketException(error));
+	//}
+	sockAddr->sin_family = addrType;
+	sockAddr->sin_port = htons(port);
+	sockAddr->sin_addr.s_addr = htonl(INADDR_ANY);
 
 }
 
-void Socket::bindSock(struct sockaddr_in *sockAddr) 
+void Socket::bindSock(struct sockaddr_in *sockAddr)
 {
 	if (bind(sock, (struct sockaddr *)sockAddr, sizeof(*sockAddr)) == SOCKET_ERROR)
 	{
@@ -42,7 +61,7 @@ void Socket::create()
 {
 	if ((sock = socket(addrType, sockType, protocol)) == INVALID_SOCKET)
 	{
-		error = "Could not create socket : " + 
+		error = "Could not create socket : " +
 			std::to_string(WSAGetLastError());
 		if (protocol == TCP)
 		{
@@ -91,8 +110,7 @@ void Socket::closeSocket()
 	}
 }
 
-void Socket::closeSocket(SOCKET *s) 
-{
+void Socket::closeSocket(SOCKET *s) {
 	if (closesocket(*s) == SOCKET_ERROR)
 	{
 		error = "Close Socket Failed. Error code : " +
@@ -190,7 +208,7 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 void Socket::setSockOptions(int optName, const char * optVal, int optLen)
 {
 
-	if (setsockopt(sock, SOL_SOCKET, optName ,optVal, sizeof(&optVal)) == SOCKET_ERROR)
+	if (setsockopt(sock, SOL_SOCKET, optName, optVal, sizeof(&optVal)) == SOCKET_ERROR)
 	{
 		std::string error = "Set Sock Options. Error code: " +
 			std::to_string(WSAGetLastError());
