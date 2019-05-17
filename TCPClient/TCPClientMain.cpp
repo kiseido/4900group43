@@ -16,12 +16,12 @@ void conPunch(const char * addr, int port);
 
 int main()
 {
-	puts("TCP Game Client Test! XD");
+	puts("TCP Game Server Test! XD");
 
 	WSASession wsa;
 	TCPSocket tSock;
 	sockaddr_in serverAddr, localAddr;
-	
+
 	//CHANGE THESE TO WHAT YOU WANT
 	//const char * addr = "142.232.142.251";
 	//const char * addr = "198.105.215.35";
@@ -33,7 +33,7 @@ int main()
 		char fetchedIP[100];
 		tSock.getIPFromDomain(domain, fetchedIP);
 		tSock.setupSockAddr(&serverAddr, fetchedIP, port);
-		
+
 		tSock.connectToServer(&serverAddr);
 
 		const char * optVal = "1";
@@ -45,7 +45,7 @@ int main()
 
 		char key[] = GAME_CONNECTION;
 		tSock.sendTo(key);
-		
+
 		char message[6];
 		//_itoa_s(tSock.internalPort, message, 10);
 		//tSock.sendTo(message);
@@ -126,6 +126,7 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	tServePunch.detach();
 
 	conPunch(addr, port);
+
 }
 
 void conPunch(const char * addr, int port)
@@ -135,14 +136,14 @@ void conPunch(const char * addr, int port)
 		TCPSocket cSock(IPv4);
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
-
-		while (true) 
+		try
 		{
-			cSock.connectToServer(&sockAddrConnect);
+			while (true)
+			{
+				cSock.connectToServer(&sockAddrConnect);
+			}
 		}
-
-
-		getchar();
+		catch (TCPException e) {}
 	}
 	catch (TCPException e) {
 		puts(e.what());
@@ -161,8 +162,8 @@ void servePunch(TCPSocket *tSock, const char * addr)
 		tSock->getPortFromSockAddr(&privateAddr, &port);
 		char internalAddr[100];
 		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
-		
 		TCPSocket cSock(IPv4);
+
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		sockaddr_in sockAddrBind;

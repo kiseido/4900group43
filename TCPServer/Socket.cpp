@@ -64,7 +64,7 @@ void Socket::getIPfromSockAddr(struct sockaddr_in *sockAddr, char *ip)
 void Socket::getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port)
 {
 	*port = ntohs(sockAddr->sin_port);
-	printf("\nPort: %d", *port);
+	printf("\nMy Local Port: %d", *port);
 }
 
 void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)

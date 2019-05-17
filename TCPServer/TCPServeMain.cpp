@@ -136,11 +136,14 @@ void conPunch(const char * addr, int port)
 		TCPSocket cSock(IPv4);
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
-		while (true)
+		try
 		{
-			cSock.connectToServer(&sockAddrConnect);
+			while (true)
+			{
+				cSock.connectToServer(&sockAddrConnect);
+			}
 		}
-		getchar();
+		catch (TCPException e) {}
 	}
 	catch (TCPException e) {
 		puts(e.what());
