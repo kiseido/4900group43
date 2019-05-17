@@ -131,7 +131,7 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	//std::thread tConPunch2(conPunch, addr, port);
 }
 
-void conPunch(Socket * tSock, const char * addr, int port)
+void conPunch(TCPSocket * tSock, const char * addr, int port)
 {
 	try
 	{
