@@ -8,13 +8,15 @@ constexpr ComponentID ComponentModel =          0b000000000000000000000000000000
 constexpr ComponentID ComponentBoardPosition =  0b00000000000000000000000000000100;
 constexpr ComponentID ComponentBoardPiece =     0b00000000000000000000000000001000;
 
-class Component
+
+constexpr ComponentID ComponentOutline =        0b01000000000000000000000000000000;
+constexpr ComponentID ComponentPick =           0b10000000000000000000000000000000;
+
+struct Component
 {
 protected:
     Component() = default;
-    Component(ComponentID cid);
 public:
-    ComponentID compID;
     ~Component() = default;
 
 };

@@ -14,7 +14,7 @@ Material* Resources::MaterialList[MATERIAL_LIST_SIZE];
 
 
 
-Model::Model(MeshID m, TextureID t, MaterialID mat) : Component(ComponentModel) {
+Model::Model(MeshID m, TextureID t, MaterialID mat) {
     mesh = Resources::GetMesh(m);
     texture = Resources::GetTexture(t);
     material = Resources::GetMaterial(mat);

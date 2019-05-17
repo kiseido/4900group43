@@ -12,9 +12,19 @@ public:
     std::vector<EntityID> elements;
 };
 
+struct BoardPiece : public Component
+{
+    BoardPiece(int moves);
+    int maxMoves;
+    int movesLeft;
+};
 
-class Board {
-    BoardPosition **board;
+struct Board {
+    BoardPosition ***board;
+    int radius;
+    int boardHeight;
+    int boardWidth;
+    ~Board();
     Board(int radius);
     Board(int width, int height);
 };

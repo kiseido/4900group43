@@ -31,8 +31,7 @@ enum MaterialID {
     MATERIAL_LIST_SIZE
 };
 
-class Mesh {
-public:
+struct Mesh {
     Mesh() = default;
     int numVertices;
     std::vector<float> pvalues;
@@ -45,8 +44,7 @@ public:
 };
 
 
-class Material {
-public:
+struct Material {
     Material();
     Material(glm::vec4 amb, glm::vec4 diff, glm::vec4 spec, float shin);
     glm::vec4 ambient;
@@ -57,12 +55,13 @@ public:
 
 
 
-class Model : public Component {
-public:
+struct Model : public Component {
     Model(MeshID m, TextureID t, MaterialID mat = BasicMaterial);
     Mesh* mesh;
     Material* material;
     Texture texture;
+    uint8_t outlineWeight;
+    glm::vec3 outlineColor;
     ~Model() = default;
 };
 

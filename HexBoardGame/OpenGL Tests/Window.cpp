@@ -80,5 +80,5 @@ void Window::mouse_button_callback(GLFWwindow* window, int button, int action, i
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    Renderer::ChangeCameraZoom(yoffset / 10);
+    Renderer::ChangeCameraZoom(-yoffset / 10);
 }

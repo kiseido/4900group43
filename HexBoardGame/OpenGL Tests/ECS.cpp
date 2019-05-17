@@ -22,9 +22,10 @@ namespace {
 
 
 ComponentID ECS::ECS_EntityComponents[MAX_ENTITY_ARRAY_SIZE];
-BoardPosition* ECS::ECS_BoardPosition[MAX_ENTITY_ARRAY_SIZE];
 Transform* ECS::ECS_Transform[MAX_ENTITY_ARRAY_SIZE];
 Model* ECS::ECS_Model[MAX_ENTITY_ARRAY_SIZE];
+BoardPosition* ECS::ECS_BoardPosition[MAX_ENTITY_ARRAY_SIZE];
+BoardPiece* ECS::ECS_BoardPiece[MAX_ENTITY_ARRAY_SIZE];
 
 
 unsigned int ECS::GetEntityCount() { return nextEntity; }
@@ -38,10 +39,8 @@ EntityID ECS::CreateEntity(ModelID m) {
 }
 
 EntityID ECS::CreateEntity(Transform* t, Model* m) {
-    //ECS_Transform[nextEntity] = t;
-    //ECS_Model[nextEntity] = m;
-    SetComponent(nextEntity, t);
-    SetComponent(nextEntity, m);
+    SetTransform(nextEntity, t);
+    SetModel(nextEntity, m);
     return nextEntity++;
 }
 
@@ -58,37 +57,46 @@ bool ECS::HasComponents(EntityID eid, ComponentID components) {
 
 Component* ECS::GetComponent(EntityID eid, ComponentID compid) {
     switch (compid) {
-    case ComponentBoardPosition:
-        return ECS_BoardPosition[eid];
-        break;
     case ComponentTransform:
-        return ECS_Transform[eid];
+        return GetTransform(eid);
         break;
     case ComponentModel:
-        return ECS_Model[eid];
+        return GetModel(eid);
+        break;
+    case ComponentBoardPosition:
+        return GetBoardPosition(eid);
+        break;
+    case ComponentBoardPiece:
+        return GetBoardPiece(eid);
         break;
     }
 }
 
-void ECS::SetComponent(EntityID eid, Component* component) {
-    if (component) {
-        switch (component->compID) {
-        case ComponentBoardPosition:
-            ECS_BoardPosition[eid] = (BoardPosition*)component;
-            break;
-        case ComponentTransform:
-            ECS_Transform[eid] = (Transform*)component;
-            break;
-        case ComponentModel:
-            ECS_Model[eid] = (Model*)component;
-            break;
-        default:
-            return;
-        }
-        ECS_EntityComponents[eid] |= component->compID;
-    }
+
+void ECS::SetComponent(EntityID eid, Transform* transform) {
+    SetTransform(eid, transform);
 }
 
+void ECS::SetComponent(EntityID eid, Model* model) {
+    SetModel(eid, model);
+}
+
+void ECS::SetComponent(EntityID eid, BoardPosition* boardposition) {
+    SetBoardPosition(eid, boardposition);
+}
+
+void ECS::SetComponent(EntityID eid, BoardPiece* boardpiece) {
+    SetBoardPiece(eid, boardpiece);
+}
+
+
+Transform* ECS::GetTransform(EntityID eid) {
+    return ECS_Transform[eid];
+}
+void ECS::SetTransform(EntityID eid, Transform* transform) {
+    ECS_Transform[eid] = transform;
+    ECS_EntityComponents[eid] |= ComponentTransform;
+}
 
 
 Model* ECS::GetModel(EntityID eid) {
@@ -96,19 +104,23 @@ Model* ECS::GetModel(EntityID eid) {
 }
 void ECS::SetModel(EntityID eid, Model* model) {
     ECS_Model[eid] = model;
+    ECS_EntityComponents[eid] |= ComponentModel;
 }
 
-Transform* ECS::GetTransform(EntityID eid) {
-    //return ECS_Transform[eid];
-    return (Transform*)GetComponent(eid, ComponentTransform);
-}
-void ECS::SetTransform(EntityID eid, Transform* transform) {
-    ECS_Transform[eid] = transform;
-}
 
 BoardPosition* ECS::GetBoardPosition(EntityID eid) {
     return ECS_BoardPosition[eid];
 }
 void ECS::SetBoardPosition(EntityID eid, BoardPosition* boardposition) {
     ECS_BoardPosition[eid] = boardposition;
+    ECS_EntityComponents[eid] |= ComponentBoardPosition;
+}
+
+
+BoardPiece* ECS::GetBoardPiece(EntityID eid) {
+    return ECS_BoardPiece[eid];
+}
+void ECS::SetBoardPiece(EntityID eid, BoardPiece* boardpiece) {
+    ECS_BoardPiece[eid] = boardpiece;
+    ECS_EntityComponents[eid] |= ComponentBoardPiece;
 }

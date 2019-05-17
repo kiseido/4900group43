@@ -5,14 +5,16 @@
 
 namespace Renderer
 {
-    constexpr glm::vec3 COLOR_RED = glm::vec3(255, 0, 0);
-    constexpr glm::vec3 COLOR_GREEN = glm::vec3(0, 255, 0);
-    constexpr glm::vec3 COLOR_BLUE = glm::vec3(0, 0, 255);
-    constexpr glm::vec3 COLOR_YELLOW = glm::vec3(255, 255, 0);
-    constexpr glm::vec3 COLOR_CYAN = glm::vec3(0, 255, 255);
-    constexpr glm::vec3 COLOR_PINK = glm::vec3(255, 0, 255);
-    constexpr glm::vec3 COLOR_WHITE = glm::vec3(255, 255, 255);
+    constexpr glm::vec3 COLOR_RED = glm::vec3(1, 0, 0);
+    constexpr glm::vec3 COLOR_GREEN = glm::vec3(0, 1, 0);
+    constexpr glm::vec3 COLOR_BLUE = glm::vec3(0, 0, 1);
+    constexpr glm::vec3 COLOR_YELLOW = glm::vec3(1, 1, 0);
+    constexpr glm::vec3 COLOR_CYAN = glm::vec3(0, 1, 1);
+    constexpr glm::vec3 COLOR_PINK = glm::vec3(1, 0, 1);
+    constexpr glm::vec3 COLOR_WHITE = glm::vec3(1, 1, 1);
     constexpr glm::vec3 COLOR_BLACK = glm::vec3(0, 0, 0);
+    glm::vec3 LIGHT(glm::vec3 color);
+    glm::vec3 DARK(glm::vec3 color);
     
     /*hi*/
     void Setup();
@@ -25,8 +27,6 @@ namespace Renderer
     void RenderScene();
 
     void UpdateCamera();
-    void SetNormalRendering();
-    void SetOutlineRendering();
     void RenderEntity(EntityID eid);
     void RenderPicking(EntityID eid);
     void RenderOutline(EntityID eid, float width, glm::vec3 color);

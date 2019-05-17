@@ -5,6 +5,23 @@
 #include "Window.h"
 #include "Utils.h"
 
+float componentscale(float component, float scale) {
+    return glm::min(glm::max(0.0f, component+scale), 1.0f);
+}
+glm::vec3 colorscale(glm::vec3 color, float scale) {
+    return glm::vec3(
+        componentscale(color.r, scale),
+        componentscale(color.g, scale),
+        componentscale(color.b, scale)
+    );
+}
+
+glm::vec3 Renderer::LIGHT(glm::vec3 color) {
+    return colorscale(color, 0.5);
+}
+glm::vec3 Renderer::DARK(glm::vec3 color) {
+    return colorscale(color, -0.5);
+}
 
 namespace {
     constexpr int numVAOs = 1;
@@ -150,7 +167,6 @@ namespace {
 void Renderer::RenderScene() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    RenderEntity(301);
     RenderAll();
 }
 
@@ -166,7 +182,7 @@ void Renderer::SetAspectRatio(float aspect) {
 }
 
 void Renderer::ChangeCameraZoom(float zoom) {
-    cameraZoom += zoom;
+    cameraZoom = glm::min(glm::max(0.25f, cameraZoom + zoom), 2.5f);
     projMat = glm::perspective(cameraZoom, aspectRatio, 0.1f, 1000.0f);
 }
 
@@ -265,13 +281,7 @@ void Renderer::UpdateCamera() {
     UpdateLightPosition();
 }
 
-void Renderer::SetNormalRendering() {
-    glDisable(GL_SCISSOR_TEST);
-}
 
-void Renderer::SetOutlineRendering() {
-
-}
 
 glm::vec3 EntityToColor(EntityID entity) {
     uint8_t r = entity & 255;
@@ -300,7 +310,7 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
     for (EntityID eid = 0; eid < totalEntities; eid++) {
-        if (ECS::HasComponents(eid, 0 | ComponentTransform | ComponentModel)) {
+        if (ECS::HasComponents(eid, ComponentPick | ComponentTransform | ComponentModel)) {
             SetRenderOptionsColor(EntityToColor(eid));
             RenderEntity(eid);
         }

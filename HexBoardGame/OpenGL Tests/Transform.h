@@ -3,9 +3,8 @@
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include "Component.h"
 
-class Transform : public Component
+struct Transform : public Component
 {
-public:
     Transform();
     ~Transform() = default;
 
@@ -18,5 +17,4 @@ public:
     glm::vec3 scale = glm::vec3(1.0);
     glm::vec3 rotation = glm::vec3(0.0);
 
-private:
 };
