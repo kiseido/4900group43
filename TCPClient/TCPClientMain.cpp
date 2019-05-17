@@ -122,10 +122,12 @@ void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receive
 
 void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
-	std::thread tServePunch(servePunch, tSock, addr);
-	tServePunch.detach();
-
 	conPunch(addr, port);
+
+	std::thread tConPunch(conPunch, addr, port);
+	tConPunch.detach();
+
+	servePunch(tSock, addr);
 
 }
 
@@ -173,9 +175,11 @@ void servePunch(TCPSocket *tSock, const char * addr)
 
 		cSock.listenForConnections(1);
 
-		std::thread tAccept(processAccept, &cSock);
-		tAccept.detach();
-		getchar();
+		processAccept(&cSock);
+		
+		//std::thread tAccept(processAccept, &cSock);
+		//tAccept.detach();
+		//getchar();
 	}
 	catch (TCPException e) {
 		puts(e.what());
