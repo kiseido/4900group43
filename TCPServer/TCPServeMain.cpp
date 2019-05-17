@@ -12,7 +12,7 @@ void holePunch(TCPSocket *tSock, const char * addr, int port);
 std::vector<std::string> parseString(std::string *message);
 void processReply(SOCKET s, TCPSocket *tSock);
 void servePunch(TCPSocket *tSock, const char * addr);
-void conPunch(const char * addr, int port);
+void conPunch(TCPSocket *tSock, const char *addr, int port);
 
 int main()
 {
@@ -146,8 +146,8 @@ void conPunch(Socket * tSock, const char * addr, int port)
 		char internalAddr[100];
 		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
 
-		sockaddr_in sockAddrConnect;
-		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		//sockaddr_in sockAddrConnect;
+		//cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		sockaddr_in sockAddrBind;
 
 		try
