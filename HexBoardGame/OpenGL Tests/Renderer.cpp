@@ -29,6 +29,8 @@ namespace {
     GLuint vao[numVAOs];
     GLuint vbo[numVBOs];
     GLuint renderingProgram;
+    bool updateCamera;
+    bool updateLight;
     float cameraX, cameraY, cameraZ;
     float aspectRatio;
     float cameraZoom = 1.05f;
@@ -167,7 +169,7 @@ namespace {
 void Renderer::RenderScene() {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    RenderAll();
+    RenderAll(0, true);
 }
 
 
@@ -335,36 +337,14 @@ void Renderer::RenderAll(ComponentID components, bool entitytocolor) {
 }
 
 void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //SetRenderOptionsSpecial(2);
-    //SetRenderOptionsLighting(0);
-    //SetRenderOptionsColor(glm::vec3(255, 0, 0));
-    //glLineWidth(5);
-    ////glEnable(GL_CULL_FACE);
-    ////glCullFace(GL_FRONT);
-    ////SetRenderOptionsNormalMod(-0.05);
-    ////glDepthRange(0.01, 0.02);
-    //RenderEntity(eid);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //SetRenderOptionsSpecial(0);
-    //SetRenderOptionsLighting(1);
-    ////SetRenderOptionsNormalMod(0);
-    ////glDepthRange(0.00, 0.01);
-    //RenderEntity(eid);
-    ////glDepthRange(0.0, 1.0);
-    ////glCullFace(GL_BACK);
-
-
-    //glDisable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
+    glColorMask(0, 0, 0, 0);
     RenderEntity(eid);
+    glColorMask(1, 1, 1, 1);
 
 
-    //glDisable(GL_DEPTH_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x01);
     SetRenderOptionsSpecial(2);
@@ -372,9 +352,7 @@ void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
     SetRenderOptionsColor(color);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLineWidth(width);
-    //Transformer::Scale(eid, glm::vec3(1.25));
     RenderEntity(eid);
-    //Transformer::Scale(eid, glm::vec3(0.8));
 
     
     glEnable(GL_DEPTH_TEST);
@@ -383,30 +361,6 @@ void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
     SetRenderOptionsLighting(1);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
-
-
-     //glClearStencil(0);
-     //glClear(GL_STENCIL_BUFFER_BIT);
-
-     //// Render the mesh into the stencil buffer.
-	
-     //glEnable(GL_STENCIL_TEST);
-
-     //glStencilFunc(GL_ALWAYS, 1, -1);
-     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-     //RenderMesh();
-
-     //// Render the thick wireframe version.
-
-     //glStencilFunc(GL_NOTEQUAL, 1, -1);
-     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-     //glLineWidth(3);
-     //glPolygonMode(GL_FRONT, GL_LINE);
-	
-     //RenderMesh();
 }
 
 void Renderer::RenderEntity(EntityID eid) {

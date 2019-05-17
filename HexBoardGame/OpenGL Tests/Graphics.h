@@ -62,6 +62,8 @@ struct Model : public Component {
     Texture texture;
     uint8_t outlineWeight;
     glm::vec3 outlineColor;
+    float overlayAlpha;
+    glm::vec3 overlayColor;
     ~Model() = default;
 };
 
