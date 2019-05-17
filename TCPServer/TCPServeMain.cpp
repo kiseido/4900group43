@@ -125,17 +125,31 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	std::thread tServePunch(servePunch, tSock, addr);
 	tServePunch.detach();
 
-	conPunch(addr, port);
-	conPunch(addr, port);
+	conPunch(tSock, addr, port);
+
+	//std::thread tConPunch1(conPunch, addr, port);
+	//std::thread tConPunch2(conPunch, addr, port);
 }
 
-void conPunch(const char * addr, int port)
+void conPunch(Socket * tSock, const char * addr, int port)
 {
 	try
 	{
 		TCPSocket cSock(IPv4);
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+
+		sockaddr_in privateAddr;
+		tSock->getSockName(&privateAddr);
+		int port;
+		tSock->getPortFromSockAddr(&privateAddr, &port);
+		char internalAddr[100];
+		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
+
+		sockaddr_in sockAddrConnect;
+		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		sockaddr_in sockAddrBind;
+
 		try
 		{
 			while (true)
@@ -143,7 +157,7 @@ void conPunch(const char * addr, int port)
 				cSock.connectToServer(&sockAddrConnect);
 			}
 		}
-		catch (TCPException e) {}
+		catch (TCPException e) { puts(e.what()); }
 	}
 	catch (TCPException e) {
 		puts(e.what());
