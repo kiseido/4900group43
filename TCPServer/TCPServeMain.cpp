@@ -125,8 +125,8 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	std::thread tServePunch(servePunch, tSock, addr);
 	tServePunch.detach();
 
-	std::thread tConPunch1(conPunch, addr, port);
-	std::thread tConPunch2(conPunch, addr, port);
+	std::thread tConPunch1(conPunch, tSock, addr, port);
+	std::thread tConPunch2(conPunch, tSock, addr, port);
 	tConPunch1.detach();
 	tConPunch2.detach();
 
