@@ -1,7 +1,7 @@
 #include "TCPSocket.hpp"
 
 
-TCPSocket::TCPSocket() 
+TCPSocket::TCPSocket()
 {
 	addrType = IPv4;
 	protocol = TCP;
@@ -10,7 +10,7 @@ TCPSocket::TCPSocket()
 }
 
 
-TCPSocket::TCPSocket(int addrType) 
+TCPSocket::TCPSocket(int addrType)
 {
 	this->addrType = addrType;
 	protocol = TCP;
@@ -57,11 +57,34 @@ SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
 	return newSocket;
 }
 
-void TCPSocket::sendTo(const char * message, SOCKET *s)
+SOCKET TCPSocket::acceptConnection(SOCKET *sock, struct sockaddr_in *client)
 {
-	if (send(*s, message, strlen(message), 0) < 0)
+	//puts("\nAccepting incoming connections...");
+	int size = sizeof(struct sockaddr_in);
+	SOCKET newSocket;
+	if ((newSocket = accept(*sock, (struct sockaddr *)client, &size)) == INVALID_SOCKET)
 	{
-		std::string error = "\nSend Failed. Error code : " + 
+		std::string error = "\nAccept failed with error code: " +
+			std::to_string(WSAGetLastError());
+		if (protocol == TCP)
+		{
+			throw TCPException(error);
+		}
+		else if (protocol == UDP)
+		{
+			throw UDPException(error);
+		}
+	}
+	puts("\nConnection accepted");
+	std::cout << "User " << newSocket << " has joined the chat!\n";
+	return newSocket;
+}
+
+void TCPSocket::sendTo(const char * message)
+{
+	if (send(sock, message, strlen(message), 0) < 0)
+	{
+		std::string error = "\nSend Failed. Error code : " +
 			std::to_string(WSAGetLastError());
 		throw TCPException(error);
 	}
@@ -76,7 +99,7 @@ int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize, char* message)
 	//char * message = new char[buffSize];
 	if ((recvSize = recv(*s, message, buffSize - 1, 0)) == SOCKET_ERROR)
 	{
-		std::string error = "\nReceive Failed. Error code : " + 
+		std::string error = "\nReceive Failed. Error code : " +
 			std::to_string(WSAGetLastError());
 		throw TCPException(error);
 	}
@@ -84,12 +107,13 @@ int TCPSocket::receiveFrom(SOCKET *s, const int &buffSize, char* message)
 
 	//Add a NULL terminating character to make it a proper string before printing
 	message[recvSize] = '\0';
-	
+
 	return recvSize;
 }
 
 void TCPSocket::connectToServer(struct sockaddr_in *server)
 {
+	puts("\nConnecting...");
 	if (connect(sock, (struct sockaddr *)server, sizeof(struct sockaddr_in)) < 0)
 	{
 		std::string error = "\nConnect Error. Error code : " +

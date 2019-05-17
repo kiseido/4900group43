@@ -9,7 +9,7 @@ protected:
 	int addrType, sockType, protocol;
 	sockaddr_in sockAddr;
 	char ip[40];
-	int port;
+
 	SOCKET sock;
 	std::queue<char*> receivedMessages;
 	std::string error = "";
@@ -20,6 +20,7 @@ protected:
 	void create();
 
 public:
+	int internalPort;
 	std::vector<SOCKET> clients;
 	/* Initializes sockaddr_in structure sockAddr using 
 	the ip address & port number 

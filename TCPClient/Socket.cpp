@@ -196,13 +196,14 @@ void Socket::setSockOptions(int optName, const char * optVal, int optLen)
 			std::to_string(WSAGetLastError());
 		throw(SocketException(error));
 	}
-	puts("Socket option set");
+	puts("Socket option set.");
 }
 
 void Socket::getSockName(sockaddr_in *name)
 {
 	puts("\nGetting Sock Name...");
-	if (getsockname(sock, (sockaddr*)name, sizeof(*name) == SOCKET_ERROR))
+	int len = sizeof(*name);
+	if (getsockname(sock, (struct sockaddr*)name, &len) == SOCKET_ERROR)
 	{
 		std::string error = "Get Sock Name failed. Error code: " +
 			std::to_string(WSAGetLastError());

@@ -9,7 +9,7 @@ protected:
 	int addrType, sockType, protocol;
 	sockaddr_in sockAddr;
 	char ip[40];
-	int port;
+
 	SOCKET sock;
 	std::queue<char*> receivedMessages;
 	std::string error = "";
@@ -20,6 +20,7 @@ protected:
 	void create();
 
 public:
+	int internalPort;
 	std::vector<SOCKET> clients;
 	/* Initializes sockaddr_in structure sockAddr using 
 	the ip address & port number 
@@ -47,9 +48,16 @@ public:
 	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
 	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
 	
+	void setSockOptions(int optName, const char * optVal, int optLen);
+
+	void getSockName(sockaddr_in *name);
+
 	/*Closes the socket specified
 	@param s socket descriptor*/
 	void closeSocket(SOCKET *s);
+
+	/*Closes socket associated with this object*/
+	void closeSocket();
 
 	void getIPFromDomain(char* hostName, char* fetchedIP);
 

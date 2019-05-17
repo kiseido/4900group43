@@ -4,68 +4,163 @@
 #include "Socket.hpp"
 #include "TCPSocket.hpp"
 #include "Util.hpp"
+#include <sstream>
 
-
-void processClient(SOCKET, TCPSocket *, int index);
+void processSend(TCPSocket *tSock);
+void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receiveThread);
+void holePunch(TCPSocket *tSock, const char * addr, int port);
+std::vector<std::string> parseString(std::string *message);
+void processReply(SOCKET s, TCPSocket *tSock);
 
 int main()
 {
-	puts("TCP Server Test! XD");
+	puts("TCP Client Server Test! XD");
+
 	WSASession wsa;
 	TCPSocket tSock;
-	sockaddr_in sockAddr;
-	
+	sockaddr_in serverAddr, localAddr;
 
 	//CHANGE THESE TO WHAT YOU WANT
-	const char * addr = "142.232.142.251";
-	int port = 8888;
+	//const char * addr = "142.232.142.251";
+	//const char * addr = "198.105.215.35";
+	const char * addr = LOCAL_HOST;
+	int port = 8080;
 
-	tSock.setupSockAddr(&sockAddr, addr, port);
+	try {
+		char domain[] = "node.digitalprojects.info";
+		char fetchedIP[100];
+		tSock.getIPFromDomain(domain, fetchedIP);
+		tSock.setupSockAddr(&serverAddr, fetchedIP, port);
 
-	tSock.bindSock(&sockAddr);
+		tSock.connectToServer(&serverAddr);
 
-	//MODIFY THIS TOO
-	int maxConnectionQueue = 3;
+		const char * optVal = "1";
+		sockaddr_in localAddr;
+		char ip[100];
+		tSock.setSockOptions(SO_REUSEADDR, optVal, sizeof("1"));
+		tSock.getSockName(&localAddr);
+		tSock.getPortFromSockAddr(&localAddr, &tSock.internalPort);
 
-	tSock.listenForConnections(maxConnectionQueue);
+		char key[] = GAME_CONNECTION;
+		tSock.sendTo(key);
 
-	sockaddr_in clientAddr;
-	SOCKET newClient;
-	for (int index = 0; (newClient = tSock.acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
+		char message[6];
+		//_itoa_s(tSock.internalPort, message, 10);
+		//tSock.sendTo(message);
+
+		//std::thread thrSend(processSend, &tSock);
+		//thrSend.detach();
+
+		processReply(*tSock.getSock(), &tSock);
+	}
+	catch (TCPException e) { puts(e.what()); }
+
+	getchar();
+}
+
+void processSend(TCPSocket *tSock)
+{
+	std::string message;
+	while (true)
 	{
-		tSock.clients.push_back(newClient);
-		std::thread conThread(*processClient, newClient, &tSock, index);
-		conThread.detach();
-		int clientPort;
-		tSock.getPortFromSockAddr(&clientAddr, &clientPort);
-		std::cout << "Client Port: " << port;
+		getline(std::cin, message);
+		const char * cMessage = message.c_str();
+		tSock->sendTo(cMessage);
 	}
 }
 
-void processClient(SOCKET s, TCPSocket *tSock, int index)
+void processReply(SOCKET s, TCPSocket *tSock)
 {
-	const char * sendMessage = "Connection successful!";
 	char receiveMessage[100];
-	tSock->sendTo(sendMessage, &s);
 	int result;
 	while (true)
 	{
 		if (tSock->receiveFrom(&s, 100, receiveMessage) == 0)
 		{
-			tSock->clients.erase(tSock->clients.begin() + index);
-			std::cout << "User " << s << " has left the chat.";
+			std::cout << "User " << s << " has Disconnected.";
 			tSock->closeSocket(&s);
 			break;
 		}
-		std::string strRecv(receiveMessage);
-		std::string s(std::to_string(s));
-		std::string strBuff = "\tUser " + s + ": ";
-		strBuff += strRecv;
-
-		const char * endMsg = strBuff.c_str();
-		for (int i = 0; i < tSock->clients.size(); i++) {
-			tSock->sendTo(endMsg, &tSock->clients[i]);
-		}
-		std::cout << "User " << s << ": " << receiveMessage << '\n';
+		std::thread tReply(checkHeader, tSock, receiveMessage, std::this_thread::get_id());
+		tReply.detach();
+		std::cout << "\nReply: " << receiveMessage << '\n';
 	}
 }
+
+void processAccept(TCPSocket *sock)
+{
+	sockaddr_in clientAddr;
+	SOCKET newClient;
+	for (int index = 0; (newClient = sock->acceptConnection(&clientAddr)) != INVALID_SOCKET; index++)
+	{
+		sock->clients.push_back(newClient);
+		//std::thread conThread(*processClient, newClient, &tSock, index);
+		//conThread.detach();
+		int clientPort;
+		sock->getPortFromSockAddr(&clientAddr, &clientPort);
+		std::cout << "Client Port: " << clientPort;
+	}
+}
+
+void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receiveThread)
+{
+	std::vector<std::string> parStrings = parseString(&message);
+	std::string str = parStrings.at(0);
+	if (!str.compare(HOLE_PUNCH))
+	{
+		const char * addr = parStrings.at(2).c_str();
+		int port = std::stoi(parStrings.at(1));
+		holePunch(tSock, addr, port);
+	}
+	else if (!str.compare(HOST_SERVER))
+	{
+
+	}
+}
+
+void holePunch(TCPSocket *tSock, const char * addr, int port)
+{
+	try
+	{
+		sockaddr_in privateAddr;
+		tSock->getSockName(&privateAddr);
+		char internalAddr[100];
+		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
+		TCPSocket cSock(IPv4);
+
+		sockaddr_in sockAddrConnect;
+		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		sockaddr_in sockAddrBind;
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
+		cSock.bindSock(&sockAddrBind);
+		cSock.listenForConnections(1);
+	   	  
+		std::thread tAccept(processAccept, &cSock);
+		tAccept.detach();
+		//cSock.connectToServer(&sockAddrConnect);
+		getchar();
+	}
+	catch (TCPException e) {
+		puts(e.what());
+		exit(1);
+	}
+}
+
+void hostServer(Socket *tSock)
+{
+
+}
+
+std::vector<std::string> parseString(std::string *message)
+{
+	std::string parsed;
+	std::vector<std::string> values;
+	std::stringstream ss(*message);
+	while (getline(ss, parsed, ' '))
+	{
+		values.push_back(parsed);
+	}
+	values.at(0);
+	return values;
+}
+

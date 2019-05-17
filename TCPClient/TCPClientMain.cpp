@@ -15,14 +15,10 @@ void processReply(SOCKET s, TCPSocket *tSock);
 int main()
 {
 	puts("TCP Client Test! XD");
-	WSASession wsa;
-	//try {
-	//	wsa = WSASession();
-	//}
-	//catch (WSAException e) { puts(e.what()); }
 
+	WSASession wsa;
 	TCPSocket tSock;
-	sockaddr_in sockAddr;
+	sockaddr_in serverAddr, localAddr;
 	
 	//CHANGE THESE TO WHAT YOU WANT
 	//const char * addr = "142.232.142.251";
@@ -34,13 +30,26 @@ int main()
 		char domain[] = "node.digitalprojects.info";
 		char fetchedIP[100];
 		tSock.getIPFromDomain(domain, fetchedIP);
+		tSock.setupSockAddr(&serverAddr, fetchedIP, port);
 		
-		tSock.setupSockAddr(&sockAddr, fetchedIP, port);
+		tSock.connectToServer(&serverAddr);
 
-		tSock.connectToServer(&sockAddr);
+		const char * optVal = "1";
+		sockaddr_in localAddr;
+		char ip[100];
+		tSock.setSockOptions(SO_REUSEADDR, optVal, sizeof("1"));
+		tSock.getSockName(&localAddr);
+		tSock.getPortFromSockAddr(&localAddr, &tSock.internalPort);
 
-		std::thread thrSend(processSend, &tSock);
-		thrSend.detach();
+		char key[] = GAME_CONNECTION;
+		tSock.sendTo(key);
+		
+		char message[6];
+		//_itoa_s(tSock.internalPort, message, 10);
+		//tSock.sendTo(message);
+
+		//std::thread thrSend(processSend, &tSock);
+		//thrSend.detach();
 
 		processReply(*tSock.getSock(), &tSock);
 	}
@@ -74,7 +83,7 @@ void processReply(SOCKET s, TCPSocket *tSock)
 		}
 		std::thread tReply(checkHeader, tSock, receiveMessage, std::this_thread::get_id());
 		tReply.detach();
-		std::cout << "Reply: " << receiveMessage << '\n';
+		std::cout << "\nReply: " << receiveMessage << '\n';
 	}
 }
 
@@ -113,21 +122,16 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
 	try 
 	{
-		const char * internalAddr = "192.168.1.64";
+		//const char * internalAddr = INADDR_ANY;
 		TCPSocket cSock(IPv4);
 
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
-		sockaddr_in sockAddrBind;
-		cSock.setupSockAddr(&sockAddrBind, internalAddr, 8080);
+		//sockaddr_in sockAddrBind;
+		//cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
 		
-		//Test Stuff
-		char domain[] = "node.digitalprojects.info";
-		char fetchedIP[100];
-		sockaddr_in sockAddr;
-		cSock.getIPFromDomain(domain, fetchedIP);
-		cSock.setupSockAddr(&sockAddr, fetchedIP, 8080);
-		cSock.connectToServer(&sockAddr);
+		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		cSock.connectToServer(&sockAddrConnect);
 		
 			
 		//cSock.bindSock(&sockAddrBind);

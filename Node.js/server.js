@@ -27,7 +27,7 @@ function createServer(){
     
     let server = net.createServer(function(socket)
     {   
-
+        // socket.end();
         console.log("Client Connected");
         // writeStream.write("Client Connected");
         socket.write('Connected to server!\r\n');

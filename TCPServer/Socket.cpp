@@ -74,7 +74,22 @@ void Socket::getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr)
 	getPortFromSockAddr(sockAddr, port);
 }
 
-
+void Socket::closeSocket()
+{
+	if (closesocket(sock) == SOCKET_ERROR)
+	{
+		error = "Close Socket Failed. Error code : " +
+			std::to_string(WSAGetLastError());
+		if (protocol == TCP)
+		{
+			throw TCPException(error);
+		}
+		else if (protocol == UDP)
+		{
+			throw UDPException(error);
+		}
+	}
+}
 
 void Socket::closeSocket(SOCKET *s) {
 	if (closesocket(*s) == SOCKET_ERROR)
@@ -160,11 +175,38 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 		}
 		InetNtopW(result->ai_family, ptr, ip, 100);		
 		_bstr_t b(ip);
-		fetchedIP = b;
+		char * temp = b;
+		for (int i = 0; i < 100; i++)
+		{
+			fetchedIP[i] = temp[i];
+		}
 		printf("\nIPv%d address: %s (%s)\n", result->ai_family == PF_INET6 ? 6 : 4,
 			fetchedIP, result->ai_canonname);
 		result = result->ai_next;
 	}
+}
 
+void Socket::setSockOptions(int optName, const char * optVal, int optLen)
+{
 
+	if (setsockopt(sock, SOL_SOCKET, optName, optVal, sizeof(&optVal)) == SOCKET_ERROR)
+	{
+		std::string error = "Set Sock Options. Error code: " +
+			std::to_string(WSAGetLastError());
+		throw(SocketException(error));
+	}
+	puts("Socket option set.");
+}
+
+void Socket::getSockName(sockaddr_in *name)
+{
+	puts("\nGetting Sock Name...");
+	int len = sizeof(*name);
+	if (getsockname(sock, (struct sockaddr*)name, &len) == SOCKET_ERROR)
+	{
+		std::string error = "Get Sock Name failed. Error code: " +
+			std::to_string(WSAGetLastError());
+		throw(SocketException(error));
+	}
+	puts("\nRetrieved Sock name successfully.");
 }

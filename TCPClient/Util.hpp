@@ -24,5 +24,6 @@
 //Will be followed by " <addr> <port>"
 #define HOLE_PUNCH "@_001"
 #define HOST_SERVER "@_002"
+#define GAME_CONNECTION "*k&Dskef3#9Nb"
 
 //Will be followed by 
