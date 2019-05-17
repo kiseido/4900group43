@@ -36,10 +36,10 @@ int main()
 
 		tSock.connectToServer(&serverAddr);
 
-		const char * optVal = "1";
+		int optVal = 1;
 		sockaddr_in localAddr;
 		char ip[100];
-		tSock.setSockOptions(SO_REUSEADDR, optVal, sizeof("1"));
+		tSock.setSockOptions(SO_REUSEADDR, (char *)&optVal, sizeof(int));
 		tSock.getSockName(&localAddr);
 		tSock.getPortFromSockAddr(&localAddr, &tSock.internalPort);
 
@@ -133,8 +133,11 @@ void conPunch(TCPSocket * tSock, const char * addr, int port)
 	try
 	{
 		TCPSocket cSock(IPv4);
+		int optVal = 1;
+		cSock.setSockOptions(SO_REUSEADDR, (char *)&optVal, sizeof(int));
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		
 
 		sockaddr_in privateAddr;
 		tSock->getSockName(&privateAddr);
@@ -144,8 +147,15 @@ void conPunch(TCPSocket * tSock, const char * addr, int port)
 		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
 
 		sockaddr_in sockAddrBind;
-		cSock.setupSockAddr(&sockAddrBind, tSock->internalPort);
-		cSock.bindSock(&sockAddrBind);
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
+		try
+		{
+			cSock.bindSock(&sockAddrBind);
+		}
+		catch (TCPException e) { 
+			puts("ConPunch BindSock Failed;");
+			puts(e.what());
+		}
 
 		while (true)
 		{
@@ -174,13 +184,21 @@ void servePunch(TCPSocket *tSock, const char * addr)
 		char internalAddr[100];
 		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
 		TCPSocket cSock(IPv4);
-
+		bool optVal= true;
+		cSock.setSockOptions(SO_REUSEADDR, (char *)&optVal, sizeof(int));
 		//sockaddr_in sockAddrConnect;
 		//cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		sockaddr_in sockAddrBind;
 
-		cSock.setupSockAddr(&sockAddrBind, tSock->internalPort);
-		cSock.bindSock(&sockAddrBind);
+		cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
+		try
+		{
+			cSock.bindSock(&sockAddrBind);
+		}
+		catch (TCPException e) {
+			puts("ServePunch BindSock Failed;");
+			puts(e.what());
+		}
 
 		cSock.listenForConnections(1);
 
