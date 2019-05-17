@@ -134,7 +134,7 @@ void conPunch(TCPSocket * tSock, const char * addr, int port)
 	{
 		TCPSocket cSock(IPv4);
 		sockaddr_in sockAddrConnect;
-		cSock.setupSockAddr(&sockAddrConnect, port);
+		cSock.setupSockAddr(&sockAddrConnect, addr, port);
 
 		sockaddr_in privateAddr;
 		tSock->getSockName(&privateAddr);
@@ -142,10 +142,12 @@ void conPunch(TCPSocket * tSock, const char * addr, int port)
 		tSock->getPortFromSockAddr(&privateAddr, &port);
 		char internalAddr[100];
 		tSock->getIPfromSockAddr(&privateAddr, internalAddr);
-
-		//sockaddr_in sockAddrConnect;
-		//cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		
 		sockaddr_in sockAddrBind;
+		cSock.setupSockAddr(&sockAddrBind, tSock->internalPort);
+		cSock.bindSock(&sockAddrBind);
+
+
 
 		while (true)
 		{
