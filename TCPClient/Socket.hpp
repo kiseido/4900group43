@@ -47,7 +47,9 @@ public:
 	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
 	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
 	
-	void setSockOptions();
+	void setSockOptions(int optName, const char * optVal, int optLen);
+
+	void getSockName(sockaddr_in *name);
 
 	/*Closes the socket specified
 	@param s socket descriptor*/

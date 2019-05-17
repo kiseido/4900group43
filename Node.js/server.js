@@ -1,7 +1,10 @@
 const fs = require('fs');
 const net = require('net');
 
-// var writeStream = fs.createWriteStream('./log.txt');
+const HOLE_PUNCH = "@_001"
+const HOST_SERVER = "@_002"
+
+// let writeStream = fs.createWriteStream('./log.txt');
 
 let count = 0;
 
@@ -12,12 +15,10 @@ let count = 0;
 //     process.exit(1);
 // })
 
+let addr = '198.105.215.36';
+let port = 8080;
 
 // setTimeout(createServer, 1000);
-
-// let addr = '198.105.215.36';
-let addr = '127.0.0.1';
-let port = 8888;
 
 createServer();
 
@@ -25,19 +26,21 @@ function createServer(){
     let clients = [];
     
     let server = net.createServer(function(socket)
-    {
+    {   
+
         console.log("Client Connected");
-        // writeStream.write("IP: " + socket.remoteAddress);
+        // writeStream.write("Client Connected");
         socket.write('Connected to server!\r\n');
         clients[clients.length] = socket;
         if(clients.length > 1)
         {
+            
             //Send to client the clientServer port number.
-            clients[clients.length - 1].write('' + clients[0].remotePort + ' ' + clients[0].remoteAddress);
+            clients[clients.length - 1].write(HOLE_PUNCH + ' ' + clients[0].remotePort + ' ' + clients[0].remoteAddress);
             
             //Send to client server other client port number.
-            clients[0].write('' + clients[clients.length - 1].remotePort + ' ' + clients[clients.length - 1].remoteAddress);
-            server.close();
+            clients[0].write(HOLE_PUNCH + ' ' + clients[clients.length - 1].remotePort + ' ' + clients[clients.length - 1].remoteAddress);
+            // server.close();
         }
         console.log('Port: ' + socket.remotePort + " IP: " + socket.remoteAddress);
         socket.on('data', function(data)

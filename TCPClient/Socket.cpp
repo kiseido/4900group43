@@ -187,12 +187,26 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 	}
 }
 
-void Socket::setSockOptions()
+void Socket::setSockOptions(int optName, const char * optVal, int optLen)
 {
-	if (setsockopt(sock, SOL_SOCKET, ) == SOCKET_ERROR)
+
+	if (setsockopt(sock, SOL_SOCKET, optName ,optVal, sizeof(&optVal)) == SOCKET_ERROR)
 	{
 		std::string error = "Set Sock Options. Error code: " +
 			std::to_string(WSAGetLastError());
 		throw(SocketException(error));
 	}
+	puts("Socket option set");
+}
+
+void Socket::getSockName(sockaddr_in *name)
+{
+	puts("\nGetting Sock Name...");
+	if (getsockname(sock, (sockaddr*)name, sizeof(*name) == SOCKET_ERROR))
+	{
+		std::string error = "Get Sock Name failed. Error code: " +
+			std::to_string(WSAGetLastError());
+		throw(SocketException(error));
+	}
+	puts("\nRetrieved Sock name successfully.");
 }
