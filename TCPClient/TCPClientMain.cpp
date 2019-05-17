@@ -124,13 +124,13 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	{
 		//const char * internalAddr = INADDR_ANY;
 		TCPSocket cSock(IPv4);
-
+		port++;
 		sockaddr_in sockAddrConnect;
 		cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		//sockaddr_in sockAddrBind;
 		//cSock.setupSockAddr(&sockAddrBind, internalAddr, tSock->internalPort);
 		
-		cSock.setupSockAddr(&sockAddrConnect, addr, port);
+		//cSock.setupSockAddr(&sockAddrConnect, addr, port);
 		cSock.connectToServer(&sockAddrConnect);
 		
 			
@@ -144,7 +144,8 @@ void holePunch(TCPSocket *tSock, const char * addr, int port)
 	}
 	catch (TCPException e) { 
 		puts(e.what()); 
-		exit(1);
+		getchar();
+		//exit(1);
 	}
 }
 
