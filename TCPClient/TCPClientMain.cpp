@@ -100,7 +100,7 @@ void processAccept(TCPSocket *sock)
 		//conThread.detach();
 		int clientPort;
 		sock->getPortFromSockAddr(&clientAddr, &clientPort);
-		std::cout << "Client Port: " << clientPort;
+		std::cout << "\nClient Port: " << clientPort;
 	}
 }
 
@@ -122,12 +122,11 @@ void checkHeader(TCPSocket * tSock, std::string message, std::thread::id receive
 
 void holePunch(TCPSocket *tSock, const char * addr, int port)
 {
+	std::thread tServePunch(servePunch, tSock, addr);
+	tServePunch.detach();
+
 	conPunch(addr, port);
-
-	std::thread tConPunch(conPunch, addr, port);
-	tConPunch.detach();
-
-	servePunch(tSock, addr);
+	conPunch(addr, port);
 
 }
 

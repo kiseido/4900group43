@@ -53,7 +53,7 @@ SOCKET TCPSocket::acceptConnection(struct sockaddr_in *client)
 		}
 	}
 	//puts("\nConnection accepted");
-	std::cout << "User " << newSocket << " has joined the chat!\n";
+	std::cout << "\nUser " << newSocket << " has joined the chat!\n";
 	return newSocket;
 }
 
@@ -76,7 +76,7 @@ SOCKET TCPSocket::acceptConnection(SOCKET *sock, struct sockaddr_in *client)
 		}
 	}
 	puts("\nConnection accepted");
-	std::cout << "User " << newSocket << " has joined the chat!\n";
+	std::cout << "\nUser " << newSocket << " has joined the chat!\n";
 	return newSocket;
 }
 
