@@ -47,6 +47,8 @@ public:
 	void getPortFromSockAddr(struct sockaddr_in *sockAddr, int *port);
 	void getSockAddrInfo(char *ip, int *port, struct sockaddr_in *sockAddr);
 	
+	void setSockOptions();
+
 	/*Closes the socket specified
 	@param s socket descriptor*/
 	void closeSocket(SOCKET *s);

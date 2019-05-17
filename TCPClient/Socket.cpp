@@ -186,3 +186,13 @@ void Socket::getIPFromDomain(char* hostName, char * fetchedIP)
 		result = result->ai_next;
 	}
 }
+
+void Socket::setSockOptions()
+{
+	if (setsockopt(sock, SOL_SOCKET, ) == SOCKET_ERROR)
+	{
+		std::string error = "Set Sock Options. Error code: " +
+			std::to_string(WSAGetLastError());
+		throw(SocketException(error));
+	}
+}
