@@ -25,28 +25,13 @@ glm::vec3 operator*(const glm::vec3& left, const float right) {
 	return out;
 }
 
-
-
 namespace ECS {
-	constexpr inline ComponentMask operator | (ComponentMask lhs, ComponentMask rhs)
-	{
-		using T = std::underlying_type_t <ComponentMask>;
-		return static_cast<ComponentMask>(static_cast<T>(lhs) | static_cast<T>(rhs));
-	}
 
-	constexpr inline ComponentMask& operator |= (ComponentMask& lhs, const ComponentMask rhs)
-	{
-		lhs = lhs | rhs;
-		return lhs;
-	}
+
 
 	EntityID Entity::NEXTID = 1;
 
 	
-	Random::Random()
-	{
-		setSeed(0);
-	}
 	void Random::setSeed(int newSeed)
 	{
 		srand(newSeed);

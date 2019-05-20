@@ -9,6 +9,7 @@ namespace ECS {
 	typedef int32_t EntityID;
 
 	class Entity {
+	public:
 		static EntityID NEXTID;
 
 		ComponentMask* componentMask;
@@ -23,7 +24,19 @@ namespace ECS {
 		Rotation* realTimeRotation;
 		Momentum* realTimeRotationalMomentum;
 		CollisionBody* realTimeCollisionBody;
+
 		Health* health;
+		Damage* damage;
+		Power* power;
+
+		BoardSpeed* boardSpeed;
+		RealtimeSpeed* realTimeSpeed;
+
+		TeamAffiliation* team;
+
+		TerrainType* terrainType;
+
+		AIStatus* ai;
 
 		EntityID id;
 

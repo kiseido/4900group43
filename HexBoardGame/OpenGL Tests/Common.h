@@ -10,4 +10,4 @@
 #include <glm\glm.hpp>
 
 #define TODOe throw new std::logic_error("TODO");
-#define TODO std::cout << "TODO " << __FUNCTION__ << "() " << __FILE__ << " " << __LINE__ << std::endl;
+#define TODO std::cout << std::endl << "TODO " << __FUNCTION__ << "() " << __FILE__ << " " << __LINE__ << std::endl << std::endl;

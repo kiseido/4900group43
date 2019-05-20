@@ -4,23 +4,28 @@
 namespace ECS {
 
 
-	void PausedSystemsPack::Run(const EngineState & lastState, EngineState & newState, TimeStamp delta)
+	void PausedSystemsPack::Run(const EngineState & lastState, EngineState & newState)
 	{
+		std::cout << "PausedSystemsPack" << std::endl;
 	}
 
-	void BoardSystemsPack::Run(const EngineState & lastState, EngineState & newState, TimeStamp delta)
+	void BoardSystemsPack::Run(const EngineState & lastState, EngineState & newState)
 	{
+		std::cout << "BoardSystemsPack" << std::endl;
 	}
 
-	void CombatSystemsPack::Run(const EngineState & lastState, EngineState & newState, TimeStamp delta)
+	void CombatSystemsPack::Run(const EngineState & lastState, EngineState & newState)
 	{
+		std::cout << "CombatSystemsPack" << std::endl;
 	}
 
-	void BoardRenderer::Run(const EngineState & lastState, EngineState & newState, TimeStamp delta)
+	void BoardRenderer::Run(const EngineState & lastState, EngineState & newState)
 	{
+		std::cout << "BoardRenderer" << std::endl;
 	}
-	void CombatRenderer::Run(const EngineState & lastState, EngineState & newState, TimeStamp delta)
+	void CombatRenderer::Run(const EngineState & lastState, EngineState & newState)
 	{
+		std::cout << "CombatRenderer" << std::endl;
 	}
 
 	/*
@@ -32,7 +37,8 @@ namespace ECS {
 
 	}
 
-	void RTPhysics::Run(const EngineState& lastState, EngineState& newState, TimeStamp delta) {
+	void RTPhysics::Run(const EngineState& lastState, EngineState& newState) {
+
 
 		ProcessMomentums(lastState, newState);
 		ProcessPositions(lastState, newState);

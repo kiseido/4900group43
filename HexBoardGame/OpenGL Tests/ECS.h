@@ -12,11 +12,10 @@ namespace ECS {
 	
 	//typedef uint16_t ComponentMask;
 
-	static class Random {
+	class Random {
 	public:
-		Random();
-		void setSeed(int);
-		int getInt();
+		static void setSeed(int);
+		static int getInt();
 	};
 
 
@@ -31,11 +30,25 @@ namespace ECS {
 			MultiPlayer
 		};
 
-		GameType gameType = Undecided;
+		enum GameStatus {
+			Paused,
+			Board,
+			Combat
+		};
+
+		GameStatus status;
+		GameType gameType;
 		EngineStateManager TimeLine;
+
+		PausedSystemsPack pausedLogic;
+		BoardSystemsPack boardLogic;
+		CombatSystemsPack combatLogic;
+
 		RTPhysics rtPhysics;
 		BoardRenderer boardRenderer;
 		CombatRenderer combatRenderer;
+
+		bool playing;
 	public:
 		Game();
 		~Game();
@@ -46,6 +59,6 @@ namespace ECS {
 		void GameLoop();
 		void ShowSplash();
 		void RequestGameType();
-		void init();
+		void setupGame();
 	};
 }

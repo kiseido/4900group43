@@ -2,6 +2,8 @@
 
 #include "ECS.h"
 
+#include <queue>
+
 namespace ECS {
 	namespace Engine {
 
@@ -12,6 +14,8 @@ namespace ECS {
 			std::unordered_map<EntityID, int> EntityMap;
 			std::unordered_map<int, EntityID> ComponentMap;
 			std::vector<ComponentT> Components;
+			std::queue<int> Unassigned;
+
 			ComponentT* getComponent(const EntityID& id) {
 				auto index = EntityMap.find(id);
 
@@ -24,13 +28,34 @@ namespace ECS {
 				auto index = EntityMap.find(id);
 
 				if (index == EntityMap.end()) {
-					//TODO
-					EntityMap.insert(id, Components.size());
-					ComponentMap.insert(Components.size(),id);
+					int pos;
+
+					if (Unassigned.size() > 0)
+					{
+						pos = Unassigned.front();
+						Unassigned.pop();
+					}
+					else
+						pos = Components.size();
+
+					EntityMap.insert_or_assign(id, pos);
+					ComponentMap.insert_or_assign(pos, id);
+
 					Components.push_back(component);
 				}
 				else
 					Components.at(index->second) = component;
+			}
+			void removeComponent(const EntityID& id) {
+				auto index = EntityMap.find(id);
+
+				if (index == EntityMap.end())
+					return;
+
+				Unassigned.push(index->second);
+
+				ComponentMap.erase(index->first);
+				EntityMap.erase(index);
 			}
 			inline ComponentT* operator[](const EntityID&) {
 				return getComponent(EntityID);
@@ -42,9 +67,13 @@ namespace ECS {
 			// Time this state represents once completed
 			TimeStamp WorldTime;
 
+			TeamAffiliation PlayerTurn;
+
 			ComponentContainer<ComponentMask> ComponentMasks;
 
 			ComponentContainer<Health> Healths;
+			ComponentContainer<Damage> Damages;
+			ComponentContainer<Power> Powers;
 
 			ComponentContainer<Visual> BoardVisuals;
 			ComponentContainer<CollisionBody> BoardCollisionBodies;
@@ -57,9 +86,18 @@ namespace ECS {
 			ComponentContainer<Visual> RealTimeVisuals;
 			ComponentContainer<CollisionBody> RealTimeCollisionBodies;
 
+			ComponentContainer<BoardSpeed> BoardSpeeds;
+			ComponentContainer<RealtimeSpeed> RealtimeSpeeds;
+
+			ComponentContainer<TeamAffiliation> Teams;
+
+			ComponentContainer<AIStatus> AI;
+
+			ComponentContainer<TerrainType> TerrainTypes;
+
 			Entity NewEntity(ComponentMask);
 			Entity getEntity(EntityID);
-			void setEntityComponents(ComponentMask);
+			void setEntityComponents(EntityID, ComponentMask);
 		};
 
 
@@ -68,7 +106,7 @@ namespace ECS {
 		private:
 			std::unordered_map<int, EngineState> Moments;
 			int historyCutoff;
-
+			int currentMoment;
 			int LastFinishedState;
 		public:
 			EngineStateManager();

@@ -9,7 +9,7 @@ namespace ECS {
 
 		class System {
 		public:
-			virtual void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta) = 0;
+			virtual void Run(const EngineState& lastState, EngineState& newState) = 0;
 		};
 
 		class RTPhysics : public System {
@@ -19,34 +19,34 @@ namespace ECS {
 			void ProcessPositions(const EngineState& lastState, EngineState& newState);
 			void ProcessRotations(const EngineState& lastState, EngineState& newState);
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 
 		class BoardRenderer : public System {
 			float opacity;
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 
 		class CombatRenderer : public System {
 			float opacity;
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 
 		class PausedSystemsPack : public System {
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 
 		class BoardSystemsPack : public System {
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 
 		class CombatSystemsPack : public System {
 		public:
-			void Run(const EngineState& lastState, EngineState& newState, TimeStamp delta);
+			void Run(const EngineState& lastState, EngineState& newState);
 		};
 	}
 }
