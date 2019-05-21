@@ -30,7 +30,7 @@ namespace Renderer
 
     void UpdateCamera();
     void RenderEntity(EntityID eid);
-    void RenderPicking(EntityID eid);
+    void RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, bool board);
     void RenderOutline(EntityID eid, float width, glm::vec3 color);
     EntityID GetMouseEntity(GLint mouseX, GLint mouseY);
     void RenderAll(ComponentID components = 0, bool entitytocolor = false);

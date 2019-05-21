@@ -36,7 +36,7 @@ bool BoardManager::IsInRange(BoardPiece* piece, BoardPosition* source, BoardPosi
 }
 
 void BoardManager::SetTransformPosition(EntityID eid, Board* board, int x, int y) {
-    Transformer::SetPosition(eid, BoardManager::GetTransformPosition(board, x, y));
+    Transformer::SetPosition(ECS_old::GetTransform(eid), BoardManager::GetTransformPosition(board, x, y));
 }
 
 void BoardManager::SetBoardPosition(EntityID eid, Board* board, int x, int y, bool transform) {

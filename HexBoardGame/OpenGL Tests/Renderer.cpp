@@ -1,9 +1,9 @@
 #include "Renderer.h"
 #include "Transformer.h"
 #include <iostream>
-#include "Component.h"
 #include "Window.h"
 #include "Utils.h"
+#include "Entity.h"
 
 float componentscale(float component, float scale) {
     return glm::min(glm::max(0.0f, component+scale), 1.0f);
@@ -375,7 +375,7 @@ void Renderer::RenderEntity(EntityID eid) {
         Model* model = ECS_old::GetModel(eid);
         SetRenderingModel(model);
 
-        Transformer::CalcTNet(eid);
+        Transformer::CalcTNet(ECS_old::GetTransform(eid));
         glm::mat4 tnet = camMat * ECS_old::GetTransform(eid)->tNet;
         glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
         glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
@@ -385,9 +385,18 @@ void Renderer::RenderEntity(EntityID eid) {
     }
 }
 
-void Renderer::RenderPicking(EntityID eid) {
+void Renderer::RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, bool board) {
+    if (ECS_old::HasComponents(eid, ComponentTransform | ComponentModel)) {
+        Model* model = board ? state.BoardModels.getComponent(eid) : state.BoardModels.getComponent(eid);
+        SetRenderingModel(model);
+        Transform* transform = board ? state.BoardTransforms.getComponent(eid) : state.BoardTransforms.getComponent(eid);
 
-    Model* model = ECS_old::GetModel(eid);
+        Transformer::CalcTNet(transform);
+        glm::mat4 tnet = camMat * transform->tNet;
+        glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
+        glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
+        glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
 
-
+        glDrawArrays(GL_TRIANGLES, 0, model->mesh->numVertices);
+    }
 }

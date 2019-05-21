@@ -75,6 +75,8 @@ namespace ECS {
 
 		ComponentMasks.removeComponent(id);
 
+        //EntityIDs.remove(id);
+
 		for (auto it = EntityIDs.begin(); it != EntityIDs.end(); ++it) {
 			if (*it == id) {
 				EntityIDs.erase(it);

@@ -82,18 +82,24 @@ namespace ECS {
 
 			std::list<EntityID> EntityIDs;
 
+
+            //-------Containers:
+            //Mask:
 			ComponentContainer<ComponentMask> ComponentMasks;
 
+            //Stats
 			ComponentContainer<Health> Healths;
 			ComponentContainer<Damage> Damages;
 			ComponentContainer<Power> Powers;
 
-            ComponentContainer<Transform> Transforms;
-            ComponentContainer<Model> Models;
+            //Board
+            ComponentContainer<Transform> BoardTransforms;
+            ComponentContainer<Model> BoardModels;
 			ComponentContainer<Visual> BoardVisuals;
 			ComponentContainer<CollisionBody> BoardCollisionBodies;
 			ComponentContainer<Position> BoardPositions;
 
+            //Combat
 			ComponentContainer<Position> RealTimePositions;
 			ComponentContainer<Momentum> Momentums;
 			ComponentContainer<Rotation> Rotations;

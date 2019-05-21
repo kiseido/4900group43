@@ -6,7 +6,7 @@ namespace ECS {
 
 	using namespace ECS::Components;
 
-	typedef int32_t EntityID;
+	typedef uint32_t EntityID;
 
 	class Entity {
 	public:

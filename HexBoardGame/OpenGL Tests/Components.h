@@ -32,6 +32,8 @@ namespace ECS {
 			TeamAffiliation_m = 0b1 << 14,
 
 			TerrainType_m = 0b1 << 15,
+
+
 		};
 
 		constexpr inline ComponentMask operator|(const ComponentMask& lhs, const ComponentMask& rhs){
