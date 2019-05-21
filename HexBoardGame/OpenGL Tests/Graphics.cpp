@@ -84,29 +84,26 @@ Texture Resources::LoadTexture(const char* filePath) {
     return t;
 }
 
-Model* Resources::GetModel(ModelID modelId) {
-    if (Resources::ModelList[modelId] == nullptr || Resources::ModelList[modelId] == 0) {
-        switch (modelId) {
-        case GrassTileModel:
-            Resources::ModelList[modelId] = new Model(HexagonTileMesh, GrassTexture);
-            break;
-        case WaterTileModel:
-            Resources::ModelList[modelId] = new Model(HexagonTileMesh, WaterTexture);
-            break;
-        case DesertTileModel:
-            Resources::ModelList[modelId] = new Model(HexagonTileMesh, DesertTexture);
-            break;
-        case RockTileModel:
-            Resources::ModelList[modelId] = new Model(HexagonTileMesh, RockTexture);
-            break;
-        case Piece1Model:
-            Resources::ModelList[modelId] = new Model(Piece1Mesh, Piece1Texture);
-            break;
-        default:
-            Resources::ModelList[modelId] = nullptr;
-        }
+Model Resources::GetModel(ModelID modelId) {
+    switch (modelId) {
+    case GrassTileModel:
+        return Model(HexagonTileMesh, GrassTexture);
+        break;
+    case WaterTileModel:
+        return Model(HexagonTileMesh, WaterTexture);
+        break;
+    case DesertTileModel:
+        return Model(HexagonTileMesh, DesertTexture);
+        break;
+    case RockTileModel:
+        return Model(HexagonTileMesh, RockTexture);
+        break;
+    case Piece1Model:
+        return Model(Piece1Mesh, Piece1Texture);
+        break;
+    default:
+        return Model();
     }
-    return Resources::ModelList[modelId];
 }
 
 Material* Resources::GetMaterial(MaterialID materialId) {

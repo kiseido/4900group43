@@ -56,6 +56,7 @@ struct Material {
 
 
 struct Model : public Component {
+    Model() = default;
     Model(MeshID m, TextureID t, MaterialID mat = BasicMaterial);
     Mesh* mesh;
     Material* material;
@@ -69,7 +70,7 @@ struct Model : public Component {
 
 
 namespace Resources {
-    Model* GetModel(ModelID modelId);
+    Model GetModel(ModelID modelId);
     Mesh* GetMesh(MeshID meshId);
     Mesh* LoadMesh(const char* filePath);
     Texture GetTexture(TextureID textureId);

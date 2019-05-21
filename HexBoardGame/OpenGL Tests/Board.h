@@ -6,6 +6,7 @@ class BoardPosition : public Component
 {
 public:
     int x, y;
+    BoardPosition() = default;
     BoardPosition(int x, int y);
     ~BoardPosition() = default;
 };

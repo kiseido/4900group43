@@ -13,11 +13,11 @@ namespace ECS_old
 
     ComponentID ECS_EntityComponents[];
     Transform* ECS_Transform[];
-    Model* ECS_Model[];
+    Model ECS_Model[];
     BoardPosition* ECS_BoardPosition[];
     BoardPiece* ECS_BoardPiece[];
 
-    EntityID CreateEntity(Transform* t, Model* m);
+    EntityID CreateEntity(Transform* t, Model m);
     EntityID CreateEntity(ModelID m);
     EntityID CreateEntity();
 
@@ -29,7 +29,7 @@ namespace ECS_old
 
     Component* GetComponent(EntityID eid, ComponentID compID);
     void SetComponent(EntityID eid, Transform* transform);
-    void SetComponent(EntityID eid, Model* model);
+    void SetComponent(EntityID eid, Model model);
     void SetComponent(EntityID eid, BoardPosition* boardposition);
     void SetComponent(EntityID eid, BoardPiece* boardpiece);
 
@@ -37,7 +37,7 @@ namespace ECS_old
     void SetTransform(EntityID eid, Transform* transform);
 
     Model* GetModel(EntityID eid);
-    void SetModel(EntityID eid, Model* model);
+    void SetModel(EntityID eid, Model model);
 
     BoardPosition* GetBoardPosition(EntityID eid);
     void SetBoardPosition(EntityID eid, BoardPosition* boardposition);

@@ -174,7 +174,13 @@ void Renderer::RenderScene() {
 
 
 void Renderer::RenderState(ECS::Engine::EngineState state) {
-    
+    if (state.status == ECS::EngineState::Board) {
+        for (ECS::EntityID eid : state.EntityIDs) {
+            if (*state.ComponentMasks.getComponent(eid) & (ECS::BoardModel_m | ECS::BoardTransform_m)) {
+                RenderEntity(state, eid, true);
+            }
+        }
+    }
 }
 
 

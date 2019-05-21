@@ -14,23 +14,21 @@ namespace ECS {
 
 		ComponentMask* componentMask;
 
-		Visual* boardVisual;
-		Position* boardPosition;
-		CollisionBody* boardCollisionBody;
-
-		Visual* realTimeVisual;
-		Position* realTimePosition;
-		Momentum* realTimeMomentum;
-		Rotation* realTimeRotation;
-		Momentum* realTimeRotationalMomentum;
-		CollisionBody* realTimeCollisionBody;
-
 		Health* health;
 		Damage* damage;
 		Power* power;
 
+        Transform* boardTransform;
+        Model* boardModel;
+		BoardPosition* boardPosition;
 		BoardSpeed* boardSpeed;
-		RealtimeSpeed* realTimeSpeed;
+
+        Transform* combatTransform;
+		Momentum* momentum;
+		Momentum* rotationalMomentum;
+        Model* combatModel;
+		CollisionBody* combatCollisionBody;
+        CombatSpeed* combatSpeed;
 
 		TeamAffiliation* team;
 

@@ -4,53 +4,53 @@
 namespace ECS {
 
 	enum Entity_templates : Mask_t {
-		BoardTileTemplate = BoardVisual_m | BoardPosition_m | TerrainType_m,
-		BoardPieceTemplate = BoardVisual_m | BoardPosition_m | RealTimeVisual_m | Health_m | Power_m | BoardSpeed_m | RealtimeSpeed_m | TeamAffiliation_m,
-		RealtimePieceTemplate = RealTimeVisual_m | RealTimePosition_m | RealTimeMomentum_m | RealTimeRotation_m | RotationalMomentum_m | RealTimeCollisionBody_m | Health_m,
-		RealtimeBulletTemplate = RealTimeVisual_m | RealTimePosition_m | RealTimeMomentum_m | RealTimeRotation_m | RotationalMomentum_m | RealTimeCollisionBody_m | Damage_m
+		BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m,
+		BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | BoardSpeed_m | TeamAffiliation_m,
+		CombatPieceTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Health_m,
+		CombatBulletTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Damage_m
 	};
 	
 
-	Entity makeBoardTile(EngineState& state, TerrainType type, Position pos) {
+	Entity makeBoardTile(EngineState& state, ModelID model, TerrainType type, BoardPosition pos) {
 		const ComponentMask mask = (ComponentMask) BoardTileTemplate;
 		auto entity = state.NewEntity(mask);
 
-		*entity.boardVisual = Visual::Terrain_v;
+        *entity.boardModel = Resources::GetModel(model);
 		*entity.boardPosition = pos;
 		*entity.terrainType = type;
 
 		return entity;
 	}
 	
-	Entity makeBoardPiecePawn(EngineState& state, TeamAffiliation team, Position pos) {
+	Entity makeBoardPiecePawn(EngineState& state, TeamAffiliation team, BoardPosition pos) {
 		const ComponentMask mask = (ComponentMask) BoardPieceTemplate;
 		auto entity = state.NewEntity(mask);
 
-		*entity.boardVisual = Visual::Pawn_v;
+        *entity.boardModel = Resources::GetModel(Piece1Model);
 		*entity.team = team;
-		*entity.boardPosition = pos;
+        *entity.boardPosition = pos;
 
 		return entity;
 	}
 
-	Entity makeBoardPieceKnight(EngineState& state, TeamAffiliation team, Position pos) {
+	Entity makeBoardPieceKnight(EngineState& state, TeamAffiliation team, BoardPosition pos) {
 		const ComponentMask mask = (ComponentMask) BoardPieceTemplate;
 		auto entity = state.NewEntity(mask);
 
-		*entity.boardVisual = Visual::Knight_v;
-		*entity.team = team;
-		*entity.boardPosition = pos;
+        *entity.boardModel = Resources::GetModel(Piece1Model);
+        *entity.team = team;
+        *entity.boardPosition = pos;
 
 		return entity;
 	}
 
-	Entity makeBoardPieceQueen(EngineState& state, TeamAffiliation team, Position pos) {
+	Entity makeBoardPieceQueen(EngineState& state, TeamAffiliation team, BoardPosition pos) {
 		const ComponentMask mask = (ComponentMask) BoardPieceTemplate;
 		auto entity = state.NewEntity(mask);
 
-		*entity.boardVisual = Visual::Queen_v;
-		*entity.team = team;
-		*entity.boardPosition = pos;
+        *entity.boardModel = Resources::GetModel(Piece1Model);
+        *entity.team = team;
+        *entity.boardPosition = pos;
 
 		return entity;
 	}
@@ -58,40 +58,36 @@ namespace ECS {
 	void turnPieceRealtime(EngineState& state, EntityID entityID, Position pos) {
 		ComponentMask mask = *state.ComponentMasks.getComponent(entityID);
 
-		mask = (ComponentMask) (mask & RealtimePieceTemplate);
+		mask = (ComponentMask) (mask & CombatPieceTemplate);
 
 		state.setEntityComponents(entityID,mask);
 
-		state.RealTimePositions.setComponent(entityID, pos);
+		//state.CombatPositions.setComponent(entityID, pos);
 	}
 
 	void removePieceRealtime(EngineState& state, EntityID entityID) {
 		ComponentMask mask = *state.ComponentMasks.getComponent(entityID);
 
-		mask = (ComponentMask) (mask & ~RealtimePieceTemplate);
+		mask = (ComponentMask) (mask & ~CombatPieceTemplate);
 		mask = (ComponentMask) (mask & BoardPieceTemplate);
 
 		state.setEntityComponents(entityID, mask);
 	}
 
-	Entity makeBullet(EngineState& state, TeamAffiliation team, Damage newDamage, Position pos, Momentum mom) {
-		const ComponentMask mask = (ComponentMask) RealtimeBulletTemplate;
+	Entity makeBullet(EngineState& state, TeamAffiliation team, Damage newDamage, Transform transf, Momentum mom) {
+		const ComponentMask mask = (ComponentMask) CombatBulletTemplate;
 		auto entity = state.NewEntity(mask);
 
-		*entity.boardVisual = Visual::Bullet_v;
 		*entity.team = team;
 		*entity.damage = newDamage;
-		*entity.realTimePosition = pos;
-		*entity.realTimeMomentum = pos;
+		*entity.combatTransform = transf;
+		*entity.momentum = mom;
 
 		return entity;
 	}
 
 	void GenerateBoard(EngineState& state) {
-		makeBoardTile(state, FlatGround, {0,0,0});
-		makeBoardTile(state, FlatGround, {0,1,0});
-		makeBoardTile(state, FlatGround, {1,0,0});
-		makeBoardTile(state, FlatGround, {1,1,0});
+		makeBoardTile(state, GrassTileModel, FlatGround, {0,0});
 	}
 
 
@@ -178,15 +174,7 @@ namespace ECS {
 
 		GenerateBoard(state);
 		
-		Entity p1 = makeBoardPiecePawn(state, Player1, {0,0,1});
-        glm::vec3 test = *state.BoardPositions.getComponent(p1.id);
-        std::cout << "boardpos: " << test.x << "," << test.y << "," << test.z << std::endl;
-        *p1.boardPosition = glm::vec3{ 0,1,0 };
-        test = *state.BoardPositions.getComponent(p1.id);
-        std::cout << "boardpos: " << test.x << "," << test.y << "," << test.z << std::endl;
-        state.BoardPositions.setComponent(p1.id, glm::vec3{ 1,0,0 });
-        test = *state.BoardPositions.getComponent(p1.id);
-        std::cout << "boardpos: " << test.x << "," << test.y << "," << test.z << std::endl;
+		Entity p1 = makeBoardPiecePawn(state, Player1, {0,0});
 
 
 		TODO

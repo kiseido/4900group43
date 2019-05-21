@@ -1,39 +1,40 @@
 #pragma once
 
 #include "Common.h"
+#include "Graphics.h"
+#include "Transform.h"
+#include "Board.h"
 
 namespace ECS {
 
 
 	namespace Components {
-		typedef int32_t Mask_t;
+		typedef uint64_t Mask_t;
 
 		enum ComponentMask : Mask_t {
 			None_m = 0b0,
 
-			BoardVisual_m = 0b1,
-			BoardCollisionBody_m = 0b1 << 1,
-			BoardPosition_m = 0b1 << 2,
+			Health_m =              1ui64 << 1,
+            Damage_m =              1ui64 << 2,
+            Power_m =               1ui64 << 3,
 
-			RealTimeVisual_m = 0b1 << 3,
-			RealTimePosition_m = 0b1 << 4,
-			RealTimeMomentum_m = 0b1 << 5,
-			RealTimeRotation_m = 0b1 << 6,
-			RotationalMomentum_m = 0b1 << 7,
-			RealTimeCollisionBody_m = 0b1 << 8,
+            BoardTransform_m =      1ui64 << 5,
+            BoardModel_m =         1ui64 << 6,
+            BoardPosition_m =       1ui64 << 7,
+            BoardSpeed_m =         1ui64 << 8,
 
-			Health_m = 0b1 << 9,
-			Damage_m = 0b1 << 10,
-			Power_m = 0b1 << 11,
+            CombatTransform_m =     1ui64 << 10,
+            Momentum_m =            1ui64 << 11,
+            RotationalMomentum_m =  1ui64 << 12,
+            CombatModel_m =        1ui64 << 13,
+            CombatCollisionBody_m = 1ui64 << 14,
+            CombatSpeed_m =         1ui64 << 15,
 
-			BoardSpeed_m = 0b1 << 12,
-			RealtimeSpeed_m = 0b1 << 13,
+            TeamAffiliation_m =     1ui64 << 20,
 
-			TeamAffiliation_m = 0b1 << 14,
+            AiStatus_m =            1ui64 << 25,
 
-			TerrainType_m = 0b1 << 15,
-
-
+            TerrainType_m =         1ui64 << 30
 		};
 
 		constexpr inline ComponentMask operator|(const ComponentMask& lhs, const ComponentMask& rhs){
@@ -52,37 +53,25 @@ namespace ECS {
 		typedef glm::vec3 CollisionBody;
 
 		typedef int BoardSpeed;
-		typedef int RealtimeSpeed;
+		typedef int CombatSpeed;
 
 		typedef int Health;
 		typedef Health Damage;
 		typedef Health Power;
 
-		enum Visual {
-			Unassigned_v,
-
-			Terrain_v,
-
-			Pawn_v,
-			Knight_v,
-			Queen_v,
-
-			Bullet_v
-		};
-
 
 		typedef float TimeStamp;
 
 		enum TerrainType : Mask_t {
-			Walkable = (0b1 << 31),
-			Flyable = (0b1 << 30),
-			Swimmable = (0b1 << 29),
+			Walkable = (1ui64 << 31),
+			Flyable = (1ui64 << 30),
+			Swimmable = (1ui64 << 29),
 
-			FlatGround = 0b1 | Walkable | Flyable,
-			Water = (0b1 << 1) | Flyable | Swimmable,
-			Cave = (0b1 << 2) | Walkable | Swimmable,
-			Mountain = (0b1 << 3) | Flyable,
-			Storm = (0b1 << 4)
+			FlatGround = 1ui64 | Walkable | Flyable,
+			Water = (1ui64 << 1) | Flyable | Swimmable,
+			Cave = (1ui64 << 2) | Walkable | Swimmable,
+			Mountain = (1ui64 << 3) | Flyable,
+			Storm = (1ui64 << 4)
 		};
 
 		enum NetworkStatus : Mask_t {
@@ -90,7 +79,7 @@ namespace ECS {
 		};
 
 		enum AIStatus : Mask_t {
-
+            NoAI = 0
 		};
 
 		enum EventID : Mask_t {
@@ -114,5 +103,7 @@ namespace ECS {
 #define DefaultCol {1,1,1}
 #define DefaultHealth 1
 #define DefaultSpeed 1
+#define DefaultTransform {}
+#define DefaultModel {}
 	}
 }

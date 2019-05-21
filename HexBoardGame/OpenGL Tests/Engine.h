@@ -95,20 +95,16 @@ namespace ECS {
             //Board
             ComponentContainer<Transform> BoardTransforms;
             ComponentContainer<Model> BoardModels;
-			ComponentContainer<Visual> BoardVisuals;
-			ComponentContainer<CollisionBody> BoardCollisionBodies;
-			ComponentContainer<Position> BoardPositions;
+			ComponentContainer<BoardPosition> BoardPositions;
+            ComponentContainer<BoardSpeed> BoardSpeeds;
 
             //Combat
-			ComponentContainer<Position> RealTimePositions;
+            ComponentContainer<Transform> CombatTransforms;
 			ComponentContainer<Momentum> Momentums;
-			ComponentContainer<Rotation> Rotations;
 			ComponentContainer<Momentum> RotationalMomentums;
-			ComponentContainer<Visual> RealTimeVisuals;
-			ComponentContainer<CollisionBody> RealTimeCollisionBodies;
-
-			ComponentContainer<BoardSpeed> BoardSpeeds;
-			ComponentContainer<RealtimeSpeed> RealtimeSpeeds;
+			ComponentContainer<Model> CombatModels;
+			ComponentContainer<CollisionBody> CombatCollisionBodies;
+			ComponentContainer<CombatSpeed> CombatSpeeds;
 
 			ComponentContainer<TeamAffiliation> Teams;
 

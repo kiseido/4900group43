@@ -10,7 +10,7 @@ struct Transform : public Component
 
     bool change = true;
 
-    Transform *parent = 0;
+    Transform *parent = nullptr;
 
     glm::mat4 tNet;
     glm::vec3 position = glm::vec3(0.0);
