@@ -6,6 +6,7 @@
 #include "Board.h"
 
 #include <queue>
+#include <list>
 
 namespace ECS {
 	namespace Engine {
@@ -77,6 +78,10 @@ namespace ECS {
 
 			TeamAffiliation PlayerTurn;
 
+			GameStatus status;
+
+			std::list<EntityID> EntityIDs;
+
 			ComponentContainer<ComponentMask> ComponentMasks;
 
 			ComponentContainer<Health> Healths;
@@ -107,6 +112,7 @@ namespace ECS {
 
 			Entity NewEntity(ComponentMask);
 			Entity getEntity(EntityID);
+			void removeEntity(EntityID);
 			void setEntityComponents(EntityID, ComponentMask);
 		};
 

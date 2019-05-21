@@ -27,8 +27,9 @@ namespace ECS {
 
 		setEntityComponents(newID, mask);
 
+		EntityIDs.push_back(newID);
+
 		return getEntity(newID);
-		TODOe
 	}
 	Entity EngineState::getEntity(EntityID id)
 	{
@@ -67,6 +68,22 @@ namespace ECS {
 
 		return e;
 	}
+
+	void Engine::EngineState::removeEntity(EntityID id)
+	{
+		setEntityComponents(id, ECS::ComponentMask::None_m);
+
+		ComponentMasks.removeComponent(id);
+
+		for (auto it = EntityIDs.begin(); it != EntityIDs.end(); ++it) {
+			if (*it == id) {
+				EntityIDs.erase(it);
+				break;
+			}
+		}
+
+	}
+
 	void EngineState::setEntityComponents(EntityID id, ComponentMask mask)
 	{
 		ComponentMask* poldMask = ComponentMasks.getComponent(id);
@@ -82,8 +99,6 @@ namespace ECS {
 			addMask = (ComponentMask) (oldMask ^ (oldMask & mask));
 			removeMask = (ComponentMask) (mask ^ (oldMask & addMask));
 		}
-
-		
 
 		if (addMask != None_m) {
 #define addMaskCheck(MASK) mask & MASK && (oldMask & MASK) == None_m
