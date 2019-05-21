@@ -182,39 +182,38 @@ namespace ECS {
 	TimeStamp Game::advanceTime(TimeStamp timeToAdvanceBy)
 	{
 		EngineState * currentState = TimeLine.getState(0);
-		const EngineState * lastState = currentState;
+		const EngineState * lastState;
 
 		switch (currentState->status)
 		{
 		case ECS::EngineState::Paused: {
-			EngineState & currentState = *TimeLine.getState(0);
-			const EngineState & lastState = currentState;
-			pausedLogic.Run(lastState, currentState);
+			currentState = TimeLine.getState(0);
+			lastState = currentState;
+			pausedLogic.Run(*lastState, *currentState);
 
-			return currentState.WorldTime;
+			return currentState->WorldTime;
 		}
-			break;
+									   break;
 		case ECS::EngineState::Board: {
-			EngineState & currentState = TimeLine.NewState();
-			const EngineState & lastState = TimeLine.getPreviousState();
+			currentState = &TimeLine.NewState();
+			lastState = &TimeLine.getPreviousState();
 
-			currentState.WorldTime += timeToAdvanceBy;
+			currentState->WorldTime += timeToAdvanceBy;
 
-			boardLogic.Run(lastState, currentState);
-			return currentState.WorldTime;
+			boardLogic.Run(*lastState, *currentState);
+			return currentState->WorldTime;
 		}
-		   break;
-		case ECS::EngineState
-		::Combat: {
-			EngineState & currentState = TimeLine.NewState();
-			const EngineState & lastState = TimeLine.getPreviousState();
+									  break;
+		case ECS::EngineState::Combat: {
+			currentState = &TimeLine.NewState();
+			lastState = &TimeLine.getPreviousState();
 
-			currentState.WorldTime += timeToAdvanceBy;
+			currentState->WorldTime += timeToAdvanceBy;
 
-			combatLogic.Run(lastState, currentState);
-			return currentState.WorldTime;
+			combatLogic.Run(*lastState, *currentState);
+			return currentState->WorldTime;
 		}
-			break;
+									   break;
 		default:
 			TODOe
 				break;
