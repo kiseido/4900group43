@@ -30,13 +30,6 @@ namespace ECS {
 			MultiPlayer
 		};
 
-		enum GameStatus {
-			Paused,
-			Board,
-			Combat
-		};
-
-		GameStatus status;
 		GameType gameType;
 		EngineStateManager TimeLine;
 

@@ -66,6 +66,11 @@ namespace ECS {
 		};
 
 		struct EngineState {
+			enum GameStatus {
+				Paused,
+				Board,
+				Combat
+			};
 			
 			// Time this state represents once completed
 			TimeStamp WorldTime;

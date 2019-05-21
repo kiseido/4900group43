@@ -130,16 +130,16 @@ namespace ECS {
 		std::cout << "Displaying splash screen" << std::endl;
 
 		std::cout << std::endl << 
-			"8 8888        8 8 8888888888   `8.`8888.      ,8'\n"\
-			"8 8888        8 8 8888          `8.`8888.    ,8'\n"\
-			"8 8888        8 8 8888           `8.`8888.  ,8'\n"\
-			"8 8888        8 8 8888            `8.`8888.,8'\n"\
-			"8 8888        8 8 888888888888     `8.`88888'\n"\
-			"8 8888        8 8 8888             .88.`8888.\n"\
-			"8 8888888888888 8 8888            .8'`8.`8888.\n"\
-			"8 8888        8 8 8888           .8'  `8.`8888.\n"\
-			"8 8888        8 8 8888          .8'    `8.`8888.\n"\
-			"8 8888        8 8 888888888888 .8'      `8.`8888."
+			"\t8 8888        8 8 8888888888   `8.`8888.      ,8'\n"\
+			"\t8 8888        8 8 8888          `8.`8888.    ,8'\n"\
+			"\t8 8888        8 8 8888           `8.`8888.  ,8'\n"\
+			"\t8 8888        8 8 8888            `8.`8888.,8'\n"\
+			"\t8 8888        8 8 888888888888     `8.`88888'\n"\
+			"\t8 8888        8 8 8888             .88.`8888.\n"\
+			"\t8 8888888888888 8 8888            .8'`8.`8888.\n"\
+			"\t8 8888        8 8 8888           .8'  `8.`8888.\n"\
+			"\t8 8888        8 8 8888          .8'    `8.`8888.\n"\
+			"\t8 8888        8 8 888888888888 .8'      `8.`8888."
 			<< std::endl << std::endl;
 
 		TODO
@@ -174,7 +174,7 @@ namespace ECS {
 
 		state.PlayerTurn = Player1;
 
-		status = ECS::Game::Board;
+		state.status = ECS::EngineState::Board;
 
 		GenerateBoard(state);
 		
@@ -193,9 +193,12 @@ namespace ECS {
 	}
 	TimeStamp Game::advanceTime(TimeStamp timeToAdvanceBy)
 	{
-		switch (status)
+		EngineState * currentState = TimeLine.getState(0);
+		const EngineState * lastState = currentState;
+
+		switch (currentState->status)
 		{
-		case ECS::Game::Paused: {
+		case ECS::EngineState::Paused: {
 			EngineState & currentState = *TimeLine.getState(0);
 			const EngineState & lastState = currentState;
 			pausedLogic.Run(lastState, currentState);
@@ -203,7 +206,7 @@ namespace ECS {
 			return currentState.WorldTime;
 		}
 			break;
-		case ECS::Game::Board: {
+		case ECS::EngineState::Board: {
 			EngineState & currentState = TimeLine.NewState();
 			const EngineState & lastState = TimeLine.getPreviousState();
 
@@ -213,7 +216,8 @@ namespace ECS {
 			return currentState.WorldTime;
 		}
 		   break;
-		case ECS::Game::Combat: {
+		case ECS::EngineState
+		::Combat: {
 			EngineState & currentState = TimeLine.NewState();
 			const EngineState & lastState = TimeLine.getPreviousState();
 
