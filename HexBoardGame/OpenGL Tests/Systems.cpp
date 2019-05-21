@@ -42,12 +42,17 @@ namespace ECS {
 
 	}
 
+	void RTPhysics::ProcessCollisions(const EngineState& lastState, EngineState& newState) {
+
+	}
+
 	void RTPhysics::Run(const EngineState& lastState, EngineState& newState) {
 
 
 		ProcessMomentums(lastState, newState);
 		ProcessPositions(lastState, newState);
 		ProcessRotations(lastState, newState);
+		ProcessCollisions(lastState, newState);
 	}
 
 	const int RTPhysics::PerPass = 100;
