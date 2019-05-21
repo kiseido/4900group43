@@ -1,4 +1,7 @@
 #pragma once
+
+
+typedef unsigned int EntityID;
 typedef unsigned long ComponentID;
 
 

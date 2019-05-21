@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "Component.h"
 #include "Transformer.h"
-#include "ECS.h"
+#include "ECS_old.h"
 #include "BoardManager.h"
 #include "Utils.h"
 
@@ -20,11 +20,11 @@ Board::Board(int radius) : radius(radius) {
         for (int i = -radius; i <= radius; i++) {
             BoardPosition* curPos = nullptr;
             if (glm::abs(i+j) <= radius) {
-                EntityID curTile = ECS::CreateEntity(GrassTileModel);
+                EntityID curTile = ECS_old::CreateEntity(GrassTileModel);
                 BoardManager::SetTransformPosition(curTile, this, i, j);
                 curPos = new BoardPosition(i, j);
-                ECS::SetBoardPosition(curTile, curPos);
-                ECS::AddComponentMask(curTile, ComponentPick);
+                ECS_old::SetBoardPosition(curTile, curPos);
+                ECS_old::AddComponentMask(curTile, ComponentPick);
             }
             board[radius+j][radius+i] = curPos;
         }

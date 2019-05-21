@@ -5,11 +5,11 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "Entity.h"
 
 namespace Window {
     GLFWwindow* Init();
     void Start();
+    void Close();
 
     bool GetMousePosition(double &mouseX, double &mouseY);
     void framebuffer_size_callback(GLFWwindow* win, int newWidth, int newHeight);
@@ -17,4 +17,8 @@ namespace Window {
     void mouse_position_callback(GLFWwindow* win, double mouseX, double mouseY);
     void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
     void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+    double GetTime();
+    void Update();
+    bool IsActive();
 }

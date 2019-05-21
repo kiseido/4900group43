@@ -1,48 +1,64 @@
 #pragma once
-#include "Transform.h"
-#include "Graphics.h"
-#include "Board.h"
+
+#include "Common.h"
+
+#include "Components.h"
+
 #include "Entity.h"
-constexpr unsigned int MAX_ENTITY_ARRAY_SIZE = 1024;
+#include "Engine.h"
+#include "Systems.h"
+
+namespace ECS {
+	
+	//typedef uint16_t ComponentMask;
+
+	class Random {
+	public:
+		static void setSeed(int);
+		static int getInt();
+	};
 
 
-
-namespace ECS
-{
-    unsigned int GetEntityCount();
-
-    ComponentID ECS_EntityComponents[];
-    Transform* ECS_Transform[];
-    Model* ECS_Model[];
-    BoardPosition* ECS_BoardPosition[];
-    BoardPiece* ECS_BoardPiece[];
-
-    EntityID CreateEntity(Transform* t, Model* m);
-    EntityID CreateEntity(ModelID m);
-    EntityID CreateEntity();
+	using namespace ECS::Engine;
+	using namespace ECS::Systems;
 
 
-    bool HasComponents(EntityID eid, ComponentID components);
+	class Game {
+		enum GameType {
+			Undecided,
+			SinglePlayer,
+			MultiPlayer
+		};
 
-    void AddComponentMask(EntityID eid, ComponentID mask);
-    void RemoveComponentMask(EntityID eid, ComponentID mask);
+		enum GameStatus {
+			Paused,
+			Board,
+			Combat
+		};
 
-    Component* GetComponent(EntityID eid, ComponentID compID);
-    void SetComponent(EntityID eid, Transform* transform);
-    void SetComponent(EntityID eid, Model* model);
-    void SetComponent(EntityID eid, BoardPosition* boardposition);
-    void SetComponent(EntityID eid, BoardPiece* boardpiece);
+		GameStatus status;
+		GameType gameType;
+		EngineStateManager TimeLine;
 
-    Transform* GetTransform(EntityID eid);
-    void SetTransform(EntityID eid, Transform* transform);
+		PausedSystemsPack pausedLogic;
+		BoardSystemsPack boardLogic;
+		CombatSystemsPack combatLogic;
 
-    Model* GetModel(EntityID eid);
-    void SetModel(EntityID eid, Model* model);
+		RTPhysics rtPhysics;
+		BoardRenderer boardRenderer;
+		CombatRenderer combatRenderer;
 
-    BoardPosition* GetBoardPosition(EntityID eid);
-    void SetBoardPosition(EntityID eid, BoardPosition* boardposition);
-
-    BoardPiece* GetBoardPiece(EntityID eid);
-    void SetBoardPiece(EntityID eid, BoardPiece* boardpiece);
-};
-
+		bool playing;
+	public:
+		Game();
+		~Game();
+		// generate next world state
+		// @param amount of time to advance worldstate by
+		// @return current board time
+		TimeStamp advanceTime(TimeStamp);
+		void GameLoop();
+		void ShowSplash();
+		void RequestGameType();
+		void Setup();
+	};
+}

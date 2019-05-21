@@ -173,6 +173,11 @@ void Renderer::RenderScene() {
 }
 
 
+void Renderer::RenderState(ECS::Engine::EngineState state) {
+    
+}
+
+
 //GLuint vao[numVAOs];
 //GLuint vbo[numVBOs];
 //GLuint curTexture = 0;
@@ -308,11 +313,11 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_SCISSOR_TEST);
     glScissor(mouseX, mouseY, 1, 1);
-    EntityID totalEntities = ECS::GetEntityCount();
+    EntityID totalEntities = ECS_old::GetEntityCount();
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
     for (EntityID eid = 0; eid < totalEntities; eid++) {
-        if (ECS::HasComponents(eid, ComponentPick | ComponentTransform | ComponentModel)) {
+        if (ECS_old::HasComponents(eid, ComponentPick | ComponentTransform | ComponentModel)) {
             SetRenderOptionsColor(EntityToColor(eid));
             RenderEntity(eid);
         }
@@ -325,10 +330,12 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
     SetRenderOptionsLighting(1);
     return mouseEntityId;
 }
+
+
 void Renderer::RenderAll(ComponentID components, bool entitytocolor) {
-    EntityID totalEntities = ECS::GetEntityCount();
+    EntityID totalEntities = ECS_old::GetEntityCount();
     for (EntityID eid = 0; eid < totalEntities; eid++) {
-        if (ECS::HasComponents(eid, components | ComponentTransform | ComponentModel)) {
+        if (ECS_old::HasComponents(eid, components | ComponentTransform | ComponentModel)) {
             if(entitytocolor)
                 SetRenderOptionsColor(EntityToColor(eid));
             RenderEntity(eid);
@@ -364,12 +371,12 @@ void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
 }
 
 void Renderer::RenderEntity(EntityID eid) {
-    if (ECS::HasComponents(eid, ComponentTransform | ComponentModel)) {
-        Model* model = ECS::GetModel(eid);
+    if (ECS_old::HasComponents(eid, ComponentTransform | ComponentModel)) {
+        Model* model = ECS_old::GetModel(eid);
         SetRenderingModel(model);
 
         Transformer::CalcTNet(eid);
-        glm::mat4 tnet = camMat * ECS::GetTransform(eid)->tNet;
+        glm::mat4 tnet = camMat * ECS_old::GetTransform(eid)->tNet;
         glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
         glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
         glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
@@ -380,7 +387,7 @@ void Renderer::RenderEntity(EntityID eid) {
 
 void Renderer::RenderPicking(EntityID eid) {
 
-    Model* model = ECS::GetModel(eid);
+    Model* model = ECS_old::GetModel(eid);
 
 
 }

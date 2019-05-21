@@ -10,54 +10,37 @@
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include "Graphics.h"
 #include "Utils.h"
-#include "ECS.h"
-#include "Renderer.h"
+#include "ECS_old.h"
 #include "Transformer.h"
+#include "Renderer.h"
 #include "Window.h"
-#include "Game.h"
+#include "Game_old.h"
+#include "ECS.h"
+#include "Engine.h"
+#include "Systems.h"
 
-using namespace std;
+#define PRINTSIZE(x) std::cout << #x << " size = " << sizeof(x) << std::endl
 
-int width, height;
-float aspect;
-
-
-void init() {
-    double testScale = 0.95;
-
-    //for (int i = 0; i < 20; i++) {
-    //    for (int j = 0; j < 15; j++) {
-    //        if (((i == 5 || i == 6) && j < 5) || ((i == 4 || i == 5) && (j >= 5 && j < 10)) || ((i == 5 || i == 6) && (j >= 10 && j < 12)) || ((i == 6 || i == 7) && (j >= 12 && j < 15))) {
-    //            lastEntity = ECS::CreateEntity(WaterTileModel);
-    //        }
-    //        else if (i < 9 || (i < 10 && (j < 5 || j >= 10))) {
-    //            lastEntity = ECS::CreateEntity(GrassTileModel);
-    //        }
-    //        else if (((i == 15 || i == 17) && (j > 10 && j < 13)) || (i == 16 && (j > 10 && j < 14))){
-    //            lastEntity = ECS::CreateEntity(RockTileModel);
-    //        }
-    //        else {
-    //            lastEntity = ECS::CreateEntity(DesertTileModel);
-    //        }
-    //        Transformer::SetPosition(lastEntity, 
-    //            glm::vec3(- 6.666 + 1.5 * cos60 * i, 0, -7.5 + sin60 * (j + 0.5 * (i%2))));
-    //        Transformer::SetScale(lastEntity, glm::vec3(testScale, testScale, testScale));
-    //        ECS::AddComponentMask(lastEntity, ComponentBoardPosition);
-    //    }
-    //}
-
-    Game::Start();
+int maain(void) {
+    PRINTSIZE(glm::vec3);
+    PRINTSIZE(glm::mat4);
+    PRINTSIZE(glm::ivec2);
+    PRINTSIZE(bool);
+    PRINTSIZE(Transform*);
+    PRINTSIZE(Transform);
+    PRINTSIZE(Component);
+    PRINTSIZE(Model);
+    PRINTSIZE(BoardPiece);
+    PRINTSIZE(BoardPosition);
 
 
 
-    Renderer::Setup();
-}
 
-
-int main(void) {
     Window::Init();
-
-    init();
+    Renderer::Setup();
+    Game_old::Start();
 
     Window::Start();
+
+    return 0;
 }

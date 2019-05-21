@@ -40,7 +40,7 @@ void BoardManager::SetTransformPosition(EntityID eid, Board* board, int x, int y
 }
 
 void BoardManager::SetBoardPosition(EntityID eid, Board* board, int x, int y, bool transform) {
-    ECS::SetBoardPosition(eid, GetPosition(board, x, y));
+    ECS_old::SetBoardPosition(eid, GetPosition(board, x, y));
     if (transform) {
         SetTransformPosition(eid, board, x, y);
     }

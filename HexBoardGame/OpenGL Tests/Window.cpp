@@ -1,6 +1,6 @@
 #include "Window.h"
 #include "Renderer.h"
-#include "Game.h"
+#include "Game_old.h"
 #include "Utils.h"
 
 namespace {
@@ -34,16 +34,30 @@ GLFWwindow* Window::Init() {
 
 void Window::Start() {
     while (!glfwWindowShouldClose(mainWindow)) {
-        Game::GameLoop(glfwGetTime());
-        glfwSwapBuffers(mainWindow);
-        glfwPollEvents();
+        Game_old::GameLoop(Window::GetTime());
+        Window::Update();
     }
+    Window::Close();
+}
 
+double Window::GetTime() {
+    return glfwGetTime();
+}
+
+bool Window::IsActive() {
+    return !glfwWindowShouldClose(mainWindow);
+}
+
+void Window::Update() {
+    glfwSwapBuffers(mainWindow);
+    glfwPollEvents();
+}
+
+void Window::Close(){
     glfwDestroyWindow(mainWindow);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
-
 
 bool Window::GetMousePosition(double &mouseX, double &mouseY) {
     //double mX, mY;
@@ -73,9 +87,9 @@ void Window::window_size_callback(GLFWwindow* win, int newWidth, int newHeight) 
 void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        Game::MouseLeftClick();
+        Game_old::MouseLeftClick();
     else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        Game::MouseRightClick();
+        Game_old::MouseRightClick();
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

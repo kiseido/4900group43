@@ -1,8 +1,7 @@
 #pragma once
-#include "ECS.h"
-#include "Entity.h"
+#include "ECS_old.h"
 
-namespace Game {
+namespace Game_old {
     void Start();
     void MouseLeftClick();
     void MouseRightClick();

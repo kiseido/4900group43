@@ -1,6 +1,6 @@
 #pragma once
 #include "Board.h"
-#include "ECS.h"
+#include "ECS_old.h"
 #include "Transformer.h"
 
 namespace BoardManager {
