@@ -1,4 +1,4 @@
-﻿#include "ECS.h"
+#include "ECS.h"
 #include "Window.h"
 
 namespace ECS {
@@ -166,7 +166,7 @@ namespace ECS {
 	}
 	void Game::Setup()
 	{
-		auto state = TimeLine.NewState();
+		auto & state = TimeLine.NewState();
 
 		state.PlayerTurn = Player1;
 
