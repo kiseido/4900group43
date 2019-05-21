@@ -15,6 +15,7 @@ namespace ECS {
         newState.BoardPositions = lastState.BoardPositions;
         newState.BoardModels = lastState.BoardModels;
         newState.BoardTransforms = lastState.BoardTransforms;
+        newState.BoardSpeeds = lastState.BoardSpeeds;
         Renderer::RenderState(newState);
 		//std::cout << "BoardSystemsPack" << std::endl;
 	}
