@@ -114,7 +114,7 @@ namespace ECS {
 				
 			}
 
-			for (int i = newState.userInputIndex; i < events.size; ++i) {
+			for (int i = newState.userInputIndex; i < events.size(); ++i) {
 
 			}
 
