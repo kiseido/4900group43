@@ -12,10 +12,10 @@ namespace ECS {
 
 	void BoardSystemsPack::Run(const EngineState & lastState, EngineState & newState)
 	{
-        newState.BoardPositions = lastState.BoardPositions;
-        newState.BoardModels = lastState.BoardModels;
-        newState.BoardTransforms = lastState.BoardTransforms;
-        Renderer::RenderState(newState);
+		newState.BoardPositions = lastState.BoardPositions;
+		newState.BoardModels = lastState.BoardModels;
+		newState.BoardTransforms = lastState.BoardTransforms;
+		Renderer::RenderState(newState);
 		//std::cout << "BoardSystemsPack" << std::endl;
 	}
 

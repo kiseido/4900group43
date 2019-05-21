@@ -96,3 +96,61 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     Renderer::ChangeCameraZoom(-yoffset / 10);
 }
+
+namespace ECS {
+	namespace Systems {
+		UserInput::UserInput()
+		{
+			events.reserve(9999);
+		}
+		void UserInput::Run(const EngineState & lastState, EngineState & newState)
+		{
+			int upKey = glfwGetKey(mainWindow, GLFW_KEY_W);
+			int leftKey = glfwGetKey(mainWindow, GLFW_KEY_A);
+			int downKey = glfwGetKey(mainWindow, GLFW_KEY_S);
+			int rightKey = glfwGetKey(mainWindow, GLFW_KEY_D);
+
+			if (newState.status == ECS::EngineState::GameStatus::Combat) {
+				
+			}
+
+			for (int i = newState.userInputIndex; i < events.size; ++i) {
+
+			}
+
+			newState.userInputIndex = events.size();
+		}
+
+		void UserInput::customGLFWkey_callback(GLFWwindow * window, int key, int scancode, int action, int mods)
+		{
+			switch (key)
+			{
+			case GLFW_KEY_ESCAPE:
+				if (scancode == GLFW_PRESS)
+					events.push_back(ActionEvent(UserAction::Exit, getTime(), key));
+				break;
+			case GLFW_KEY_ENTER:
+				if (scancode == GLFW_PRESS)
+					events.push_back(ActionEvent(UserAction::Accept, getTime(), key));
+				break;
+			case GLFW_MOUSE_BUTTON_1:
+				if (scancode == GLFW_PRESS) {
+					double x, y;
+					glfwGetCursorPos(window, &x, &y);
+					events.push_back(ActionEvent(UserAction::Mouse, getTime(), key, {x, y}));
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		UserInput::ActionEvent::ActionEvent(UserAction action, TimeStamp time, int keyCode) : action(action), time(time), keyCode(keyCode)
+		{
+		}
+
+		UserInput::ActionEvent::ActionEvent(UserAction action, TimeStamp time, int keyCode, glm::vec2 position) : action(action), time(time), keyCode(keyCode), position(position)
+		{
+		}
+	}
+}

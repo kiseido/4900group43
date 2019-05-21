@@ -18,6 +18,8 @@ namespace ECS {
 		static int getInt();
 	};
 
+	TimeStamp getTime();
+
 
 	using namespace ECS::Engine;
 	using namespace ECS::Systems;
