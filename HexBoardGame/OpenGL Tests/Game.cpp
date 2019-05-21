@@ -179,6 +179,22 @@ namespace ECS {
 
 		TODO
 	}
+
+    void BasicCopyState(const ECS::Engine::EngineState & lastState, ECS::Engine::EngineState & newState) {
+        newState.PlayerTurn = lastState.PlayerTurn;
+        newState.status = lastState.status;
+        newState.WorldTime = lastState.WorldTime;
+        newState.EntityIDs = lastState.EntityIDs;
+        newState.ComponentMasks = lastState.ComponentMasks;
+        newState.Healths = lastState.Healths;
+        newState.Damages = lastState.Damages;
+        newState.Powers = lastState.Powers;
+
+        newState.Teams = lastState.Teams;
+        newState.AI = lastState.AI;
+        newState.TerrainTypes = lastState.TerrainTypes;
+    }
+
 	TimeStamp Game::advanceTime(TimeStamp timeToAdvanceBy)
 	{
 		EngineState * currentState = TimeLine.getState(0);
@@ -197,7 +213,7 @@ namespace ECS {
 		case ECS::EngineState::Board: {
 			currentState = &TimeLine.NewState();
 			lastState = &TimeLine.getPreviousState();
-
+            BasicCopyState(*lastState, *currentState);
 			currentState->WorldTime += timeToAdvanceBy;
 
 			boardLogic.Run(*lastState, *currentState);

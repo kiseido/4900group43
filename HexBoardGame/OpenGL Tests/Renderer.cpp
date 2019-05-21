@@ -174,6 +174,8 @@ void Renderer::RenderScene() {
 
 
 void Renderer::RenderState(ECS::Engine::EngineState state) {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     if (state.status == ECS::EngineState::Board) {
         for (ECS::EntityID eid : state.EntityIDs) {
             if (*state.ComponentMasks.getComponent(eid) & (ECS::BoardModel_m | ECS::BoardTransform_m)) {
@@ -392,17 +394,15 @@ void Renderer::RenderEntity(EntityID eid) {
 }
 
 void Renderer::RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, bool board) {
-    if (ECS_old::HasComponents(eid, ComponentTransform | ComponentModel)) {
-        Model* model = board ? state.BoardModels.getComponent(eid) : state.BoardModels.getComponent(eid);
-        SetRenderingModel(model);
-        Transform* transform = board ? state.BoardTransforms.getComponent(eid) : state.BoardTransforms.getComponent(eid);
+    Model* model = board ? state.BoardModels.getComponent(eid) : state.BoardModels.getComponent(eid);
+    SetRenderingModel(model);
+    Transform* transform = board ? state.BoardTransforms.getComponent(eid) : state.BoardTransforms.getComponent(eid);
 
-        Transformer::CalcTNet(transform);
-        glm::mat4 tnet = camMat * transform->tNet;
-        glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
-        glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
-        glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
+    Transformer::CalcTNet(transform);
+    glm::mat4 tnet = camMat * transform->tNet;
+    glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
+    glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
+    glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
 
-        glDrawArrays(GL_TRIANGLES, 0, model->mesh->numVertices);
-    }
+    glDrawArrays(GL_TRIANGLES, 0, model->mesh->numVertices);
 }
