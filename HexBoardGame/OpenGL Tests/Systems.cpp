@@ -16,7 +16,7 @@ namespace ECS {
         newState.Models = lastState.Models;
         newState.Transforms = lastState.Transforms;
         Renderer::RenderState(newState);
-		std::cout << "BoardSystemsPack" << std::endl;
+		//std::cout << "BoardSystemsPack" << std::endl;
 	}
 
 	void CombatSystemsPack::Run(const EngineState & lastState, EngineState & newState)
