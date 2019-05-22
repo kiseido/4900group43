@@ -9,21 +9,20 @@ glm::mat4 *Transformer::GetTransform(Transform* transf) {
 
 
 void Transformer::CalcTNet(Transform* transf) {
-    
-    if (!transf->change) {
-        return;
-    }
-    transf->tNet = glm::mat4(1.0);
-    transf->tNet = glm::translate(transf->tNet, transf->position);
-    transf->tNet = glm::rotate(transf->tNet, transf->rotation.x, glm::vec3(1.0, 0.0, 0.0));
-    transf->tNet = glm::rotate(transf->tNet, transf->rotation.y, glm::vec3(0.0, 1.0, 0.0));
-    transf->tNet = glm::rotate(transf->tNet, transf->rotation.z, glm::vec3(0.0, 0.0, 1.0));
-    transf->tNet = glm::scale(transf->tNet, transf->scale);
 
+    if (transf->change) {
+        transf->baseTNet = glm::mat4(1.0);
+        transf->baseTNet = glm::translate(transf->baseTNet, transf->position);
+        transf->baseTNet = glm::rotate(transf->baseTNet, transf->rotation.x, glm::vec3(1.0, 0.0, 0.0));
+        transf->baseTNet = glm::rotate(transf->baseTNet, transf->rotation.y, glm::vec3(0.0, 1.0, 0.0));
+        transf->baseTNet = glm::rotate(transf->baseTNet, transf->rotation.z, glm::vec3(0.0, 0.0, 1.0));
+        transf->baseTNet = glm::scale(transf->baseTNet, transf->scale);
+    }
+    transf->tNet = transf->baseTNet;
     Transform *curParent = transf->parent;
     while (curParent != 0) {
         Transformer::CalcTNet(curParent);
-        transf->tNet = transf->tNet * curParent->tNet;
+        transf->tNet = curParent->tNet * transf->tNet;
         curParent = curParent->parent;
     }
 

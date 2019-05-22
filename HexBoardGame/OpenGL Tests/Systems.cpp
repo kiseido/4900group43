@@ -212,8 +212,18 @@ namespace ECS {
 
     
     IntroSystem::IntroSystem() {
-        //Transformer::SetScale(&BaseTransform, glm::vec3(0.1, 0.1, 0.1));
+        Transformer::SetScale(&BaseTransform, glm::vec3(1.5, 1.5, 1.5));
+        Transformer::SetRotation(&BaseTransform, glm::vec3(0.785, 0, 0));
+        Transformer::SetPosition(&BCIT_b_transform, glm::vec3(-10, 20, 0));
+        Transformer::SetPosition(&BCIT_c_transform, glm::vec3(-5, 20, 0));
+        Transformer::SetPosition(&BCIT_i_transform, glm::vec3(5, 20, 0));
+        Transformer::SetPosition(&BCIT_t_transform, glm::vec3(10, 20, 0));
+        
         BCIT_square_transform.parent = &BaseTransform;
+        BCIT_b_transform.parent = &BaseTransform;
+        BCIT_c_transform.parent = &BaseTransform;
+        BCIT_i_transform.parent = &BaseTransform;
+        BCIT_t_transform.parent = &BaseTransform;
         BCIT_square_model = Resources::GetModel(BCITSquareModel);
         BCIT_b_model = Resources::GetModel(BCITBModel);
         BCIT_c_model = Resources::GetModel(BCITCModel);
@@ -227,14 +237,60 @@ namespace ECS {
         newState.BoardTransforms = lastState.BoardTransforms;
         newState.BoardPieces = lastState.BoardPieces;
         newState.BoardMovements = lastState.BoardMovements;
-        if (newState.WorldTime >= 5)
+        float increment = 0.25f;
+        if (newState.WorldTime <= 1.1) {
+            float f = glm::min(newState.WorldTime, 1.0f);
+            Renderer::SetLight(
+                glm::vec4{ f/4, f/4, f/4, 1.0f },
+                glm::vec3{ 0, 1, 1 },
+                glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
+                glm::vec4{ f, f, f, 1.0f },
+                glm::vec4{ f, f, f, 1.0f }
+            );
+        }
+        else if (newState.WorldTime <= 2 + 4 * increment) {
+            float shake = 0;
+            if(newState.WorldTime > 1 + 0.5 * increment && newState.WorldTime < 1 + 4.5 * increment)
+                shake = glm::max((float)glm::cos((newState.WorldTime - 1 - 0.1 * increment)*2 *3.1415926/increment) - 0.9f, 0.0f) * 3;
+            float blerp = glm::min(newState.WorldTime - (1 + 0 * increment), increment) * 1.0f/increment;
+            float clerp = glm::min(newState.WorldTime - (1 + 1 * increment), increment) * 1.0f/increment;
+            float ilerp = glm::min(newState.WorldTime - (1 + 2 * increment), increment) * 1.0f/increment;
+            float tlerp = glm::min(newState.WorldTime - (1 + 3 * increment), increment) * 1.0f/increment;
+            Transformer::SetPosition(&BCIT_b_transform, (1 - blerp) * glm::vec3(10, 30, 0));
+            Transformer::SetPosition(&BCIT_c_transform, (1 - clerp) * glm::vec3(-5, 30, 0));
+            Transformer::SetPosition(&BCIT_i_transform, (1 - ilerp) * glm::vec3(5, 30, 0));
+            Transformer::SetPosition(&BCIT_t_transform, (1 - tlerp) * glm::vec3(-10, 30, 0));
+            shake *= glm::sign(1 + 2.5 * increment - newState.WorldTime);
+            Transformer::SetRotation(&BaseTransform, glm::vec3(0.785, 0, shake));
+        }
+        else if (newState.WorldTime <= 3 + 4 * increment + 0.2) {
+            float f = 1 - glm::min(newState.WorldTime - (2 + 4 * increment), 1.0f);
+            Renderer::SetLight(
+                glm::vec4{ f / 4, f / 4, f / 4, 1.0f },
+                glm::vec3{ 0, 1, 1 },
+                glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
+                glm::vec4{ f, f, f, 1.0f },
+                glm::vec4{ f, f, f, 1.0f }
+            );
+        }
+        else if (newState.WorldTime >= 3 + 4 * increment + 0.3) {
+            Transformer::SetScale(&BaseTransform, glm::vec3(0, 0, 0));
+            Renderer::SetLight(
+                glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f },
+                glm::vec3{ 0, 1, 1 },
+                glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
+                glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f },
+                glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }
+            );
             newState.status = EngineState::Board;
+        }
         Renderer::Clear();
         Renderer::Render(&BCIT_square_model, &BCIT_square_transform);
         Renderer::Render(&BCIT_b_model, &BCIT_b_transform);
         Renderer::Render(&BCIT_c_model, &BCIT_c_transform);
         Renderer::Render(&BCIT_i_model, &BCIT_i_transform);
         Renderer::Render(&BCIT_t_model, &BCIT_t_transform);
-        //Transformer::Rotate(&BCIT_square_transform, glm::vec3(0.05, 0, 0));
+        //Transformer::Rotate(&BaseTransform, glm::vec3(0, 0.05, 0));
+        //Transformer::Rotate(&BCIT_square_transform, glm::vec3(0, 0.05, 0));
     }
 }

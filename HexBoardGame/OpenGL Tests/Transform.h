@@ -11,6 +11,7 @@ struct Transform
 
     Transform *parent = nullptr;
 
+    glm::mat4 baseTNet;
     glm::mat4 tNet;
     glm::vec3 position = glm::vec3(0.0);
     glm::vec3 scale = glm::vec3(1.0);
