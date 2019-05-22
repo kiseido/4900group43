@@ -1,15 +1,19 @@
 #include "ECS.h"
 #include "Window.h"
+#include "BoardManager.h"
 
 namespace ECS {
 
 	enum Entity_templates : Mask_t {
 		BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m | ControlPick_m,
-		BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | BoardSpeed_m | TeamAffiliation_m,
+		BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | BoardPiece_m | TeamAffiliation_m,
 		CombatPieceTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Health_m,
 		CombatBulletTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Damage_m
 	};
 	
+    Entity makeBoardPiece(EngineState& state, ModelID model, TeamAffiliation team, BoardPosition pos, BoardPiece piece, Health hp, Power power) {
+        const ComponentMask mask = (ComponentMask)BoardPieceTemplate;
+    }
 
     Entity makeBoardTile(EngineState& state, ModelID model, TerrainType type, BoardPosition pos) {
         const ComponentMask mask = (ComponentMask)BoardTileTemplate;
@@ -18,6 +22,7 @@ namespace ECS {
         *entity.boardModel = Resources::GetModel(model);
         *entity.boardPosition = pos;
         *entity.terrainType = type;
+        BoardManager::SetTransformFromBoard(entity.boardTransform, entity.boardPosition);
 		return entity;
 	}
 	

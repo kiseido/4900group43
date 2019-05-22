@@ -124,6 +124,11 @@ namespace ECS {
 			Entity getEntity(EntityID);
 			void removeEntity(EntityID);
 			void setEntityComponents(EntityID, ComponentMask);
+
+            inline void removeComponent(EntityID id, ComponentMask mask) {
+                setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) & ~mask)));
+            }
+            void addComponent(EntityID, ComponentMask);
 		};
 
 

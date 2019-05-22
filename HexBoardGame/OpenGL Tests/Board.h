@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "EntityID.h"
 
 class BoardPosition
 {
@@ -17,13 +18,13 @@ struct BoardPiece {
 };
 
 struct BoardMovement {
-    int startX, startY, nextX, nextY, endX, endY;
+    int startX, startY, endX, endY;
     float speed = 1;
     float lerp = 0;
 };
 
 struct Board {
-    BoardPosition ***board;
+    ECS::EntityID ***board;
     int radius;
     int boardHeight;
     int boardWidth;

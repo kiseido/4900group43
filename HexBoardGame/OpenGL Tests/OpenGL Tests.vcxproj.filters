@@ -66,6 +66,9 @@
     <ClInclude Include="Systems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EntityID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">

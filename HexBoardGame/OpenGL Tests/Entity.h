@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Components.h"
+#include "EntityID.h"
 
 namespace ECS {
 
 	using namespace ECS::Components;
 
-	typedef uint32_t EntityID;
 
 	class Entity {
 	public:
