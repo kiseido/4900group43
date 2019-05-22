@@ -68,6 +68,7 @@ namespace ECS {
 
 		struct EngineState {
 			enum GameStatus {
+                Intro,
 				Paused,
 				Board,
 				Combat
@@ -120,6 +121,7 @@ namespace ECS {
 			// System Specific
 			int userInputIndex;
 
+            
 			Entity NewEntity(ComponentMask);
 			Entity getEntity(EntityID);
 			void removeEntity(EntityID);
@@ -128,7 +130,12 @@ namespace ECS {
             inline void removeComponent(EntityID id, ComponentMask mask) {
                 setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) & ~mask)));
             }
-            void addComponent(EntityID, ComponentMask);
+            void addComponent(EntityID id, ComponentMask mask) {
+                setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) | mask)));
+            }
+            inline bool hasComponent(EntityID id, ComponentMask mask) {
+                return (*ComponentMasks.getComponent(id) & mask) == mask;
+            }
 		};
 
 

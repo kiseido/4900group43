@@ -29,8 +29,8 @@ namespace Renderer
 
     void UpdateCamera();
     void RenderEntity(ECS::Engine::EngineState& state, ECS::EntityID eid, bool board);
-    ECS::EntityID GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY);
-    ECS::EntityID GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y));
+    ECS::EntityID GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY, ECS::ComponentMask mask = ECS::None_m);
+    ECS::EntityID GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y), ECS::ComponentMask mask = ECS::None_m);
     void SetOutline(Model* model, uint8_t weight, glm::vec3 color);
     void RenderAll(ECS::Engine::EngineState& state, ECS::ComponentMask components = ECS::None_m, bool entitytocolor = false, bool outlinecheckk = false);
 };

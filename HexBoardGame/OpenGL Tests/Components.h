@@ -40,6 +40,13 @@ namespace ECS {
             ControlPick_m =         1ui64 << 35
 		};
 
+        enum Entity_templates : Mask_t {
+            BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m | ControlPick_m,
+            BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | ControlPick_m | BoardPiece_m | TeamAffiliation_m,
+            CombatPieceTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Health_m,
+            CombatBulletTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Damage_m
+        };
+
 		constexpr inline ComponentMask operator|(const ComponentMask& lhs, const ComponentMask& rhs){
 			return (ComponentMask)((Mask_t)lhs | (Mask_t)rhs);
 		};

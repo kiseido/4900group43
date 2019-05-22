@@ -19,8 +19,9 @@ struct BoardPiece {
 
 struct BoardMovement {
     int startX, startY, endX, endY;
-    float speed = 1;
     float lerp = 0;
+    int distance = 0;
+    float speed = 1;
 };
 
 struct Board {
@@ -29,6 +30,5 @@ struct Board {
     int boardHeight;
     int boardWidth;
     ~Board();
-    Board(int radius);
-    Board(int width, int height);
+    Board() = default;
 };

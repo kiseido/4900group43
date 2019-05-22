@@ -13,6 +13,81 @@ namespace ECS {
 		std::cout << "PausedSystemsPack" << std::endl;
 	}
 
+    void EndTurn(EngineState& newState) {
+        if (newState.PlayerTurn == Player1)
+            newState.PlayerTurn = Player2;
+        else
+            newState.PlayerTurn = Player1;
+        for (EntityID eid : newState.EntityIDs) {
+            if (newState.hasComponent(eid, BoardPiece_m)) {
+                BoardPiece* piece = newState.BoardPieces.getComponent(eid);
+                piece->movesLeft = piece->maxMoves;
+            }
+        }
+    }
+
+    void ProcessPieceOutline(EngineState& newState) {
+        for (EntityID eid : newState.EntityIDs) {
+            if (newState.hasComponent(eid, TeamAffiliation_m | BoardModel_m | BoardTransform_m)) {
+                if (*newState.Teams.getComponent(eid) == newState.PlayerTurn) {
+                    Renderer::SetOutline(newState.BoardModels.getComponent(eid), 4, Renderer::LIGHT(Renderer::COLOR_BLACK));
+                }
+            }
+        }
+    }
+
+    void ProcessBoardInput(EngineState& newState, EntityID& mouseOver, EntityID& selection) {
+        Window::MouseInput::MouseState mouseState = Window::GetMouseState(true);
+        if (!selection) {
+            mouseOver = Renderer::GetMouseEntity(newState, Window::GetMousePosition, ECS::BoardPosition_m | ECS::BoardPiece_m);
+            if (mouseOver && *newState.Teams.getComponent(mouseOver) != newState.PlayerTurn)
+                mouseOver = 0;
+            if (mouseOver) {
+                if (mouseState == Window::MouseInput::LeftButtonDown) {
+                    selection = mouseOver;
+                }
+                Renderer::SetOutline(newState.BoardModels.getComponent(mouseOver), 6, Renderer::LIGHT(Renderer::COLOR_BLUE));
+            }
+        }
+        else {
+            mouseOver = Renderer::GetMouseEntity(newState, Window::GetMousePosition, ECS::BoardPosition_m | ECS::TerrainType_m);
+            Renderer::SetOutline(newState.BoardModels.getComponent(selection), 10, Renderer::COLOR_BLUE);
+            if (mouseOver) {
+                BoardPosition* piecePos = newState.BoardPositions.getComponent(selection);
+                BoardPosition* tilePos = newState.BoardPositions.getComponent(mouseOver);
+                int reach = newState.BoardPieces.getComponent(selection)->movesLeft;
+                int dist = BoardManager::GetDistance(piecePos, tilePos);
+                bool canMove = reach >= 1 && dist == 1;
+                glm::vec3 outlineColor = dist == 0 ? Renderer::COLOR_BLUE : canMove ? Renderer::COLOR_GREEN : dist <= reach ? Renderer::COLOR_YELLOW : Renderer::COLOR_RED;
+                Renderer::SetOutline(newState.BoardModels.getComponent(mouseOver), 10, outlineColor);
+                if (mouseState == Window::MouseInput::LeftButtonDown && canMove) {
+                    newState.addComponent(selection, BoardMovement_m);
+                    BoardMovement* mov = newState.BoardMovements.getComponent(selection);
+                    mov->startX = piecePos->x;
+                    mov->startY = piecePos->y;
+                    mov->endX = tilePos->x;
+                    mov->endY = tilePos->y;
+                    mov->lerp = 0;
+                    mov->distance = 1;
+                    EntityID enemyID = 0;
+                    for (EntityID eid : newState.EntityIDs) {
+                        if(newState.hasComponent(eid, BoardPosition_m | BoardPiece_m)){
+                            BoardPosition* ebpos = newState.BoardPositions.getComponent(eid);
+                            if (ebpos->x == tilePos->x && ebpos->y == tilePos->y) {
+                                enemyID = eid;
+                            }
+                        }
+                    }
+                    if (enemyID)
+                        newState.removeEntity(enemyID);
+                }
+            }
+        }
+        if (mouseState == Window::MouseInput::RightButtonDown) {
+            selection = 0;
+            EndTurn(newState);
+        }
+    }
 
     void ProcessBoardMovements(const EngineState & lastState, EngineState & newState) {
         for (EntityID eid : newState.EntityIDs) {
@@ -20,14 +95,14 @@ namespace ECS {
                 BoardMovement* mov = newState.BoardMovements.getComponent(eid);
                 glm::vec3 startPos = BoardManager::GetTransformPosition(mov->startX, mov->startY);
                 glm::vec3 endPos = BoardManager::GetTransformPosition(mov->endX, mov->endY);
+                mov->lerp = glm::min(mov->lerp + 0.1f, 1.0f);
                 glm::vec3 curPos = startPos + mov->lerp * (endPos - startPos);
-                mov->lerp = glm::min(mov->lerp + 0.05f, 1.0f);
                 if (mov->lerp == 1) {
                     BoardPosition* bpos = newState.BoardPositions.getComponent(eid);
                     bpos->x = mov->endX;
                     bpos->y = mov->endY;
+                    newState.BoardPieces.getComponent(eid)->movesLeft -= mov->distance;
                     newState.removeComponent(eid, BoardMovement_m);
-                    
                 }
                 Transformer::SetPosition(newState.BoardTransforms.getComponent(eid), curPos);
             }
@@ -41,7 +116,8 @@ namespace ECS {
         newState.BoardTransforms = lastState.BoardTransforms;
         newState.BoardPieces = lastState.BoardPieces;
         newState.BoardMovements = lastState.BoardMovements;
-        Renderer::SetOutline(newState.BoardModels.getComponent(Renderer::GetMouseEntity(newState, Window::GetMousePosition)), 10, Renderer::COLOR_GREEN);
+        ProcessPieceOutline(newState);
+        ProcessBoardInput(newState, mouseOver, selection);
         Renderer::RenderState(newState);
         ProcessBoardMovements(lastState, newState);
 		//std::cout << "BoardSystemsPack" << std::endl;

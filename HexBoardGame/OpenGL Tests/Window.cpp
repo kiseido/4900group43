@@ -7,6 +7,7 @@ namespace {
     double mouseXPos, mouseYPos;
     float aspect;
     GLFWwindow* mainWindow;
+    Window::MouseInput::MouseState curMouseState = Window::MouseInput::MouseState::NoState;
 }
 
 
@@ -50,6 +51,14 @@ void Window::Close(){
     exit(EXIT_SUCCESS);
 }
 
+
+Window::MouseInput::MouseState Window::GetMouseState(bool clear) {
+    Window::MouseInput::MouseState state = curMouseState;
+    if (clear)
+        curMouseState = Window::MouseInput::MouseState::NoState;
+    return state;
+}
+
 bool Window::GetMousePosition(double &mouseX, double &mouseY) {
     //double mX, mY;
     //glfwGetCursorPos(mainWindow, &mX, &mY);
@@ -77,10 +86,10 @@ void Window::window_size_callback(GLFWwindow* win, int newWidth, int newHeight) 
 
 void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    //if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        //Game_old::MouseLeftClick();
-    //else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        //Game_old::MouseRightClick();
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        curMouseState = MouseInput::LeftButtonDown;
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        curMouseState = MouseInput::RightButtonDown;
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

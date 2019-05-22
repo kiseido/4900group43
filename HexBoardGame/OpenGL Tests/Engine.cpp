@@ -54,6 +54,7 @@ namespace ECS {
         e.boardModel = (mask & BoardModel_m) ? BoardModels.getComponent(id) : nullptr;
         e.boardPosition = (mask & BoardPosition_m) ? BoardPositions.getComponent(id) : nullptr;
         e.boardMovement = (mask & BoardMovement_m) ? BoardMovements.getComponent(id) : nullptr;
+        e.boardPiece = (mask & BoardPiece_m) ? BoardPieces.getComponent(id) : nullptr;
 
         e.combatTransform = (mask & CombatTransform_m) ? CombatTransforms.getComponent(id) : nullptr;
         e.momentum = (mask & Momentum_m) ? Momentums.getComponent(id) : nullptr;
@@ -86,13 +87,6 @@ namespace ECS {
 
 	}
 
-    //void EngineState::removeComponent(EntityID id, ComponentMask mask) {
-    //    setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) & ~mask)));
-    //}
-
-    void EngineState::addComponent(EntityID id, ComponentMask mask) {
-        setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) | mask)));
-    }
 
 	void EngineState::setEntityComponents(EntityID id, ComponentMask mask)
 	{

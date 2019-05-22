@@ -1,6 +1,8 @@
 #include "BoardManager.h"
 #include "Utils.h"
 #include "Transformer.h"
+#include "ECS.h"
+#include "Components.h"
 
 float cos60 = glm::cos(Utils::toRadians(60));
 float sin60 = glm::sin(Utils::toRadians(60));
@@ -27,12 +29,14 @@ std::vector<BoardPosition*> BoardManager::GetPossibleMoves(Board* board, BoardPo
     return moves;
 }
 
-bool BoardManager::IsInRange(BoardPiece* piece, BoardPosition* source, BoardPosition* destination) {
+int BoardManager::GetDistance(BoardPosition* source, BoardPosition* destination) {
     int distX = destination->x - source->x;
     int distY = destination->y - source->y;
-    int dist = glm::max(glm::max(glm::abs(distX), glm::abs(distY)), glm::abs(distX+distY));
-    std::cout << distX << " " << distY << " " << dist << std::endl;
-    return dist <= piece->movesLeft;
+    return glm::max(glm::max(glm::abs(distX), glm::abs(distY)), glm::abs(distX + distY));
+}
+
+bool BoardManager::IsInRange(BoardPiece* piece, BoardPosition* source, BoardPosition* destination) {
+    return GetDistance(source, destination) <= piece->movesLeft;
     return false;
 }
 
@@ -40,3 +44,34 @@ void BoardManager::SetTransformFromBoard(Transform* transform, BoardPosition* po
     Transformer::SetPosition(transform, BoardManager::GetTransformPosition(position->x, position->y));
 }
 
+
+Board BoardManager::MakeBoard(ECS::EngineState& state, int radius) {
+
+    int boardHeight = 2 * radius + 1;
+    int boardWidth = 2 * radius + 1;
+    Board newboard;
+    newboard.board = new ECS::EntityID**[boardHeight];
+    for (int j = -radius; j <= radius; j++) {
+        newboard.board[radius + j] = new ECS::EntityID*[boardWidth];
+        for (int i = -radius; i <= radius; i++) {
+            ECS::EntityID* curTile = nullptr;
+            if (glm::abs(i + j) <= radius) {
+                const ECS::ComponentMask mask = (ECS::ComponentMask)ECS::BoardTileTemplate;
+                auto entity = state.NewEntity(mask);
+
+                *entity.boardModel = Resources::GetModel(GrassTileModel);
+                *entity.boardPosition = BoardPosition{ i, j };
+                *entity.terrainType = ECS::TerrainType::FlatGround;
+                BoardManager::SetTransformFromBoard(entity.boardTransform, entity.boardPosition);
+                
+                //EntityID curTile = ECS_old::CreateEntity(GrassTileModel);
+                //BoardManager::SetTransformPosition(curTile, this, i, j);
+                //curPos = new BoardPosition(i, j);
+                //ECS_old::SetBoardPosition(curTile, curPos);
+                //ECS_old::AddComponentMask(curTile, ComponentPick);
+            }
+            newboard.board[radius + j][radius + i] = curTile;
+        }
+    }
+    return newboard;
+}

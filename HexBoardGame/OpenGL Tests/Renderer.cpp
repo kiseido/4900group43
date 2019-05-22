@@ -304,19 +304,20 @@ ECS::EntityID ColorToEntity(glm::vec3 color) {
     return eid;
 }
 
-ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y)) {
+ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y), ECS::ComponentMask mask) {
     double X, Y;
-    callback(X, Y);
-    return GetMouseEntity(state, X, Y);
+    if (!callback(X, Y))
+        return 0;
+    return GetMouseEntity(state, X, Y, mask);
 }
-ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY) {
+ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY, ECS::ComponentMask mask) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_SCISSOR_TEST);
     glScissor(mouseX, mouseY, 1, 1);
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
-    RenderAll(state, ECS::ComponentMask::ControlPick_m, true);
+    RenderAll(state, mask | ECS::ComponentMask::ControlPick_m, true);
     unsigned char pixel[4];
     glReadPixels (mouseX, mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
     ECS::EntityID mouseEntityId = ColorToEntity(glm::vec3(pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0));

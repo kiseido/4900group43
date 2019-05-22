@@ -7,9 +7,21 @@
 #include <fstream>
 
 namespace Window {
+    namespace MouseInput {
+        enum MouseState {
+            NoState,
+            LeftButtonDown,
+            LeftButtonPressed,
+            LeftButtonUp,
+            RightButtonDown,
+            RightButtonPressed,
+            RightButtonUp
+        };
+    }
     GLFWwindow* Init();
     void Close();
 
+    MouseInput::MouseState GetMouseState(bool clear);
     bool GetMousePosition(double &mouseX, double &mouseY);
     void framebuffer_size_callback(GLFWwindow* win, int newWidth, int newHeight);
     void window_size_callback(GLFWwindow* win, int newWidth, int newHeight);

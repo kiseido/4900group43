@@ -45,6 +45,8 @@ namespace ECS {
 
 		// System designed to provide all needed game logic while the game is at the board view
 		class BoardSystemsPack : public System {
+            EntityID selection;
+            EntityID mouseOver;
 		public:
 			void Run(const EngineState& lastState, EngineState& newState);
 		};

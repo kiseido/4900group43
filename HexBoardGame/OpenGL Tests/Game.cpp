@@ -4,15 +4,19 @@
 
 namespace ECS {
 
-	enum Entity_templates : Mask_t {
-		BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m | ControlPick_m,
-		BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | BoardPiece_m | TeamAffiliation_m,
-		CombatPieceTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Health_m,
-		CombatBulletTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Damage_m
-	};
 	
     Entity makeBoardPiece(EngineState& state, ModelID model, TeamAffiliation team, BoardPosition pos, BoardPiece piece, Health hp, Power power) {
         const ComponentMask mask = (ComponentMask)BoardPieceTemplate;
+        Entity entity = state.NewEntity(mask);
+
+        *entity.boardModel = Resources::GetModel(model);
+        *entity.boardPosition = pos;
+        *entity.team = team;
+        *entity.boardPiece = piece;
+        *entity.health = hp;
+        *entity.power = power;
+        BoardManager::SetTransformFromBoard(entity.boardTransform, entity.boardPosition);
+        return entity;
     }
 
     Entity makeBoardTile(EngineState& state, ModelID model, TerrainType type, BoardPosition pos) {
@@ -33,6 +37,7 @@ namespace ECS {
         *entity.boardModel = Resources::GetModel(Piece1Model);
 		*entity.team = team;
         *entity.boardPosition = pos;
+        *entity.boardPiece = { 3 };
 
 		return entity;
 	}
@@ -91,7 +96,7 @@ namespace ECS {
 	}
 
 	void GenerateBoard(EngineState& state) {
-		makeBoardTile(state, GrassTileModel, FlatGround, {0,0});
+        Board b = BoardManager::MakeBoard(state, 5);
 	}
 
 
@@ -177,9 +182,17 @@ namespace ECS {
 		state.status = ECS::EngineState::Board;
 
 		GenerateBoard(state);
-		
-		Entity p1 = makeBoardPiecePawn(state, Player1, {0,0});
 
+        for (int i = 0; i < 3; i++) {
+            int x = 5 - glm::pow(1 - i, 2) + i/2;
+            int y = 1 - i;
+            std::cout << "p1 = " << x << ", " << y << std::endl;
+            std::cout << "p2 = " << -x << ", " << y << std::endl;
+            Entity p1 = makeBoardPiecePawn(state, Player1, { x, y });
+            BoardManager::SetTransformFromBoard(p1.boardTransform, p1.boardPosition);
+            Entity p2 = makeBoardPiecePawn(state, Player2, { -x, -y });
+            BoardManager::SetTransformFromBoard(p2.boardTransform, p2.boardPosition);
+        }
 
 		TODO
 	}
@@ -206,6 +219,11 @@ namespace ECS {
 
 		switch (currentState->status)
 		{
+        case ECS::EngineState::Intro: {
+
+            return currentState->WorldTime;
+        }
+                                      break;
 		case ECS::EngineState::Paused: {
 			currentState = TimeLine.getState(0);
 			lastState = currentState;
