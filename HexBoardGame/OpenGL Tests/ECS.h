@@ -10,19 +10,22 @@
 
 namespace ECS {
 	
-	//typedef uint16_t ComponentMask;
-
+	// Random
+	// Provides a deterministic random number generate that can be syncronized between game client and server
 	class Random {
 	public:
 		static void setSeed(int);
 		static int getInt();
 	};
 
+	TimeStamp getTime();
+
 
 	using namespace ECS::Engine;
 	using namespace ECS::Systems;
 
-
+	// Game
+	// Encapsulates complete game state and logic
 	class Game {
 		enum GameType {
 			Undecided,

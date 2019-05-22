@@ -86,6 +86,14 @@ namespace ECS {
 
 	}
 
+    //void EngineState::removeComponent(EntityID id, ComponentMask mask) {
+    //    setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) & ~mask)));
+    //}
+
+    void EngineState::addComponent(EntityID id, ComponentMask mask) {
+        setEntityComponents(id, (ComponentMask)((*ComponentMasks.getComponent(id) | mask)));
+    }
+
 	void EngineState::setEntityComponents(EntityID id, ComponentMask mask)
 	{
 		ComponentMask* poldMask = ComponentMasks.getComponent(id);
@@ -98,8 +106,8 @@ namespace ECS {
 		if (poldMask != nullptr) {
 			oldMask = *poldMask;
 
-			addMask = (ComponentMask) (oldMask ^ (oldMask & mask));
-			removeMask = (ComponentMask) (mask ^ (oldMask & addMask));
+			addMask = (ComponentMask) (oldMask ^ (oldMask | mask));
+			removeMask = (ComponentMask) (oldMask ^ (oldMask & mask));
 		}
 
 		if (addMask != None_m) {
@@ -115,28 +123,28 @@ namespace ECS {
                 Powers.setComponent(id, 0);
             }
             if (addMaskCheck(BoardTransform_m)) {
-                BoardTransforms.setComponent(id, Transform{});
+                BoardTransforms.setComponent(id, {});
             }
             if (addMaskCheck(BoardModel_m)) {
-                BoardModels.setComponent(id, Model{});
+                BoardModels.setComponent(id, {});
             }
 			if (addMaskCheck(BoardPosition_m)) {
-                BoardPositions.setComponent(id, BoardPosition{});
+                BoardPositions.setComponent(id, {});
 			}
             if (addMaskCheck(BoardTransform_m)) {
-                BoardTransforms.setComponent(id, Transform{});
+                BoardTransforms.setComponent(id, {});
             }
             if (addMaskCheck(BoardPiece_m)) {
                 BoardPieces.setComponent(id, {0});
             }
             if (addMaskCheck(BoardMovement_m)) {
-                BoardMovements.setComponent(id, DefaultSpeed);
+                BoardMovements.setComponent(id, {});
             }
             if (addMaskCheck(CombatTransform_m)) {
-                CombatTransforms.setComponent(id, Transform{});
+                CombatTransforms.setComponent(id, {});
             }
 			if (addMaskCheck(CombatModel_m)) {
-				CombatModels.setComponent(id, Model{});
+				CombatModels.setComponent(id, {});
 			}
 			if (addMaskCheck(Momentum_m)) {
 				Momentums.setComponent(id, DefaultMom);

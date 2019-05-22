@@ -40,6 +40,10 @@ namespace ECS {
 	{
 		return rand();
 	}
+	TimeStamp getTime()
+	{
+		return TimeStamp();
+	}
 }
 
 

@@ -78,6 +78,8 @@ namespace ECS {
 
 			TeamAffiliation PlayerTurn;
 
+			TeamAffiliation UserTeam;
+
 			GameStatus status;
 
 			std::list<EntityID> EntityIDs;
@@ -112,6 +114,11 @@ namespace ECS {
 			ComponentContainer<AIStatus> AI;
 
 			ComponentContainer<TerrainType> TerrainTypes;
+
+			ComponentContainer<TeamAffiliation> UserInput;
+
+			// System Specific
+			int userInputIndex;
 
 			Entity NewEntity(ComponentMask);
 			Entity getEntity(EntityID);
