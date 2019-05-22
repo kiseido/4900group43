@@ -242,12 +242,12 @@ namespace ECS {
         newState.BoardMovements = lastState.BoardMovements;
         float increment = 0.25f;
         float stage1 = 0;
-        float stage2 = 1;
+        float stage2 = 1.05;
         float stage3 = stage2 + 0.5 + 4 * increment;
         float stage4 = stage3 + 1;
         float stage5 = stage4 + 1;
-        if (newState.WorldTime <= stage2 + 0.2) {
-            float f = glm::min(newState.WorldTime, 1.0f);
+        if (newState.WorldTime <= stage2) {
+            float f = glm::min(newState.WorldTime, stage2 - 0.05f);
             Renderer::SetLight(
                 glm::vec4{ f/3, f/3, f/3, 1.0f },
                 glm::vec3{ 0, 1, 1 },
