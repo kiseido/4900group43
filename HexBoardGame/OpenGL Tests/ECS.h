@@ -46,6 +46,8 @@ namespace ECS {
 		BoardRenderer boardRenderer;
 		CombatRenderer combatRenderer;
 
+		Networking networking;
+
 		bool playing;
 	public:
 		Game();

@@ -217,6 +217,8 @@ namespace ECS {
 		EngineState * currentState = TimeLine.getState(0);
 		const EngineState * lastState;
 
+		TimeStamp retVal;
+
 		switch (currentState->status)
 		{
         case ECS::EngineState::Intro: {
@@ -224,9 +226,9 @@ namespace ECS {
             lastState = &TimeLine.getPreviousState();
             BasicCopyState(*lastState, *currentState);
             currentState->WorldTime += timeToAdvanceBy;
-
             introLogic.Run(*lastState, *currentState);
-            return currentState->WorldTime;
+
+			retVal = currentState->WorldTime;
         }
                                       break;
 		case ECS::EngineState::Paused: {
@@ -234,7 +236,7 @@ namespace ECS {
 			lastState = currentState;
 			pausedLogic.Run(*lastState, *currentState);
 
-			return currentState->WorldTime;
+			retVal = currentState->WorldTime;
 		}
 									   break;
 		case ECS::EngineState::Board: {
@@ -244,7 +246,7 @@ namespace ECS {
 			currentState->WorldTime += timeToAdvanceBy;
 
 			boardLogic.Run(*lastState, *currentState);
-			return currentState->WorldTime;
+			retVal = currentState->WorldTime;
 		}
 									  break;
 		case ECS::EngineState::Combat: {
@@ -254,13 +256,16 @@ namespace ECS {
 			currentState->WorldTime += timeToAdvanceBy;
 
 			combatLogic.Run(*lastState, *currentState);
-			return currentState->WorldTime;
+			retVal = currentState->WorldTime;
 		}
 									   break;
 		default:
 			TODOe
 				break;
 		}
-		TODOe
+		
+		networking.Run(TimeLine);
+
+		return retVal;
 	}
 }

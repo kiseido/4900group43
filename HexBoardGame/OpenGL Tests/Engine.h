@@ -143,14 +143,16 @@ namespace ECS {
 		class EngineStateManager {
 		private:
 			std::unordered_map<int, EngineState> Moments;
+		public:
 			int historyCutoff;
 			int currentMoment;
 			int LastFinishedState;
-		public:
+
 			EngineStateManager();
 
 			//Returns Engine state with 0 being the most recently completed state
 			EngineState* getState(int);
+			void popEnd();
 			int getHistoryLength();
 			const EngineState& getPreviousState() const;
 			EngineState& NewState();

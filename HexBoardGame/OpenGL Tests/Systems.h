@@ -111,5 +111,12 @@ namespace ECS {
             IntroSystem();
             void Run(const EngineState& lastState, EngineState& newState);
         };
+		class Networking
+		{
+		public:
+			Networking();
+			~Networking();
+			void Run(Engine::EngineStateManager& stateManager);
+		};
 	}
 }

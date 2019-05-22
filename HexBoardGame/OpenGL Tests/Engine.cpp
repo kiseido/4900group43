@@ -236,4 +236,17 @@ namespace ECS {
 		else
 			return nullptr;
 	}
+	void Engine::EngineStateManager::popEnd()
+	{
+		auto s = Moments.find(historyCutoff);
+
+		if (s != Moments.end())
+			Moments.erase(s);
+
+		historyCutoff++;
+	}
+	int Engine::EngineStateManager::getHistoryLength()
+	{
+		return LastFinishedState - historyCutoff;
+	}
 }
