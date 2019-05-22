@@ -55,6 +55,9 @@ Mesh* Resources::GetMesh(MeshID meshId) {
         case BCITSquareMesh:
             Resources::MeshList[meshId] = LoadMesh("BCIT_square.obj");
             break;
+        case DigiProMesh:
+            Resources::MeshList[meshId] = LoadMesh("DigiPro_plane.obj");
+            break;
         default:
             Resources::MeshList[meshId] = nullptr;
         }
@@ -91,6 +94,9 @@ Texture Resources::GetTexture(TextureID textureId) {
             break;
         case BCITLetterTexture:
             Resources::TextureList[textureId] = LoadTexture("white.jpg");
+            break;
+        case DigiProTexture:
+            Resources::TextureList[textureId] = LoadTexture("digipro.jpg");
             break;
         default:
             Resources::TextureList[textureId] = 0;
@@ -136,6 +142,9 @@ Model Resources::GetModel(ModelID modelId) {
         break;
     case BCITTModel:
         return Model(BCITTMesh, BCITLetterTexture);
+        break;
+    case DigiProModel:
+        return Model(DigiProMesh, DigiProTexture);
         break;
     default:
         return Model();

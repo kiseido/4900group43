@@ -218,17 +218,20 @@ namespace ECS {
         Transformer::SetPosition(&BCIT_c_transform, glm::vec3(-5, 20, 0));
         Transformer::SetPosition(&BCIT_i_transform, glm::vec3(5, 20, 0));
         Transformer::SetPosition(&BCIT_t_transform, glm::vec3(10, 20, 0));
+        Transformer::SetRotation(&DigiPro_plane_transform, glm::vec3(0, 0, 3.1415926));
         
         BCIT_square_transform.parent = &BaseTransform;
         BCIT_b_transform.parent = &BaseTransform;
         BCIT_c_transform.parent = &BaseTransform;
         BCIT_i_transform.parent = &BaseTransform;
         BCIT_t_transform.parent = &BaseTransform;
+        DigiPro_plane_transform.parent = &BaseTransform;
         BCIT_square_model = Resources::GetModel(BCITSquareModel);
         BCIT_b_model = Resources::GetModel(BCITBModel);
         BCIT_c_model = Resources::GetModel(BCITCModel);
         BCIT_i_model = Resources::GetModel(BCITIModel);
         BCIT_t_model = Resources::GetModel(BCITTModel);
+        DigiPro_plane_model = Resources::GetModel(DigiProModel);
     }
 
     void IntroSystem::Run(const EngineState& lastState, EngineState& newState) {
@@ -238,24 +241,29 @@ namespace ECS {
         newState.BoardPieces = lastState.BoardPieces;
         newState.BoardMovements = lastState.BoardMovements;
         float increment = 0.25f;
-        if (newState.WorldTime <= 1.1) {
+        float stage1 = 0;
+        float stage2 = 1;
+        float stage3 = stage2 + 0.5 + 4 * increment;
+        float stage4 = stage3 + 1;
+        float stage5 = stage4 + 1;
+        if (newState.WorldTime <= stage2 + 0.2) {
             float f = glm::min(newState.WorldTime, 1.0f);
             Renderer::SetLight(
-                glm::vec4{ f/4, f/4, f/4, 1.0f },
+                glm::vec4{ f/3, f/3, f/3, 1.0f },
                 glm::vec3{ 0, 1, 1 },
                 glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
                 glm::vec4{ f, f, f, 1.0f },
                 glm::vec4{ f, f, f, 1.0f }
             );
         }
-        else if (newState.WorldTime <= 2 + 4 * increment) {
+        else if (newState.WorldTime <= stage3) {
             float shake = 0;
-            if(newState.WorldTime > 1 + 0.5 * increment && newState.WorldTime < 1 + 4.5 * increment)
-                shake = glm::max((float)glm::cos((newState.WorldTime - 1 - 0.1 * increment)*2 *3.1415926/increment) - 0.9f, 0.0f) * 3;
-            float blerp = glm::min(newState.WorldTime - (1 + 0 * increment), increment) * 1.0f/increment;
-            float clerp = glm::min(newState.WorldTime - (1 + 1 * increment), increment) * 1.0f/increment;
-            float ilerp = glm::min(newState.WorldTime - (1 + 2 * increment), increment) * 1.0f/increment;
-            float tlerp = glm::min(newState.WorldTime - (1 + 3 * increment), increment) * 1.0f/increment;
+            if(newState.WorldTime > stage2 + 0.5 * increment && newState.WorldTime < stage2 + 4.5 * increment)
+                shake = glm::max((float)glm::cos((newState.WorldTime - stage2 - 0.1 * increment)*2 *3.1415926/increment) - 0.9f, 0.0f) * 3;
+            float blerp = glm::min(newState.WorldTime - (stage2 + 0 * increment), increment) * 1.0f/increment;
+            float clerp = glm::min(newState.WorldTime - (stage2 + 1 * increment), increment) * 1.0f/increment;
+            float ilerp = glm::min(newState.WorldTime - (stage2 + 2 * increment), increment) * 1.0f/increment;
+            float tlerp = glm::min(newState.WorldTime - (stage2 + 3 * increment), increment) * 1.0f/increment;
             Transformer::SetPosition(&BCIT_b_transform, (1 - blerp) * glm::vec3(10, 30, 0));
             Transformer::SetPosition(&BCIT_c_transform, (1 - clerp) * glm::vec3(-5, 30, 0));
             Transformer::SetPosition(&BCIT_i_transform, (1 - ilerp) * glm::vec3(5, 30, 0));
@@ -263,17 +271,25 @@ namespace ECS {
             shake *= glm::sign(1 + 2.5 * increment - newState.WorldTime);
             Transformer::SetRotation(&BaseTransform, glm::vec3(0.785, 0, shake));
         }
-        else if (newState.WorldTime <= 3 + 4 * increment + 0.2) {
-            float f = 1 - glm::min(newState.WorldTime - (2 + 4 * increment), 1.0f);
+        else if (newState.WorldTime <= stage4) {
+            float rot = -3.1415926;
+            if (newState.WorldTime <= stage3 + 0.25)
+                rot = glm::sin((glm::max(0.0f, newState.WorldTime - (stage3))) * 2 * 3.1415926);
+            else if (newState.WorldTime <= stage3 + 0.5)
+                rot = - 3 * 3.1415926 + (3*3.1415926 + 1)*glm::max(0.0, glm::sin((newState.WorldTime - stage3) * 2 * 3.1415926));
+            Transformer::SetRotation(&BaseTransform, glm::vec3(0.785, 0, rot));
+        }
+        else if (newState.WorldTime <= stage5) {
+            float f = 1 - glm::max(newState.WorldTime - (stage4), 0.0f);
             Renderer::SetLight(
-                glm::vec4{ f / 4, f / 4, f / 4, 1.0f },
+                glm::vec4{ f / 3, f / 3, f / 3, 1.0f },
                 glm::vec3{ 0, 1, 1 },
                 glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f },
                 glm::vec4{ f, f, f, 1.0f },
                 glm::vec4{ f, f, f, 1.0f }
             );
         }
-        else if (newState.WorldTime >= 3 + 4 * increment + 0.3) {
+        else if (newState.WorldTime >= stage5) {
             Transformer::SetScale(&BaseTransform, glm::vec3(0, 0, 0));
             Renderer::SetLight(
                 glm::vec4{ 0.25f, 0.25f, 0.25f, 1.0f },
@@ -290,6 +306,7 @@ namespace ECS {
         Renderer::Render(&BCIT_c_model, &BCIT_c_transform);
         Renderer::Render(&BCIT_i_model, &BCIT_i_transform);
         Renderer::Render(&BCIT_t_model, &BCIT_t_transform);
+        Renderer::Render(&DigiPro_plane_model, &DigiPro_plane_transform);
         //Transformer::Rotate(&BaseTransform, glm::vec3(0, 0.05, 0));
         //Transformer::Rotate(&BCIT_square_transform, glm::vec3(0, 0.05, 0));
     }
