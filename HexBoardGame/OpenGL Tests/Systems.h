@@ -93,5 +93,13 @@ namespace ECS {
 		private:
 			std::vector<ActionEvent> events;
 		};
+
+		class Networking
+		{
+		public:
+			Networking();
+			~Networking();
+			void Run(Engine::EngineStateManager& stateManager);
+		};
 	}
 }
