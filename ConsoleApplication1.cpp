@@ -507,7 +507,6 @@ struct Player {
 	}
 };
 
-
 //Hexboard AI 
 //-Piece toMove
 //- double cost;
@@ -584,25 +583,46 @@ int runGame(Player player, Player cpu) {
 
 int main()
 {
-	GridLocation start = GridLocation{ 4,1 };
-	GridLocation goal = GridLocation{ 5,3 };
+	GridLocation start = GridLocation{ 0,0 };
+	GridLocation goal = GridLocation{ 9,4 };
 	std::unordered_map<GridLocation, GridLocation> came_from;
 	std::unordered_map<GridLocation, double> cost_so_far;
 
-	/*GridWithWeights test = testWeightedSquareGrid();
+	GridWithWeights test = testWeightedSquareGrid();
 	dijkstra_search(test, start, came_from, cost_so_far);
-	draw_grid(test, 10, &cost_so_far);*/
-	
-	HexGrid hexGrid = HexGrid(7, 7);
-	dijkstra_search(hexGrid, start, came_from, cost_so_far);
+	draw_grid(test, 10, &cost_so_far);
+
+	std::cout << "\n";
+
+	std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
+	draw_grid(test, 10, NULL, NULL, &path);
+
+	std::cout << "\n";
+
+	std::unordered_map<GridLocation, GridLocation> came_from_;
+	std::unordered_map<GridLocation, double> cost_so_far_;
+	a_star_search(test, start, goal, came_from_, cost_so_far_);
+	draw_grid(test, 10, &cost_so_far_);
+
+	std::cout << "\n";
+
+	path = reconstruct_path(start, goal, came_from_);
+	draw_grid(test, 10, NULL, NULL, &path);
+
+	//std::cout << "\n";
+
+	//draw_grid(test, 10, &cost_so_far_);
+	//draw_grid(test, 10, &came_from);
+
+	//HexGrid hexGrid = HexGrid(7, 7);
+	//dijkstra_search(hexGrid, start, came_from, cost_so_far);
 	//draw_grid(hexGrid, 10);
 	//draw_grid(hexGrid, 10, &cost_so_far);
 	//draw_grid(hexGrid, 10, 0 , &came_from);
-
-	std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
-	draw_grid(hexGrid, 10, 0, 0, &path);
-	GridLocation moveTo = movement(path, 1.0, cost_so_far);
-	std::cout << moveTo;
+	//std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
+	//draw_grid(hexGrid, 10, 0, 0, &path);
+	//GridLocation moveTo = movement(path, 1.0, cost_so_far);
+	//std::cout << moveTo;
 	return 0;
 }
 
@@ -615,11 +635,10 @@ Combat AI
 */
 
 template<typename Graph>
-bool combatAI(Graph board, GridLocation cpu, GridLocation player) {
+std::vector<GridLocation> combatAI(Graph board, GridLocation cpu, GridLocation player) {
 	std::unordered_map<GridLocation, GridLocation> came_from;
 	std::unordered_map<GridLocation, double> cost_so_far;
 	a_star_search(board, cpu, player, came_from, cost_so_far);
 
-	std::vector<GridLocation> path = reconstruct_path(start, goal, came_from);
-
+	return reconstruct_path(cpu, player, came_from);
 }
