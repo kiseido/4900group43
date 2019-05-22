@@ -166,10 +166,15 @@ namespace {
 }
 
 
-void Renderer::RenderState(ECS::Engine::EngineState& state) {
+void Renderer::Clear() {
     UpdateCamera();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+
+void Renderer::RenderState(ECS::Engine::EngineState& state) {
+    Clear();
     RenderAll(state, ECS::ComponentMask::None_m, false, true);
 }
 
@@ -401,8 +406,12 @@ void Renderer::RenderAll(ECS::Engine::EngineState& state, ECS::ComponentMask com
 
 void Renderer::RenderEntity(ECS::Engine::EngineState& state, ECS::EntityID eid, bool board) {
     Model* model = board ? state.BoardModels.getComponent(eid) : state.BoardModels.getComponent(eid);
-    SetRenderingModel(model);
     Transform* transform = board ? state.BoardTransforms.getComponent(eid) : state.BoardTransforms.getComponent(eid);
+    Render(model, transform);
+}
+
+void Renderer::Render(Model* model, Transform* transform) {
+    SetRenderingModel(model);
 
     Transformer::CalcTNet(transform);
     glm::mat4 tnet = camMat * transform->tNet;

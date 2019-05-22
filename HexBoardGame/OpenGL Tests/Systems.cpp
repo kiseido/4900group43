@@ -209,4 +209,32 @@ namespace ECS {
 		//	}
 		//}
 	}
+
+    
+    IntroSystem::IntroSystem() {
+        //Transformer::SetScale(&BaseTransform, glm::vec3(0.1, 0.1, 0.1));
+        BCIT_square_transform.parent = &BaseTransform;
+        BCIT_square_model = Resources::GetModel(BCITSquareModel);
+        BCIT_b_model = Resources::GetModel(BCITBModel);
+        BCIT_c_model = Resources::GetModel(BCITCModel);
+        BCIT_i_model = Resources::GetModel(BCITIModel);
+        BCIT_t_model = Resources::GetModel(BCITTModel);
+    }
+
+    void IntroSystem::Run(const EngineState& lastState, EngineState& newState) {
+        newState.BoardPositions = lastState.BoardPositions;
+        newState.BoardModels = lastState.BoardModels;
+        newState.BoardTransforms = lastState.BoardTransforms;
+        newState.BoardPieces = lastState.BoardPieces;
+        newState.BoardMovements = lastState.BoardMovements;
+        if (newState.WorldTime >= 5)
+            newState.status = EngineState::Board;
+        Renderer::Clear();
+        Renderer::Render(&BCIT_square_model, &BCIT_square_transform);
+        Renderer::Render(&BCIT_b_model, &BCIT_b_transform);
+        Renderer::Render(&BCIT_c_model, &BCIT_c_transform);
+        Renderer::Render(&BCIT_i_model, &BCIT_i_transform);
+        Renderer::Render(&BCIT_t_model, &BCIT_t_transform);
+        //Transformer::Rotate(&BCIT_square_transform, glm::vec3(0.05, 0, 0));
+    }
 }

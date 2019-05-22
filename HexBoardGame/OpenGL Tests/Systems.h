@@ -93,5 +93,23 @@ namespace ECS {
 		private:
 			std::vector<ActionEvent> events;
 		};
+
+        class IntroSystem : public System {
+            Transform BaseTransform;
+            Transform BCIT_Transform;
+            Transform BCIT_square_transform;
+            Transform BCIT_b_transform;
+            Transform BCIT_c_transform;
+            Transform BCIT_i_transform;
+            Transform BCIT_t_transform;
+            Model BCIT_square_model;
+            Model BCIT_b_model;
+            Model BCIT_c_model;
+            Model BCIT_i_model;
+            Model BCIT_t_model;
+        public:
+            IntroSystem();
+            void Run(const EngineState& lastState, EngineState& newState);
+        };
 	}
 }

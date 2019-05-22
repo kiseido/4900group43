@@ -179,7 +179,7 @@ namespace ECS {
 
 		state.PlayerTurn = Player1;
 
-		state.status = ECS::EngineState::Board;
+		state.status = ECS::EngineState::Intro;
 
 		GenerateBoard(state);
 
@@ -220,7 +220,12 @@ namespace ECS {
 		switch (currentState->status)
 		{
         case ECS::EngineState::Intro: {
+            currentState = &TimeLine.NewState();
+            lastState = &TimeLine.getPreviousState();
+            BasicCopyState(*lastState, *currentState);
+            currentState->WorldTime += timeToAdvanceBy;
 
+            introLogic.Run(*lastState, *currentState);
             return currentState->WorldTime;
         }
                                       break;

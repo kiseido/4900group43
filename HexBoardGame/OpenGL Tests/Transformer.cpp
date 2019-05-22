@@ -22,6 +22,7 @@ void Transformer::CalcTNet(Transform* transf) {
 
     Transform *curParent = transf->parent;
     while (curParent != 0) {
+        Transformer::CalcTNet(curParent);
         transf->tNet = transf->tNet * curParent->tNet;
         curParent = curParent->parent;
     }

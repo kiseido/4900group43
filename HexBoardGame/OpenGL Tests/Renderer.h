@@ -25,6 +25,8 @@ namespace Renderer
  
     void SetLight(glm::vec4 global_amb, glm::vec3 pos, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec);
     
+    void Clear();
+
     void RenderState(ECS::Engine::EngineState& state);
 
     void UpdateCamera();
@@ -33,6 +35,8 @@ namespace Renderer
     ECS::EntityID GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y), ECS::ComponentMask mask = ECS::None_m);
     void SetOutline(Model* model, uint8_t weight, glm::vec3 color);
     void RenderAll(ECS::Engine::EngineState& state, ECS::ComponentMask components = ECS::None_m, bool entitytocolor = false, bool outlinecheckk = false);
+    void Render(Model* model, Transform* transform);
+
 };
 
 struct RenderOptions {

@@ -40,6 +40,21 @@ Mesh* Resources::GetMesh(MeshID meshId) {
         case Piece1Mesh:
             Resources::MeshList[meshId] = LoadMesh("piece1.obj");
             break;
+        case BCITBMesh:
+            Resources::MeshList[meshId] = LoadMesh("BCIT_b.obj");
+            break;
+        case BCITCMesh:
+            Resources::MeshList[meshId] = LoadMesh("BCIT_c.obj");
+            break;
+        case BCITIMesh:
+            Resources::MeshList[meshId] = LoadMesh("BCIT_i.obj");
+            break;
+        case BCITTMesh:
+            Resources::MeshList[meshId] = LoadMesh("BCIT_t.obj");
+            break;
+        case BCITSquareMesh:
+            Resources::MeshList[meshId] = LoadMesh("BCIT_square.obj");
+            break;
         default:
             Resources::MeshList[meshId] = nullptr;
         }
@@ -71,6 +86,12 @@ Texture Resources::GetTexture(TextureID textureId) {
         case Piece1Texture:
             Resources::TextureList[textureId] = LoadTexture("wood.jpg");
             break;
+        case BCITSquareTexture:
+            Resources::TextureList[textureId] = LoadTexture("blue.jpg");
+            break;
+        case BCITLetterTexture:
+            Resources::TextureList[textureId] = LoadTexture("white.jpg");
+            break;
         default:
             Resources::TextureList[textureId] = 0;
         }
@@ -100,6 +121,21 @@ Model Resources::GetModel(ModelID modelId) {
         break;
     case Piece1Model:
         return Model(Piece1Mesh, Piece1Texture);
+        break;
+    case BCITSquareModel:
+        return Model(BCITSquareMesh, BCITSquareTexture);
+        break;
+    case BCITBModel:
+        return Model(BCITBMesh, BCITLetterTexture);
+        break;
+    case BCITCModel:
+        return Model(BCITCMesh, BCITLetterTexture);
+        break;
+    case BCITIModel:
+        return Model(BCITIMesh, BCITLetterTexture);
+        break;
+    case BCITTModel:
+        return Model(BCITTMesh, BCITLetterTexture);
         break;
     default:
         return Model();

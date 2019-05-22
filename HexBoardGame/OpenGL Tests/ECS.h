@@ -36,6 +36,8 @@ namespace ECS {
 		GameType gameType;
 		EngineStateManager TimeLine;
 
+        IntroSystem introLogic;
+
 		PausedSystemsPack pausedLogic;
 		BoardSystemsPack boardLogic;
 		CombatSystemsPack combatLogic;
