@@ -21,7 +21,8 @@ namespace ECS {
         Transform* boardTransform;
         Model* boardModel;
 		BoardPosition* boardPosition;
-		BoardSpeed* boardSpeed;
+        BoardPiece* boardPiece;
+		BoardMovement* boardMovement;
 
         Transform* combatTransform;
 		Momentum* momentum;

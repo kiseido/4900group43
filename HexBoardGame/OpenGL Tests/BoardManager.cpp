@@ -1,11 +1,12 @@
 #include "BoardManager.h"
 #include "Utils.h"
+#include "Transformer.h"
 
 float cos60 = glm::cos(Utils::toRadians(60));
 float sin60 = glm::sin(Utils::toRadians(60));
 float spacing = 0.05;
 
-glm::vec3 BoardManager::GetTransformPosition(Board* board, int x, int y) {
+glm::vec3 BoardManager::GetTransformPosition(int x, int y) {
     return glm::vec3((1.0 + spacing) * 1.5 * cos60 * x, 0, (1.0 + spacing) * sin60 * (y + 0.5 * x));
 }
 
@@ -35,17 +36,7 @@ bool BoardManager::IsInRange(BoardPiece* piece, BoardPosition* source, BoardPosi
     return false;
 }
 
-void BoardManager::SetTransformPosition(EntityID eid, Board* board, int x, int y) {
-    Transformer::SetPosition(ECS_old::GetTransform(eid), BoardManager::GetTransformPosition(board, x, y));
+void BoardManager::SetTransformFromBoard(Transform* transform, BoardPosition* position) {
+    Transformer::SetPosition(transform, BoardManager::GetTransformPosition(position->x, position->y));
 }
 
-void BoardManager::SetBoardPosition(EntityID eid, Board* board, int x, int y, bool transform) {
-    ECS_old::SetBoardPosition(eid, GetPosition(board, x, y));
-    if (transform) {
-        SetTransformPosition(eid, board, x, y);
-    }
-}
-
-BoardPosition* BoardManager::GetPosition(Board* board, int x, int y) {
-    return board->board[board->radius + y][board->radius + x];
-}

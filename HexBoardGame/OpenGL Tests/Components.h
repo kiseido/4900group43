@@ -19,14 +19,15 @@ namespace ECS {
             Power_m =               1ui64 << 3,
 
             BoardTransform_m =      1ui64 << 5,
-            BoardModel_m =         1ui64 << 6,
+            BoardModel_m =          1ui64 << 6,
             BoardPosition_m =       1ui64 << 7,
-            BoardSpeed_m =         1ui64 << 8,
+            BoardPiece_m =          1ui64 << 8,
+            BoardMovement_m =       1ui64 << 9,
 
             CombatTransform_m =     1ui64 << 10,
             Momentum_m =            1ui64 << 11,
             RotationalMomentum_m =  1ui64 << 12,
-            CombatModel_m =        1ui64 << 13,
+            CombatModel_m =         1ui64 << 13,
             CombatCollisionBody_m = 1ui64 << 14,
             CombatSpeed_m =         1ui64 << 15,
 
@@ -34,7 +35,9 @@ namespace ECS {
 
             AiStatus_m =            1ui64 << 25,
 
-            TerrainType_m =         1ui64 << 30
+            TerrainType_m =         1ui64 << 30,
+
+            ControlPick_m =         1ui64 << 35
 		};
 
 		constexpr inline ComponentMask operator|(const ComponentMask& lhs, const ComponentMask& rhs){
@@ -52,7 +55,6 @@ namespace ECS {
 
 		typedef glm::vec3 CollisionBody;
 
-		typedef int BoardSpeed;
 		typedef int CombatSpeed;
 
 		typedef int Health;

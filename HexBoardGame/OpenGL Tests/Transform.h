@@ -1,9 +1,8 @@
 #pragma once
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include "Component.h"
 
-struct Transform : public Component
+struct Transform
 {
     Transform();
     ~Transform() = default;

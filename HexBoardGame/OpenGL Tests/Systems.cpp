@@ -1,5 +1,6 @@
 #include "ECS.h"
 #include "Renderer.h"
+#include "Window.h"
 
 
 namespace ECS {
@@ -16,6 +17,7 @@ namespace ECS {
         newState.BoardModels = lastState.BoardModels;
         newState.BoardTransforms = lastState.BoardTransforms;
         newState.BoardSpeeds = lastState.BoardSpeeds;
+        Renderer::SetOutline(newState.BoardModels.getComponent(Renderer::GetMouseEntity(newState, Window::GetMousePosition)), 10, Renderer::COLOR_GREEN);
         Renderer::RenderState(newState);
 		//std::cout << "BoardSystemsPack" << std::endl;
 	}

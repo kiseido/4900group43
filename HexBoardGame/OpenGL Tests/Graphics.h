@@ -3,7 +3,6 @@
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 #include "Transform.h"
-#include "Component.h"
 
 typedef GLuint Texture;
 
@@ -55,16 +54,16 @@ struct Material {
 
 
 
-struct Model : public Component {
+struct Model{
     Model() = default;
     Model(MeshID m, TextureID t, MaterialID mat = BasicMaterial);
-    Mesh* mesh;
-    Material* material;
-    Texture texture;
-    uint8_t outlineWeight;
-    glm::vec3 outlineColor;
-    float overlayAlpha;
-    glm::vec3 overlayColor;
+    Mesh* mesh = nullptr;
+    Material* material = nullptr;
+    Texture texture = 0;
+    uint8_t outlineWeight = 0;
+    glm::vec3 outlineColor = { 0,0,0 };
+    float overlayAlpha = 0;
+    glm::vec3 overlayColor = { 0,0,0 };
     ~Model() = default;
 };
 

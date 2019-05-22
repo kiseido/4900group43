@@ -1,6 +1,6 @@
 #pragma once
-#include "ECS_old.h"
-#include <GLFW\glfw3.h>
+#include "GL/glew.h"
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "ECS.h"
 
@@ -25,15 +25,14 @@ namespace Renderer
  
     void SetLight(glm::vec4 global_amb, glm::vec3 pos, glm::vec4 amb, glm::vec4 diff, glm::vec4 spec);
     
-    void RenderScene();
-    void RenderState(ECS::Engine::EngineState state);
+    void RenderState(ECS::Engine::EngineState& state);
 
     void UpdateCamera();
-    void RenderEntity(EntityID eid);
-    void RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, bool board);
-    void RenderOutline(EntityID eid, float width, glm::vec3 color);
-    EntityID GetMouseEntity(GLint mouseX, GLint mouseY);
-    void RenderAll(ComponentID components = 0, bool entitytocolor = false);
+    void RenderEntity(ECS::Engine::EngineState& state, ECS::EntityID eid, bool board);
+    ECS::EntityID GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY);
+    ECS::EntityID GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y));
+    void SetOutline(Model* model, uint8_t weight, glm::vec3 color);
+    void RenderAll(ECS::Engine::EngineState& state, ECS::ComponentMask components = ECS::None_m, bool entitytocolor = false, bool outlinecheckk = false);
 };
 
 struct RenderOptions {

@@ -166,23 +166,11 @@ namespace {
 }
 
 
-void Renderer::RenderScene() {
+void Renderer::RenderState(ECS::Engine::EngineState& state) {
+    UpdateCamera();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    RenderAll(0, true);
-}
-
-
-void Renderer::RenderState(ECS::Engine::EngineState state) {
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    if (state.status == ECS::EngineState::Board) {
-        for (ECS::EntityID eid : state.EntityIDs) {
-            if (*state.ComponentMasks.getComponent(eid) & (ECS::BoardModel_m | ECS::BoardTransform_m)) {
-                RenderEntity(state, eid, true);
-            }
-        }
-    }
+    RenderAll(state, ECS::ComponentMask::None_m, false, true);
 }
 
 
@@ -298,17 +286,17 @@ void Renderer::UpdateCamera() {
 
 
 
-glm::vec3 EntityToColor(EntityID entity) {
+glm::vec3 EntityToColor(ECS::EntityID entity) {
     uint8_t r = entity & 255;
     uint8_t g = (entity >> 8) & 255;
     uint8_t b = (entity >> 16) & 255;
     return glm::vec3(r/255.0, g/255.0, b/255.0);
 }
-EntityID ColorToEntity(glm::vec3 color) {
+ECS::EntityID ColorToEntity(glm::vec3 color) {
     uint8_t r = uint8_t(color.x * 255);
     uint8_t g = uint8_t(color.y * 255);
     uint8_t b = uint8_t(color.z * 255);
-    EntityID eid = b;
+    ECS::EntityID eid = b;
     eid = eid << 8;
     eid = eid | g;
     eid = eid << 8;
@@ -316,23 +304,22 @@ EntityID ColorToEntity(glm::vec3 color) {
     return eid;
 }
 
-EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
+ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, bool callback(double& X, double& Y)) {
+    double X, Y;
+    callback(X, Y);
+    return GetMouseEntity(state, X, Y);
+}
+ECS::EntityID Renderer::GetMouseEntity(ECS::EngineState& state, GLint mouseX, GLint mouseY) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_SCISSOR_TEST);
     glScissor(mouseX, mouseY, 1, 1);
-    EntityID totalEntities = ECS_old::GetEntityCount();
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
-    for (EntityID eid = 0; eid < totalEntities; eid++) {
-        if (ECS_old::HasComponents(eid, ComponentPick | ComponentTransform | ComponentModel)) {
-            SetRenderOptionsColor(EntityToColor(eid));
-            RenderEntity(eid);
-        }
-    }
+    RenderAll(state, ECS::ComponentMask::ControlPick_m, true);
     unsigned char pixel[4];
     glReadPixels (mouseX, mouseY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-    EntityID mouseEntityId = ColorToEntity(glm::vec3(pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0));
+    ECS::EntityID mouseEntityId = ColorToEntity(glm::vec3(pixel[0] / 255.0, pixel[1] / 255.0, pixel[2] / 255.0));
     glDisable(GL_SCISSOR_TEST);
     SetRenderOptionsSpecial(0);
     SetRenderOptionsLighting(1);
@@ -340,23 +327,22 @@ EntityID Renderer::GetMouseEntity(GLint mouseX, GLint mouseY) {
 }
 
 
-void Renderer::RenderAll(ComponentID components, bool entitytocolor) {
-    EntityID totalEntities = ECS_old::GetEntityCount();
-    for (EntityID eid = 0; eid < totalEntities; eid++) {
-        if (ECS_old::HasComponents(eid, components | ComponentTransform | ComponentModel)) {
-            if(entitytocolor)
-                SetRenderOptionsColor(EntityToColor(eid));
-            RenderEntity(eid);
-        }
+void RenderOutlines(ECS::EngineState& state, std::vector<ECS::EntityID> eidlist) {
+    ECS::ComponentContainer<Model>* modelcontainer = nullptr;
+    if (state.status == ECS::EngineState::Board) {
+        modelcontainer = &state.BoardModels;
     }
-}
+    else if (state.status == ECS::EngineState::Combat) {
+        modelcontainer = &state.CombatModels;
+    }
 
-void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
     glColorMask(0, 0, 0, 0);
-    RenderEntity(eid);
+    for (ECS::EntityID eid : eidlist) {
+        Renderer::RenderEntity(state, eid, state.status == ECS::EngineState::Board);
+    }
     glColorMask(1, 1, 1, 1);
 
 
@@ -364,10 +350,17 @@ void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
     glStencilMask(0x01);
     SetRenderOptionsSpecial(2);
     SetRenderOptionsLighting(0);
-    SetRenderOptionsColor(color);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth(width);
-    RenderEntity(eid);
+    Model* model = nullptr;
+    for (ECS::EntityID eid : eidlist) {
+        model = modelcontainer->getComponent(eid);
+        if (!model)
+            continue;
+        SetRenderOptionsColor(model->outlineColor);
+        glLineWidth(model->outlineWeight);
+        model->outlineWeight = 0;
+        Renderer::RenderEntity(state, eid, state.status == ECS::EngineState::Board);
+    }
 
     
     glEnable(GL_DEPTH_TEST);
@@ -378,22 +371,34 @@ void Renderer::RenderOutline(EntityID eid, float width, glm::vec3 color) {
 
 }
 
-void Renderer::RenderEntity(EntityID eid) {
-    if (ECS_old::HasComponents(eid, ComponentTransform | ComponentModel)) {
-        Model* model = ECS_old::GetModel(eid);
-        SetRenderingModel(model);
-
-        Transformer::CalcTNet(ECS_old::GetTransform(eid));
-        glm::mat4 tnet = camMat * ECS_old::GetTransform(eid)->tNet;
-        glm::mat4 invTrMat = glm::transpose(glm::inverse(tnet));
-        glUniformMatrix4fv(tnetLoc, 1, GL_FALSE, glm::value_ptr(tnet));
-        glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
-
-        glDrawArrays(GL_TRIANGLES, 0, model->mesh->numVertices);
+void Renderer::RenderAll(ECS::Engine::EngineState& state, ECS::ComponentMask components, bool entitytocolor, bool outlinecheck) {
+    ECS::ComponentMask transformmodel = ECS::ComponentMask::None_m;
+    ECS::ComponentContainer<Model>* modelcontainer = nullptr;
+    if (state.status == ECS::EngineState::Board) {
+        transformmodel = transformmodel | ECS::ComponentMask::BoardTransform_m | ECS::ComponentMask::BoardModel_m;
+        modelcontainer = &state.BoardModels;
     }
+    else if (state.status == ECS::EngineState::Combat) {
+        transformmodel = transformmodel | ECS::ComponentMask::CombatTransform_m | ECS::ComponentMask::CombatModel_m;
+        modelcontainer = &state.CombatModels;
+    }
+    components = components | transformmodel;
+    std::vector<ECS::EntityID> outlines;
+    for (ECS::EntityID eid : state.EntityIDs) {
+        if ((*state.ComponentMasks.getComponent(eid) & components) == components) {
+            if (entitytocolor)
+                SetRenderOptionsColor(EntityToColor(eid));
+            if (outlinecheck && modelcontainer->getComponent(eid)->outlineWeight > 0)
+                outlines.push_back(eid);
+            RenderEntity(state, eid, true);
+        }
+    }
+    if(outlines.size() > 0)
+        RenderOutlines(state, outlines);
 }
 
-void Renderer::RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, bool board) {
+
+void Renderer::RenderEntity(ECS::Engine::EngineState& state, ECS::EntityID eid, bool board) {
     Model* model = board ? state.BoardModels.getComponent(eid) : state.BoardModels.getComponent(eid);
     SetRenderingModel(model);
     Transform* transform = board ? state.BoardTransforms.getComponent(eid) : state.BoardTransforms.getComponent(eid);
@@ -405,4 +410,11 @@ void Renderer::RenderEntity(ECS::Engine::EngineState state, ECS::EntityID eid, b
     glUniformMatrix4fv(normalLoc, 1, GL_FALSE, glm::value_ptr(invTrMat));
 
     glDrawArrays(GL_TRIANGLES, 0, model->mesh->numVertices);
+}
+
+void Renderer::SetOutline(Model* model, uint8_t weight, glm::vec3 color) {
+    if (!model)
+        return;
+    model->outlineWeight = weight;
+    model->outlineColor = color;
 }

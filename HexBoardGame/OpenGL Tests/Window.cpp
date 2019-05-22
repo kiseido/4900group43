@@ -1,6 +1,5 @@
 #include "Window.h"
 #include "Renderer.h"
-#include "Game_old.h"
 #include "Utils.h"
 
 namespace {
@@ -30,14 +29,6 @@ GLFWwindow* Window::Init() {
     glfwGetFramebufferSize(mainWindow, &width, &height);
     aspect = (float)width / (float)height;
     Renderer::SetAspectRatio(aspect);
-}
-
-void Window::Start() {
-    while (!glfwWindowShouldClose(mainWindow)) {
-        Game_old::GameLoop(Window::GetTime());
-        Window::Update();
-    }
-    Window::Close();
 }
 
 double Window::GetTime() {
@@ -86,10 +77,10 @@ void Window::window_size_callback(GLFWwindow* win, int newWidth, int newHeight) 
 
 void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        Game_old::MouseLeftClick();
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        Game_old::MouseRightClick();
+    //if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        //Game_old::MouseLeftClick();
+    //else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+        //Game_old::MouseRightClick();
 }
 
 void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

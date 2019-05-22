@@ -96,7 +96,8 @@ namespace ECS {
             ComponentContainer<Transform> BoardTransforms;
             ComponentContainer<Model> BoardModels;
 			ComponentContainer<BoardPosition> BoardPositions;
-            ComponentContainer<BoardSpeed> BoardSpeeds;
+            ComponentContainer<BoardPiece> BoardPieces;
+            ComponentContainer<BoardMovement> BoardMovements;
 
             //Combat
             ComponentContainer<Transform> CombatTransforms;

@@ -4,21 +4,20 @@
 namespace ECS {
 
 	enum Entity_templates : Mask_t {
-		BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m,
+		BoardTileTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | TerrainType_m | ControlPick_m,
 		BoardPieceTemplate = BoardTransform_m | BoardModel_m | BoardPosition_m | Health_m | Power_m | BoardSpeed_m | TeamAffiliation_m,
 		CombatPieceTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Health_m,
 		CombatBulletTemplate = CombatTransform_m | CombatModel_m | Momentum_m | RotationalMomentum_m | CombatCollisionBody_m | Damage_m
 	};
 	
 
-	Entity makeBoardTile(EngineState& state, ModelID model, TerrainType type, BoardPosition pos) {
-		const ComponentMask mask = (ComponentMask) BoardTileTemplate;
-		auto entity = state.NewEntity(mask);
+    Entity makeBoardTile(EngineState& state, ModelID model, TerrainType type, BoardPosition pos) {
+        const ComponentMask mask = (ComponentMask)BoardTileTemplate;
+        auto entity = state.NewEntity(mask);
 
         *entity.boardModel = Resources::GetModel(model);
-		*entity.boardPosition = pos;
-		*entity.terrainType = type;
-
+        *entity.boardPosition = pos;
+        *entity.terrainType = type;
 		return entity;
 	}
 	

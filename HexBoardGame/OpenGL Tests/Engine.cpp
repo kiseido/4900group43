@@ -53,7 +53,7 @@ namespace ECS {
         e.boardTransform = (mask & BoardTransform_m) ? BoardTransforms.getComponent(id) : nullptr;
         e.boardModel = (mask & BoardModel_m) ? BoardModels.getComponent(id) : nullptr;
         e.boardPosition = (mask & BoardPosition_m) ? BoardPositions.getComponent(id) : nullptr;
-        e.boardSpeed = (mask & BoardSpeed_m) ? BoardSpeeds.getComponent(id) : nullptr;
+        e.boardMovement = (mask & BoardMovement_m) ? BoardMovements.getComponent(id) : nullptr;
 
         e.combatTransform = (mask & CombatTransform_m) ? CombatTransforms.getComponent(id) : nullptr;
         e.momentum = (mask & Momentum_m) ? Momentums.getComponent(id) : nullptr;
@@ -126,9 +126,12 @@ namespace ECS {
             if (addMaskCheck(BoardTransform_m)) {
                 BoardTransforms.setComponent(id, Transform{});
             }
-			if (addMaskCheck(BoardSpeed_m)) {
-				BoardSpeeds.setComponent(id, DefaultSpeed);
-			}
+            if (addMaskCheck(BoardPiece_m)) {
+                BoardPieces.setComponent(id, {0});
+            }
+            if (addMaskCheck(BoardMovement_m)) {
+                BoardMovements.setComponent(id, DefaultSpeed);
+            }
             if (addMaskCheck(CombatTransform_m)) {
                 CombatTransforms.setComponent(id, Transform{});
             }
@@ -183,8 +186,11 @@ namespace ECS {
             if (removeMaskCheck(BoardTransform_m)) {
                 BoardTransforms.removeComponent(id);
             }
-            if (removeMaskCheck(BoardSpeed_m)) {
-                BoardSpeeds.removeComponent(id);
+            if (removeMaskCheck(BoardPiece_m)) {
+                BoardPieces.removeComponent(id);
+            }
+            if (removeMaskCheck(BoardMovement_m)) {
+                BoardMovements.removeComponent(id);
             }
             if (removeMaskCheck(CombatTransform_m)) {
                 CombatTransforms.removeComponent(id);

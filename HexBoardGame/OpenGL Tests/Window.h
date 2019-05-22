@@ -8,7 +8,6 @@
 
 namespace Window {
     GLFWwindow* Init();
-    void Start();
     void Close();
 
     bool GetMousePosition(double &mouseX, double &mouseY);

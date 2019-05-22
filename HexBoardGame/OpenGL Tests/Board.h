@@ -1,8 +1,7 @@
 #pragma once
-#include "Component.h"
 #include <vector>
 
-class BoardPosition : public Component
+class BoardPosition
 {
 public:
     int x, y;
@@ -11,11 +10,16 @@ public:
     ~BoardPosition() = default;
 };
 
-struct BoardPiece : public Component
-{
+struct BoardPiece {
     BoardPiece(int moves);
     int maxMoves;
     int movesLeft;
+};
+
+struct BoardMovement {
+    int startX, startY, nextX, nextY, endX, endY;
+    float speed = 1;
+    float lerp = 0;
 };
 
 struct Board {
